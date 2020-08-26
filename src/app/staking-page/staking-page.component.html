@@ -1,0 +1,229 @@
+<div class="content-container">
+  <div class="content-block" [ngClass]="{'no-active': !account}">
+    <div class="content-block_title">
+      <span>Create deposit</span>
+      <span class="content-block_title_help"></span>
+    </div>
+    <div class="blocks-list without-arrow_separator">
+      <form #depositForm="ngForm" class="width-66 blocks-list_new-item" [ngClass]="{disabled: depositTokensProgress}">
+        <div class="blocks-list_element deposit-form">
+          <div class="blocks-list_item no-padding">
+            <div class="form-groups-list">
+              <div class="form-group width-66">
+                <div class="form-group_title uppercase">Enter deposit amount</div>
+                <div class="form-group_big-input">
+                  <input type="text"
+                         *ngIf="account"
+                         autocomplete="off"
+                         required="required"
+                         [appBigNumber]="{
+                            decimals: tokensDecimals['HEX2X'],
+                            min: 1,
+                            max: account.balances.HEX2X.wei
+                         }"
+                         name="deposit-amount"
+                         placeholder="0"
+                         [maxValueChange]="onChangeAccount"
+                         [(ngModel)]="formsData.depositAmount">
+                </div>
+                <div class="blocks-list_item_currency blocks-list_item_currency__axn">
+                  <span>AXN</span>
+                </div>
+                <div class="blocks-list_item_btn">
+                  <button (click)="formsData.depositAmount = account?.balances.HEX2X.shortBigNumber.toString()">
+                    Send max
+                  </button>
+                </div>
+              </div>
+              <div class="form-group width-33">
+                <div class="form-group_title uppercase">Set deposit period</div>
+                <div class="form-group_big-input">
+                  <input type="number" step="1"
+                         autocomplete="off"
+                         [appMinMaxNumber]="{
+                            min: 1,
+                            max: depositMaxDays
+                         }"
+                         min="1"
+                         [max]="depositMaxDays"
+                         placeholder="1"
+                         required="required"
+                         name="deposit-days"
+                         [(ngModel)]="formsData.depositDays">
+                </div>
+
+                <div class="blocks-list_item_btn without-arrow">
+                  <span class="as-button">Day</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="blocks-list_element">
+          <div class="staking-info-table">
+            <div class="staking-info-table_cell">
+              <div class="staking-info-table_value">{{ stakingContractInfo.StepsFromStart || 0 }}</div>
+              <div class="staking-info-table_label uppercase">Day from start</div>
+            </div>
+            <div class="staking-info-table_cell">
+              <div class="staking-info-table_value">{{ stakeDays }}</div>
+              <div class="staking-info-table_label uppercase">Last active day</div>
+            </div>
+            <div class="staking-info-table_cell">
+              <div class="staking-info-table_value">{{ stakeDays + 1 }}</div>
+              <div class="staking-info-table_label uppercase">Pay day</div>
+            </div>
+            <div class="staking-info-table_cell no-border">
+              <button class="btn btn__normal uppercase nowrap" (click)="openDeposit()"
+                      [ngClass]="{progress: depositTokensProgress}"
+                      [disabled]="depositForm.invalid || depositDaysInvalid">
+                <span class="lds-ellipsis" *ngIf="depositTokensProgress">
+                  <span class="lds-ellipsis-container">
+                    <span></span><span></span><span></span><span></span>
+                  </span>
+                </span>
+                <span>&nbsp;&nbsp;Open deposit&nbsp;&nbsp;</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+      <div class="width-33 blocks-list_new-item">
+        <div class="blocks-list_element">
+          <div class="blocks-list_item no-padding">
+            <div class="blocks-list_item_title uppercase">Longer pays better bonus</div>
+            <div class="blocks-list_item_value blocks-list_item_value__positive" fittext [maxFontSize]="38">
+              {{ bonusLongerPays | bigNumberFormat : tokensDecimals.HEX2X : true : false : 4 }}
+            </div>
+            <div class="blocks-list_item_currency blocks-list_item_currency__axn">
+              <span>AXN</span>
+            </div>
+          </div>
+        </div>
+        <div class="blocks-list_element">
+          <div class="blocks-list_item no-padding">
+            <div class="blocks-list_item_title uppercase">Shares</div>
+            <div class="blocks-list_item_value" fittext [maxFontSize]="38">
+              {{ userShares | bigNumberFormat : tokensDecimals.HEX2X : true : false : 4 }}
+            </div>
+            <div class="blocks-list_item_title uppercase">
+              Share rate {{ stakingContractInfo.ShareRate || 0 }}
+            </div>
+          </div>
+        </div>
+
+        <div class="blocks-list_element">
+          <div class="blocks-list_item no-padding">
+            <div class="blocks-list_item_title uppercase">Big pay day pool</div>
+            <div class="blocks-list_item_description">Stake for 350 days or more and get bonus revenue</div>
+            <div class="blocks-list_item_values">
+              <div class="blocks-list_item_values_item">
+                <div class="blocks-list_item_value inherit-align" fittext [maxFontSize]="38">1200</div>
+                <div class="blocks-list_item_label uppercase">Shares</div>
+              </div>
+              <div class="blocks-list_item_values_item">
+                <div class="blocks-list_item_value inherit-align" fittext [maxFontSize]="38">1200000</div>
+                <div class="blocks-list_item_label uppercase">AXN</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-block" *ngIf="depositsLists?.opened.length && tokensDecimals">
+    <div class="content-block_title text-left">
+      <span>Opened deposits</span>
+    </div>
+    <table class="standard-table" cellpadding="0" cellspacing="0" border="0">
+      <thead>
+      <tr>
+        <th (click)="sortDeposits('opened', 'start')" class="as-sort"
+            [ngClass]="{active: currentSort['opened']['field'] === 'start', ask: currentSort['opened']['ask']}">
+          Start date
+          <span class="sort-indicator"></span>
+        </th>
+        <th (click)="sortDeposits('opened', 'end')" class="as-sort"
+            [ngClass]="{active: currentSort['opened']['field'] === 'end', ask: currentSort['opened']['ask']}">
+          End date
+          <span class="sort-indicator"></span>
+        </th>
+        <th (click)="sortDeposits('opened', 'progress')" class="as-sort"
+            [ngClass]="{active: currentSort['opened']['field'] === 'progress', ask: currentSort['opened']['ask']}">
+          Progress
+          <span class="sort-indicator"></span>
+        </th>
+        <th (click)="sortDeposits('opened', 'amount')" class="as-sort"
+            [ngClass]="{active: currentSort['opened']['field'] === 'amount', ask: currentSort['opened']['ask']}">
+          Principal
+          <span class="sort-indicator"></span>
+        </th>
+        <th (click)="sortDeposits('opened', 'shares')" class="as-sort"
+            [ngClass]="{active: currentSort['opened']['field'] === 'shares', ask: currentSort['opened']['ask']}">
+          Shares
+          <span class="sort-indicator"></span>
+        </th>
+        <th>BigPayDay</th>
+        <th>Interest</th>
+        <th width="10">&nbsp;</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let deposit of depositsLists.opened">
+        <td>{{deposit.start | date : 'dd.MM.yyyy'}}</td>
+        <td>{{deposit.end | date : 'dd.MM.yyyy'}}</td>
+        <td>{{getProgress(deposit)}}%</td>
+        <td>{{deposit.amount | bigNumberFormat : tokensDecimals['HEX2X'] : true : false : 5}}&nbsp;AXN</td>
+        <td>{{deposit.shares | bigNumberFormat : tokensDecimals['HEX2X'] : true : false : 5}}</td>
+        <td></td>
+        <td></td>
+        <td class="action-button">
+          <button class="btn btn__normal" (click)="depositWithdraw(deposit)"
+                  [ngClass]="{progress: deposit.withdrawProgress}"
+                  [disabled]="deposit.withdrawProgress">
+                <span class="lds-ellipsis" *ngIf="deposit.withdrawProgress">
+                  <span class="lds-ellipsis-container">
+                    <span></span><span></span><span></span><span></span>
+                  </span>
+                </span>
+            <span>&nbsp;&nbsp;Withdraw&nbsp;&nbsp;</span>
+          </button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="content-block" *ngIf="depositsLists?.closed.length && tokensDecimals">
+    <div class="content-block_title text-left">
+      <span>Deposit history</span>
+    </div>
+    <table class="standard-table" cellpadding="0" cellspacing="0" border="0">
+      <thead>
+      <tr>
+        <th>Start date</th>
+        <th>End date</th>
+        <th>Progress</th>
+        <th>Principal</th>
+        <th>Shares</th>
+        <th>BigPayDay</th>
+        <th>Interest</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let deposit of depositsLists.closed">
+        <td>{{deposit.start | date : 'dd.MM.yyyy'}}</td>
+        <td>{{deposit.end | date : 'dd.MM.yyyy'}}</td>
+        <td>{{getProgress(deposit)}}%</td>
+        <td>{{deposit.amount | bigNumberFormat : tokensDecimals['HEX2X'] : true : false : 5}}</td>
+        <td>{{deposit.shares | bigNumberFormat : tokensDecimals['HEX2X'] : true : false : 5}}</td>
+        <td></td>
+        <td></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+

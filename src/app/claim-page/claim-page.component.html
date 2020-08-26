@@ -1,0 +1,160 @@
+<div class="content-container">
+  <div class="content-block" [ngClass]="{'no-active': !account}">
+    <div class="content-block_title">
+      <span>HEX > Axion</span>
+      <span class="content-block_title_help"></span>
+    </div>
+    <div class="blocks-list">
+      <div class="blocks-list_element width-33">
+        <div class="blocks-list_item">
+          <div class="blocks-list_item_title uppercase">Your Amount</div>
+          <div class="blocks-list_item_value" fittext [maxFontSize]="38">50,879,777,143.4973</div>
+          <div class="blocks-list_item_currency blocks-list_item_currency__hex">
+            <span>HEX</span>
+          </div>
+        </div>
+      </div>
+      <div class="blocks-list_group blocks-list_element width-66">
+        <div class="list">
+          <div class="blocks-list_item">
+            <div class="blocks-list_item_title uppercase">For Claim</div>
+            <div class="blocks-list_item_value blocks-list_item_value__positive" fittext [maxFontSize]="38">50,879,777,143.4973</div>
+            <div class="blocks-list_item_currency blocks-list_item_currency__axn">
+              <span>AXN</span>
+            </div>
+          </div>
+          <div class="blocks-list_item">
+            <div class="blocks-list_item_title uppercase">Penalty</div>
+            <div class="blocks-list_item_value blocks-list_item_value__negative" fittext [maxFontSize]="38">50,879,777,143.4973</div>
+            <div class="blocks-list_item_currency blocks-list_item_currency__axn">
+              <span>AXN</span>
+            </div>
+          </div>
+        </div>
+        <div class="blocks-list_group_btn">
+          <button class="btn btn__normal">
+            Claim
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="content-block uppercase" [ngClass]="{'no-active': !account}">
+    <div class="content-block_title">
+      <span>H2T > H2X</span>
+      <span class="content-block_title_help"></span>
+    </div>
+
+    <form #sendForm="ngForm" class="blocks-list">
+      <div class="blocks-list_group blocks-list_element blocks-list_form-group width-45">
+        <div class="list">
+          <div class="blocks-list_item" *ngIf="account?.balances.H2T.display">
+            <div class="blocks-list_item_title nowrap">Your amount</div>
+            <div class="blocks-list_item_value" fittext [maxFontSize]="38">
+              {{account ? account?.balances.H2T.display || 0 : 0}}
+            </div>
+            <div class="blocks-list_item_currency blocks-list_item_currency__h2t">
+              <span>H2T</span>
+            </div>
+          </div>
+          <div class="blocks-list_item" [ngClass]="{disabled: swapTokensProgress}">
+            <div class="blocks-list_item_title">Send to Swap</div>
+            <div class="form-group">
+              <div class="form-group_title">Enter amount</div>
+              <div class="form-group_input">
+                <input type="text"
+                       *ngIf="account"
+                       required="required"
+                       [appBigNumber]="{
+                          decimals: tokensDecimals['H2T'],
+                          min: 1,
+                          max: account?.balances.H2T.wei
+                       }"
+                       [maxValueChange]="onChangeAccount"
+                       [(ngModel)]="formsData.swapAmount"
+                       name="swap-amount">
+                <div class="form-group_input-btn">
+                  <button (click)="formsData.swapAmount = account?.balances.H2T.shortBigNumber.toString()">Send<br/>max</button>
+                </div>
+              </div>
+            </div>
+            <div class="blocks-list_group_btn without-margin">
+              <button class="btn btn__normal"
+                      [ngClass]="{progress: swapTokensProgress}"
+                      [disabled]="sendForm.invalid || swapTokensProgress" (click)="swapH2T()">
+                <span class="lds-ellipsis" *ngIf="swapTokensProgress">
+                  <span class="lds-ellipsis-container">
+                    <span></span><span></span><span></span><span></span>
+                  </span>
+                </span>
+                <span>Send</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="blocks-list_element width-20" [ngClass]="{'in-update': updateSwapBalanceProgress}">
+        <div class="blocks-list_item">
+          <div class="blocks-list_item_title">SWAP Contract</div>
+          <div class="blocks-list_item_value" fittext [maxFontSize]="38">
+            {{(swapContractBalance || 0) | bigNumberFormat : 0 : true : false : false}}
+          </div>
+          <div class="blocks-list_item_currency blocks-list_item_currency__h2t">
+            <span>H2T</span>
+          </div>
+        </div>
+
+        <div class="blocks-list_group_btn">
+          <button class="btn btn__transparent"
+                  (click)="withdrawH2T()"
+                  [ngClass]="{progress: withdrawH2TProgress}"
+                  [disabled]="+swapContractBalance === 0 || withdrawH2TProgress">
+            <span class="lds-ellipsis" *ngIf="withdrawH2TProgress">
+              <span class="lds-ellipsis-container">
+                <span></span><span></span><span></span><span></span>
+              </span>
+            </span>
+            <span>Draw back</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="blocks-list_group blocks-list_element width-40">
+        <div class="list">
+          <div class="blocks-list_item width-50">
+            <div class="blocks-list_item_title">For Claim</div>
+            <div class="blocks-list_item_value blocks-list_item_value__positive" fittext [maxFontSize]="38">0</div>
+            <div class="blocks-list_item_currency blocks-list_item_currency__axn">
+              <span>AXN</span>
+            </div>
+          </div>
+          <div class="blocks-list_item width-50">
+            <div class="blocks-list_item_title">Penalty</div>
+            <div class="blocks-list_item_value blocks-list_item_value__negative" fittext [maxFontSize]="38">
+              50,879,777,143.4973
+            </div>
+            <div class="blocks-list_item_currency blocks-list_item_currency__axn">
+              <span>AXN</span>
+            </div>
+          </div>
+        </div>
+        <div class="blocks-list_group_btn">
+          <button class="btn btn__normal"
+                  (click)="burnH2T()"
+                  [ngClass]="{progress: burnTokensProgress}"
+                  [disabled]="burnTokensProgress">
+            <span class="lds-ellipsis" *ngIf="burnTokensProgress">
+              <span class="lds-ellipsis-container">
+                <span></span><span></span><span></span><span></span>
+              </span>
+            </span>
+            <span>Burn</span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
