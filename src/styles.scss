@@ -270,7 +270,7 @@ input:-internal-autofill-selected {
         background: url('./assets/images/styling/block-arrow.svg') center center no-repeat #4A2994;
         background-size: contain;
         left: -34px;
-        top: calc(50px + 1.7vw);
+        top: calc(50px + 15px);
         border-radius: 50%;
       }
     }
@@ -462,7 +462,11 @@ input:-internal-autofill-selected {
     background: linear-gradient(135deg,  #8b6bdf 0%,#6c44d6 100%);
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#8b6bdf', endColorstr='#6c44d6',GradientType=1 );
     color: #fff;
-    padding-right: 25px;
+    padding-right: 5px;
+    .blocks-list_item:first-child {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
   }
 
 

@@ -49,12 +49,14 @@ export class StakingPageComponent implements OnDestroy {
       if (!account || account.balances) {
         this.ngZone.run(() => {
           this.account = account;
+          window.dispatchEvent(new Event('resize'));
           if (account) {
             this.onChangeAccount.emit();
             this.contractService.getAccountStakes().then((res) => {
               this.depositsLists = res;
               this.applySort('opened');
               this.applySort('closed');
+              window.dispatchEvent(new Event('resize'));
             });
           }
         });

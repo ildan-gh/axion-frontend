@@ -30,12 +30,14 @@ export class ClaimPageComponent implements OnDestroy {
       if (!account || account.balances) {
         this.ngZone.run(() => {
           this.account = account;
+          window.dispatchEvent(new Event('resize'));
           if (account) {
             this.onChangeAccount.emit();
             this.updateSwapBalanceProgress = true;
             this.contractService.swapTokenBalanceOf().then((balance) => {
               this.swapContractBalance = balance;
               this.updateSwapBalanceProgress = false;
+              window.dispatchEvent(new Event('resize'));
             });
           }
         });

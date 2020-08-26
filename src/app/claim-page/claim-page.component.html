@@ -41,17 +41,17 @@
   </div>
 
 
-  <div class="content-block uppercase" [ngClass]="{'no-active': !account}">
+  <div class="content-block" [ngClass]="{'no-active': !account}">
     <div class="content-block_title">
       <span>H2T > H2X</span>
       <span class="content-block_title_help"></span>
     </div>
 
     <form #sendForm="ngForm" class="blocks-list">
-      <div class="blocks-list_group blocks-list_element blocks-list_form-group width-45">
+      <div class="blocks-list_group blocks-list_element blocks-list_form-group width-40">
         <div class="list">
-          <div class="blocks-list_item" *ngIf="account?.balances.H2T.display">
-            <div class="blocks-list_item_title nowrap">Your amount</div>
+          <div class="blocks-list_item" *ngIf="account?.balances">
+            <div class="blocks-list_item_title nowrap uppercase">Your amount</div>
             <div class="blocks-list_item_value" fittext [maxFontSize]="38">
               {{account ? account?.balances.H2T.display || 0 : 0}}
             </div>
@@ -60,9 +60,9 @@
             </div>
           </div>
           <div class="blocks-list_item" [ngClass]="{disabled: swapTokensProgress}">
-            <div class="blocks-list_item_title">Send to Swap</div>
+            <div class="blocks-list_item_title uppercase">Send to Swap</div>
             <div class="form-group">
-              <div class="form-group_title">Enter amount</div>
+              <div class="form-group_title uppercase">Enter amount</div>
               <div class="form-group_input">
                 <input type="text"
                        *ngIf="account"
@@ -98,7 +98,7 @@
 
       <div class="blocks-list_element width-20" [ngClass]="{'in-update': updateSwapBalanceProgress}">
         <div class="blocks-list_item">
-          <div class="blocks-list_item_title">SWAP Contract</div>
+          <div class="blocks-list_item_title uppercase">SWAP Contract</div>
           <div class="blocks-list_item_value" fittext [maxFontSize]="38">
             {{(swapContractBalance || 0) | bigNumberFormat : 0 : true : false : false}}
           </div>
@@ -125,14 +125,14 @@
       <div class="blocks-list_group blocks-list_element width-40">
         <div class="list">
           <div class="blocks-list_item width-50">
-            <div class="blocks-list_item_title">For Claim</div>
+            <div class="blocks-list_item_title uppercase">For Claim</div>
             <div class="blocks-list_item_value blocks-list_item_value__positive" fittext [maxFontSize]="38">0</div>
             <div class="blocks-list_item_currency blocks-list_item_currency__axn">
               <span>AXN</span>
             </div>
           </div>
           <div class="blocks-list_item width-50">
-            <div class="blocks-list_item_title">Penalty</div>
+            <div class="blocks-list_item_title uppercase">Penalty</div>
             <div class="blocks-list_item_value blocks-list_item_value__negative" fittext [maxFontSize]="38">
               50,879,777,143.4973
             </div>

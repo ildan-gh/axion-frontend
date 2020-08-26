@@ -32,18 +32,20 @@ export class AuctionPageComponent implements OnDestroy {
       if (!account || account.balances) {
         this.ngZone.run(() => {
           this.account = account;
+          window.dispatchEvent(new Event('resize'));
           if (account) {
             this.onChangeAccount.emit();
+            this.contractService.getAuctionInfo().then((result) => {
+              this.auctionInfo = result;
+              window.dispatchEvent(new Event('resize'));
+            });
+            this.contractService.getUserAuctions().then((auctions) => {
+              this.auctionsList = auctions;
+              window.dispatchEvent(new Event('resize'));
+            });
           }
         });
       }
-      this.contractService.getAuctionInfo().then((result) => {
-        this.auctionInfo = result;
-      });
-      this.contractService.getUserAuctions().then((auctions) => {
-        console.log(auctions);
-        this.auctionsList = auctions;
-      });
     });
     this.tokensDecimals = this.contractService.getCoinsDecimals();
   }
