@@ -299,7 +299,9 @@ input:-internal-autofill-selected {
       font-weight: 300;
       font-size: 38px;
       line-height: 45px;
+      height: 45px;
       margin-bottom: 20px;
+      overflow: hidden;
       &:not(.inherit-align) {
         text-align: center;
       }
@@ -466,6 +468,10 @@ input:-internal-autofill-selected {
     .blocks-list_item:first-child {
       padding-left: 10px;
       padding-right: 10px;
+      width: 33%;
+    }
+    .blocks-list_item:nth-child(2) {
+      width: 67%;
     }
   }
 
