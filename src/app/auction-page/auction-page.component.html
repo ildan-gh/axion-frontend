@@ -8,7 +8,7 @@
     </div>
 
     <form #sendForm="ngForm" class="blocks-list blocks-list__small-size blocks-list__full-width">
-      <div class="blocks-list_group blocks-list_element blocks-list_form-group">
+      <div class="blocks-list_group blocks-list_element blocks-list_form-group width-40">
         <div class="list">
           <div class="blocks-list_item">
             <div class="blocks-list_item_title nowrap uppercase">Your amount</div>
@@ -54,7 +54,7 @@
         </div>
       </div>
 
-      <div class="blocks-list_element">
+      <div class="blocks-list_element width-20">
         <div class="blocks-list_item">
           <div class="blocks-list_item_title uppercase">Auction Contract</div>
           <div class="blocks-list_item_value" fittext [maxFontSize]="38">
@@ -66,7 +66,7 @@
         </div>
       </div>
 
-      <div class="blocks-list_group blocks-list_element">
+      <div class="blocks-list_group blocks-list_element width-40">
         <div class="blocks-list_item_title uppercase">Auction pool</div>
         <div class="list">
           <div class="blocks-list_item">
@@ -125,10 +125,11 @@
         <td>{{auction.start | date : 'dd.MM.yyyy'}}</td>
         <td>{{auction.token | bigNumberFormat : tokensDecimals['HEX2X'] : true : false : 4}}</td>
         <td>{{auction.eth | bigNumberFormat : tokensDecimals['ETH'] : true : false : 4}}</td>
-        <td>{{auction.accountTokenBalance | bigNumberFormat : tokensDecimals['HEX2X'] : true : false : 4}}</td>
-        <td class="action-button">
+        <td [colSpan]="auction.accountETHBalance.isZero() ? 2 : 1">
+          {{auction.accountTokenBalance | bigNumberFormat : tokensDecimals['HEX2X'] : true : false : 4}}
+        </td>
+        <td class="action-button"*ngIf="!auction.accountETHBalance.isZero()">
           <button class="btn btn__transparent" (click)="auctionWithdraw(auction)"
-                  *ngIf="!auction.accountETHBalance.isZero()"
                   [ngClass]="{progress: auction.withdrawProgress}"
                   [disabled]="auction.withdrawProgress">
                 <span class="lds-ellipsis" *ngIf="auction.withdrawProgress">

@@ -4,6 +4,8 @@ import BigNumber from 'bignumber.js';
 interface StakingInfoInterface {
   ShareRate: number;
   StepsFromStart: number;
+  closestYearShares?: string;
+  closestPoolAmount?: string;
 }
 
 @Component({
@@ -30,7 +32,9 @@ export class StakingPageComponent implements OnDestroy {
 
   public stakingContractInfo: StakingInfoInterface = {
     ShareRate: 0,
-    StepsFromStart: 0
+    StepsFromStart: 0,
+    closestYearShares: '0',
+    closestPoolAmount: '0'
   };
 
   public currentSort: {
@@ -64,6 +68,7 @@ export class StakingPageComponent implements OnDestroy {
     });
     this.contractService.getStakingContractInfo().then((data: StakingInfoInterface) => {
       this.stakingContractInfo = data;
+      window.dispatchEvent(new Event('resize'));
     });
     this.tokensDecimals = this.contractService.getCoinsDecimals();
   }

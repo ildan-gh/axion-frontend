@@ -61,19 +61,19 @@
         </div>
         <div class="blocks-list_element">
           <div class="staking-info-table">
-            <div class="staking-info-table_cell">
+            <div class="staking-info-table_cell width-20">
               <div class="staking-info-table_value">{{ stakingContractInfo.StepsFromStart || 0 }}</div>
               <div class="staking-info-table_label uppercase">Day from start</div>
             </div>
-            <div class="staking-info-table_cell">
+            <div class="staking-info-table_cell width-20">
               <div class="staking-info-table_value">{{ stakeDays }}</div>
               <div class="staking-info-table_label uppercase">Last active day</div>
             </div>
-            <div class="staking-info-table_cell">
+            <div class="staking-info-table_cell width-20">
               <div class="staking-info-table_value">{{ stakeDays + 1 }}</div>
               <div class="staking-info-table_label uppercase">Pay day</div>
             </div>
-            <div class="staking-info-table_cell no-border">
+            <div class="staking-info-table_cell no-border width-40">
               <button class="btn btn__normal uppercase nowrap" (click)="openDeposit()"
                       [ngClass]="{progress: depositTokensProgress}"
                       [disabled]="depositForm.invalid || depositDaysInvalid">
@@ -118,11 +118,15 @@
             <div class="blocks-list_item_description">Stake for 350 days or more and get bonus revenue</div>
             <div class="blocks-list_item_values">
               <div class="blocks-list_item_values_item">
-                <div class="blocks-list_item_value inherit-align" fittext [maxFontSize]="38">1200</div>
+                <div class="blocks-list_item_value inherit-align" fittext [maxFontSize]="38">
+                  {{(stakingContractInfo.closestYearShares) || 0 | bigNumberFormat : tokensDecimals.HEX2X : true : false : 4 }}
+                </div>
                 <div class="blocks-list_item_label uppercase">Shares</div>
               </div>
               <div class="blocks-list_item_values_item">
-                <div class="blocks-list_item_value inherit-align" fittext [maxFontSize]="38">1200000</div>
+                <div class="blocks-list_item_value inherit-align" fittext [maxFontSize]="38">
+                  {{(stakingContractInfo.closestPoolAmount) || 0 | bigNumberFormat : tokensDecimals.HEX2X : true : false : 4 }}
+                </div>
                 <div class="blocks-list_item_label uppercase">AXN</div>
               </div>
             </div>
@@ -164,7 +168,12 @@
           Shares
           <span class="sort-indicator"></span>
         </th>
-        <th>BigPayDay</th>
+
+        <th (click)="sortDeposits('opened', 'shares')" class="as-sort"
+            [ngClass]="{active: currentSort['opened']['field'] === 'shares', ask: currentSort['opened']['ask']}">
+          BigPayDay
+          <span class="sort-indicator"></span>
+        </th>
         <th>Interest</th>
         <th width="10">&nbsp;</th>
       </tr>
@@ -176,7 +185,7 @@
         <td>{{getProgress(deposit)}}%</td>
         <td>{{deposit.amount | bigNumberFormat : tokensDecimals['HEX2X'] : true : false : 5}}&nbsp;AXN</td>
         <td>{{deposit.shares | bigNumberFormat : tokensDecimals['HEX2X'] : true : false : 5}}</td>
-        <td></td>
+        <td>{{deposit.bigPayDay | bigNumberFormat : tokensDecimals['HEX2X'] : true : false : 5}}&nbsp;AXN</td>
         <td></td>
         <td class="action-button">
           <button class="btn btn__normal" (click)="depositWithdraw(deposit)"
@@ -218,7 +227,7 @@
         <td>{{getProgress(deposit)}}%</td>
         <td>{{deposit.amount | bigNumberFormat : tokensDecimals['HEX2X'] : true : false : 5}}</td>
         <td>{{deposit.shares | bigNumberFormat : tokensDecimals['HEX2X'] : true : false : 5}}</td>
-        <td></td>
+        <td>{{deposit.bigPayDay | bigNumberFormat : tokensDecimals['HEX2X'] : true : false : 5}}&nbsp;AXN</td>
         <td></td>
       </tr>
       </tbody>

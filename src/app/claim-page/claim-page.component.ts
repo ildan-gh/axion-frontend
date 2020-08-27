@@ -19,6 +19,7 @@ export class ClaimPageComponent implements OnDestroy {
   public updateSwapBalanceProgress: boolean;
   public withdrawH2TProgress: boolean;
   public burnTokensProgress: boolean;
+  public claimTokensProgress: boolean;
 
   @ViewChild('sendForm', {static: false}) sendForm;
 
@@ -30,7 +31,6 @@ export class ClaimPageComponent implements OnDestroy {
       if (!account || account.balances) {
         this.ngZone.run(() => {
           this.account = account;
-          console.log(this.account);
           window.dispatchEvent(new Event('resize'));
           if (account) {
             this.onChangeAccount.emit();
@@ -82,6 +82,17 @@ export class ClaimPageComponent implements OnDestroy {
     });
   }
 
+  public claim() {
+    this.claimTokensProgress = true;
+    this.contractService.claimFromForeign().then(() => {
+      this.claimTokensProgress = false;
+      // this.contractService.updateH2TBalance(true).then(() => {
+      //   this.burnTokensProgress = false;
+      // });
+    }).catch(() => {
+      this.claimTokensProgress = false;
+    });
+  }
 
   ngOnDestroy() {
     this.accountSubscribe.unsubscribe();

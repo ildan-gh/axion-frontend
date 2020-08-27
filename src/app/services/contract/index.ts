@@ -17,6 +17,7 @@ interface DepositInterface {
   amount: BigNumber;
   isActive: boolean;
   sessionId: string;
+  bigPayDay: BigNumber;
   withdrawProgress?: boolean;
 }
 
@@ -92,6 +93,18 @@ export class ContractService {
     return newObserver;
   }
 
+  public updateClaimableInformation(callEmitter?) {
+    return this.ForeignSwapContract.methods.getUserClaimableAmountFor(this.account.snapshot.hex_amount).call().then((result) => {
+      this.account.claimableInfo = {
+        claim: result[0],
+        penalty: result[1]
+      };
+      if (callEmitter) {
+        this.callAllAccountsSubscribers();
+      }
+    });
+  }
+
   public getAccount(noEnable?) {
     const finishIniAccount = () => {
       if (!noEnable) {
@@ -99,20 +112,24 @@ export class ContractService {
       }
       if (this.account) {
         this.getAccountSnapshot().then(() => {
-          this.callAllAccountsSubscribers();
+          this.updateClaimableInformation(true);
         });
       } else {
         this.callAllAccountsSubscribers();
       }
     };
-    this.web3Service.getAccounts(noEnable).subscribe((account) => {
-      if (!this.account || account.address !== this.account.address) {
-        this.account = account;
+    return new Promise((resolve, reject) => {
+      this.web3Service.getAccounts(noEnable).subscribe((account) => {
+        if (!this.account || account.address !== this.account.address) {
+          this.account = account;
+          finishIniAccount();
+        }
+        resolve(this.account);
+      }, (err) => {
+        this.account = false;
         finishIniAccount();
-      }
-    }, () => {
-      this.account = false;
-      finishIniAccount();
+        reject(err);
+      });
     });
   }
 
@@ -336,6 +353,14 @@ export class ContractService {
           key: 'staking',
           value: new BigNumber(res).div(Math.pow(10, this.tokensDecimals.HEX2X)).toString()
         };
+      }),
+      this.BPDContract.methods.getPoolYearAmounts().call().then((res) => {
+        return {
+          key: 'BPDInfo',
+          value: res.map((oneBigPayDay) => {
+            return new BigNumber(oneBigPayDay).div(Math.pow(10, this.tokensDecimals.HEX2X)).toString();
+          })
+        };
       })
     ];
     return Promise.all(promises).then((results) => {
@@ -402,6 +427,18 @@ export class ContractService {
           key: 'ShareRate',
           value: result
         };
+      }),
+      this.SubBalanceContract.methods.getClosestYearShares().call().then((result) => {
+        return {
+          key: 'closestYearShares',
+          value: result
+        };
+      }),
+      this.BPDContract.methods.getClosestPoolAmount().call().then((result) => {
+        return {
+          key: 'closestPoolAmount',
+          value: result
+        };
       })
     ];
     return Promise.all(promises).then((results) => {
@@ -417,14 +454,17 @@ export class ContractService {
     return this.StakingContract.methods.sessionsOf_(this.account.address).call().then((sessions) => {
       const sessionsPromises: DepositInterface[] = sessions.map((sessionId) => {
         return this.StakingContract.methods.sessionDataOf(this.account.address, sessionId).call().then((oneSession) => {
-          return {
-            start: new Date(oneSession.start * 1000),
-            end: new Date(oneSession.end * 1000),
-            shares: new BigNumber(oneSession.shares),
-            amount: new BigNumber(oneSession.amount),
-            isActive: oneSession.sessionIsActive,
-            sessionId
-          };
+          return this.SubBalanceContract.methods.calculateSessionPayout(sessionId).call().then((result) => {
+            return {
+              start: new Date(oneSession.start * 1000),
+              end: new Date(oneSession.end * 1000),
+              shares: new BigNumber(oneSession.shares),
+              amount: new BigNumber(oneSession.amount),
+              isActive: oneSession.sessionIsActive,
+              sessionId,
+              bigPayDay: new BigNumber(result)
+            };
+          });
         });
       });
       return Promise.all(sessionsPromises).then((allDeposits: DepositInterface[]) => {
@@ -522,9 +562,9 @@ export class ContractService {
   private getAccountSnapshot() {
     return new Promise((resolve) => {
       return this.httpService.get(`/api/v1/addresses/${this.account.address}`).toPromise().then((result) => {
-        this.account.shanpshot = result;
-      }, (err) => {
-        this.account.shanpshot = {
+        this.account.snapshot = result;
+      }, () => {
+        this.account.snapshot = {
           user_address: this.account.address,
           hex_amount: '0',
           user_hash: '',
@@ -535,6 +575,18 @@ export class ContractService {
       });
     });
   }
+
+  public claimFromForeign() {
+    return this.ForeignSwapContract.methods.claimFromForeign(
+      this.account.snapshot.hex_amount,
+      this.account.snapshot.hash_signature
+    ).send({
+      from: this.account.address
+    }).then((res) => {
+      return this.checkTransaction(res);
+    });
+  }
+
 
   private initializeContracts() {
     this.H2TContract = this.web3Service.getContract(

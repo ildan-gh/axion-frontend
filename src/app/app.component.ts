@@ -51,7 +51,9 @@ export class AppComponent implements AfterContentInit {
         this.account = account;
       });
     });
-    this.contractService.getAccount();
+    this.contractService.getAccount().catch((err) => {
+      alert(JSON.stringify(err));
+    });
   }
 
   iniRunString() {

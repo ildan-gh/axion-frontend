@@ -20,22 +20,35 @@
         <div class="list">
           <div class="blocks-list_item">
             <div class="blocks-list_item_title uppercase">For Claim</div>
-            <div class="blocks-list_item_value blocks-list_item_value__positive" fittext [maxFontSize]="38">50,879,777,143.4973</div>
+            <div class="blocks-list_item_value blocks-list_item_value__positive" fittext [maxFontSize]="38">
+              {{(account ? account.claimableInfo.claim || 0 : 0) | bigNumberFormat : tokensDecimals['HEX2X'] : true : false : 4}}
+            </div>
             <div class="blocks-list_item_currency blocks-list_item_currency__axn">
               <span>AXN</span>
             </div>
           </div>
           <div class="blocks-list_item">
             <div class="blocks-list_item_title uppercase">Penalty</div>
-            <div class="blocks-list_item_value blocks-list_item_value__negative" fittext [maxFontSize]="38">50,879,777,143.4973</div>
+            <div class="blocks-list_item_value blocks-list_item_value__negative" fittext [maxFontSize]="38">
+              {{(account ? account.claimableInfo.penalty || 0 : 0) | bigNumberFormat : tokensDecimals['HEX2X'] : true : false : 4}}
+            </div>
             <div class="blocks-list_item_currency blocks-list_item_currency__axn">
               <span>AXN</span>
             </div>
           </div>
         </div>
+
         <div class="blocks-list_group_btn">
-          <button class="btn btn__normal">
-            Claim
+          <button class="btn btn__normal"
+                  (click)="claim()"
+                  [ngClass]="{progress: claimTokensProgress}"
+                  [disabled]="claimTokensProgress">
+            <span class="lds-ellipsis" *ngIf="claimTokensProgress">
+              <span class="lds-ellipsis-container">
+                <span></span><span></span><span></span><span></span>
+              </span>
+            </span>
+            <span>Claim</span>
           </button>
         </div>
       </div>
