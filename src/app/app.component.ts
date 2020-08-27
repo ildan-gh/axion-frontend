@@ -1,4 +1,4 @@
-import {AfterContentInit, Component, NgZone, ViewChild} from '@angular/core';
+import {Component, NgZone, ViewChild} from '@angular/core';
 import { ContractService} from './services/contract';
 
 @Component({
@@ -6,11 +6,12 @@ import { ContractService} from './services/contract';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements AfterContentInit {
+export class AppComponent  {
   public account;
   private accountSubscribe;
   public leftDaysInfo;
   public tableInfo;
+  public runLineCountArray = new Array(1);
   @ViewChild('runString', {static: false}) runString;
   constructor(
     private contractService: ContractService,
@@ -28,14 +29,10 @@ export class AppComponent implements AfterContentInit {
     this.contractService.getEndDateTime().then((result) => {
       this.leftDaysInfo = result;
     });
-  }
 
-  ngAfterContentInit() {
     this.contractService.getContractsInfo().then((info) => {
       this.tableInfo = info;
-      setTimeout(() => {
-        this.iniRunString();
-      }, 100);
+      this.iniRunString();
     });
   }
 
@@ -59,23 +56,16 @@ export class AppComponent implements AfterContentInit {
   iniRunString() {
     const runStringElement = this.runString.nativeElement;
     const runStringItem = runStringElement.getElementsByClassName('repeat-content')[0];
-    const countElements = Math.ceil(runStringElement.offsetWidth / runStringItem.offsetWidth) * 2;
-    const allRepeatElements = [runStringItem];
-    for (let k = 0; k < countElements; k++) {
-      const newElement = runStringItem.cloneNode(true);
-      runStringElement.appendChild(newElement);
-      allRepeatElements.push(newElement);
-    }
+    this.runLineCountArray.length = Math.ceil(runStringElement.offsetWidth / runStringItem.offsetWidth) * 2;
 
     setInterval(() => {
-      const marginLeft = allRepeatElements[0].style.marginLeft || '0px';
+      const allElements = runStringElement.getElementsByClassName('repeat-content');
+      const marginLeft = allElements[0].style.marginLeft || '0px';
       const newMarginLeft = marginLeft.replace('px', '') - 1;
-      allRepeatElements[0].style.marginLeft = newMarginLeft + 'px';
-      if (-newMarginLeft > allRepeatElements[0].offsetWidth) {
-        const firstElement = allRepeatElements.shift();
-        runStringElement.appendChild(firstElement);
-        firstElement.style.marginLeft = 0;
-        allRepeatElements.push(firstElement);
+      allElements[0].style.marginLeft = newMarginLeft + 'px';
+      if (-newMarginLeft > allElements[0].offsetWidth) {
+        allElements[0].style.marginLeft = 0;
+        runStringElement.appendChild(allElements[0]);
       }
     }, 30);
   }

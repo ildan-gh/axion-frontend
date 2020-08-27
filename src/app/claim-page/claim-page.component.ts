@@ -33,6 +33,7 @@ export class ClaimPageComponent implements OnDestroy {
           this.account = account;
           window.dispatchEvent(new Event('resize'));
           if (account) {
+            console.log(account.claimableInfo);
             this.onChangeAccount.emit();
             this.updateSwapBalanceProgress = true;
             this.contractService.swapTokenBalanceOf().then((balance) => {

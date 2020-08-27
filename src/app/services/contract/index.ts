@@ -96,8 +96,8 @@ export class ContractService {
   public updateClaimableInformation(callEmitter?) {
     return this.ForeignSwapContract.methods.getUserClaimableAmountFor(this.account.snapshot.hex_amount).call().then((result) => {
       this.account.claimableInfo = {
-        claim: result[0],
-        penalty: result[1]
+        claim: new BigNumber(result[0]),
+        penalty: new BigNumber(result[1])
       };
       if (callEmitter) {
         this.callAllAccountsSubscribers();

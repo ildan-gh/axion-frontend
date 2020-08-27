@@ -38,7 +38,7 @@
           </div>
         </div>
 
-        <div class="blocks-list_group_btn">
+        <div class="blocks-list_group_btn" *ngIf="account && (!account.claimableInfo.claim.isZero() || !account.claimableInfo.penalty.isZero())">
           <button class="btn btn__normal"
                   (click)="claim()"
                   [ngClass]="{progress: claimTokensProgress}"
