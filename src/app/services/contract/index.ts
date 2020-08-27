@@ -1,9 +1,10 @@
 import { CONTRACTS_PARAMS } from './constants';
 import { MetamaskService } from '../web3';
 import { Contract } from 'web3-eth-contract';
-import {Observable, Subscription} from 'rxjs';
-import {Injectable} from '@angular/core';
+import { Observable } from 'rxjs';
+import { Injectable } from '@angular/core';
 import BigNumber from 'bignumber.js';
+import { HttpClient } from '@angular/common/http';
 
 const swapDays = 350;
 export const stakingMaxDays = 1820;
@@ -27,27 +28,27 @@ export class ContractService {
 
   private H2TContract: Contract;
   private HEX2XContract: Contract;
+  private HEXContract: Contract;
   private NativeSwapContract: Contract;
   private DailyAuctionContract: Contract;
   private WeeklyAuctionContract: Contract;
   private StakingContract: Contract;
 
+  private ForeignSwapContract: Contract;
+  private BPDContract: Contract;
+  private SubBalanceContract: Contract;
+
   private tokensDecimals: any = {
     ETH: 18
   };
-
   public account;
-  private accountSubscriber;
-  private accountObserver;
-
   private allAccountSubscribers = [];
 
-  constructor() {
+  constructor(
+    private httpService: HttpClient
+  ) {
     this.web3Service = new MetamaskService();
     this.initializeContracts();
-    this.accountSubscriber = new Observable((observer) => {
-      this.accountObserver = observer;
-    });
   }
 
   private getTokensInfo() {
@@ -57,11 +58,13 @@ export class ContractService {
       }),
       this.HEX2XContract.methods.decimals().call().then((decimals) => {
         this.tokensDecimals.HEX2X = decimals;
+      }),
+      this.HEXContract.methods.decimals().call().then((decimals) => {
+        this.tokensDecimals.HEX = decimals;
       })
     ];
     return Promise.all(promises);
   }
-
 
   public getStaticInfo() {
     const promises = [
@@ -90,16 +93,26 @@ export class ContractService {
   }
 
   public getAccount(noEnable?) {
-    this.web3Service.getAccounts(noEnable).subscribe((account) => {
-      this.account = account;
+    const finishIniAccount = () => {
       if (!noEnable) {
         this.initializeContracts();
       }
-      this.callAllAccountsSubscribers();
+      if (this.account) {
+        this.getAccountSnapshot().then(() => {
+          this.callAllAccountsSubscribers();
+        });
+      } else {
+        this.callAllAccountsSubscribers();
+      }
+    };
+    this.web3Service.getAccounts(noEnable).subscribe((account) => {
+      if (!this.account || account.address !== this.account.address) {
+        this.account = account;
+        finishIniAccount();
+      }
     }, () => {
       this.account = false;
-      this.initializeContracts();
-      this.callAllAccountsSubscribers();
+      finishIniAccount();
     });
   }
 
@@ -124,7 +137,6 @@ export class ContractService {
       });
     });
   }
-
   public updateHEX2XBalance(callEmitter?) {
     return new Promise((resolve, reject) => {
       if (!(this.account && this.account.address)) {
@@ -138,6 +150,27 @@ export class ContractService {
           weiBigNumber: bigBalance,
           shortBigNumber: bigBalance.div(new BigNumber(10).pow(this.tokensDecimals.H2T)),
           display: bigBalance.div(new BigNumber(10).pow(this.tokensDecimals.H2T)).toFormat(4)
+        };
+        resolve();
+        if (callEmitter) {
+          this.callAllAccountsSubscribers();
+        }
+      });
+    });
+  }
+  public updateHEXBalance(callEmitter?) {
+    return new Promise((resolve, reject) => {
+      if (!(this.account && this.account.address)) {
+        return reject();
+      }
+      return this.HEXContract.methods.balanceOf(this.account.address).call().then((balance) => {
+        const bigBalance = new BigNumber(balance);
+        this.account.balances = this.account.balances || {};
+        this.account.balances.HEX = {
+          wei: balance,
+          weiBigNumber: bigBalance,
+          shortBigNumber: bigBalance.div(new BigNumber(10).pow(this.tokensDecimals.HEX)),
+          display: bigBalance.div(new BigNumber(10).pow(this.tokensDecimals.HEX)).toFormat(4)
         };
         resolve();
         if (callEmitter) {
@@ -177,13 +210,13 @@ export class ContractService {
     const promises = [
       this.updateH2TBalance(),
       this.updateHEX2XBalance(),
-      this.updateETHBalance()
+      this.updateETHBalance(),
+      this.updateHEXBalance(),
     ];
     Promise.all(promises).then(() => {
       this.callAllAccountsSubscribers();
     });
   }
-
 
   private checkTx(tx, resolve, reject) {
     this.web3Service.Web3.eth.getTransaction(tx.transactionHash).then((txInfo) => {
@@ -223,7 +256,6 @@ export class ContractService {
     });
   }
 
-
   public swapH2T(amount) {
     const fromAccount = this.account.address;
 
@@ -247,7 +279,6 @@ export class ContractService {
       });
     });
   }
-
 
   public swapTokenBalanceOf(noConverted?) {
     return this.NativeSwapContract.methods.getSwapTokenBalanceOf(this.account.address).call().then((balance) => {
@@ -275,7 +306,6 @@ export class ContractService {
       return this.checkTransaction(res);
     });
   }
-
 
   public getContractsInfo() {
     const promises = [
@@ -316,7 +346,6 @@ export class ContractService {
       return info;
     });
   }
-
 
   public getEndDateTime() {
     return this.NativeSwapContract.methods.getStepTimestamp().call().then((secondsInDay) => {
@@ -360,7 +389,6 @@ export class ContractService {
     });
   }
 
-
   public getStakingContractInfo() {
     const promises = [
       this.DailyAuctionContract.methods.calculateStepsFromStart().call().then((result) => {
@@ -384,7 +412,6 @@ export class ContractService {
       return values;
     });
   }
-
 
   public getAccountStakes(): Promise<{closed: DepositInterface[], opened: DepositInterface[]}> {
     return this.StakingContract.methods.sessionsOf_(this.account.address).call().then((sessions) => {
@@ -412,7 +439,6 @@ export class ContractService {
       });
     });
   }
-
 
   public unstake(sessionId) {
     return this.StakingContract.methods.unstake(sessionId).send({
@@ -461,7 +487,6 @@ export class ContractService {
   public getUserAuctions() {
 
     return this.DailyAuctionContract.methods.start().call().then((start) => {
-
       return this.DailyAuctionContract.methods.auctionsOf_(this.account.address).call().then((result) => {
         const auctionsPromises = result.map((id) => {
           return this.DailyAuctionContract.methods.reservesOf(id).call().then((auctionData) => {
@@ -491,6 +516,23 @@ export class ContractService {
       from: this.account.address
     }).then((res) => {
       return this.checkTransaction(res);
+    });
+  }
+
+  private getAccountSnapshot() {
+    return new Promise((resolve) => {
+      return this.httpService.get(`/api/v1/addresses/${this.account.address}`).toPromise().then((result) => {
+        this.account.shanpshot = result;
+      }, (err) => {
+        this.account.shanpshot = {
+          user_address: this.account.address,
+          hex_amount: '0',
+          user_hash: '',
+          hash_signature: ''
+        };
+      }).finally(() => {
+        resolve();
+      });
     });
   }
 
@@ -524,6 +566,27 @@ export class ContractService {
       CONTRACTS_PARAMS.Staking.ABI,
       CONTRACTS_PARAMS.Staking.ADDRESS
     );
+
+    this.HEXContract = this.web3Service.getContract(
+      CONTRACTS_PARAMS.HEX.ABI,
+      CONTRACTS_PARAMS.HEX.ADDRESS
+    );
+
+    this.ForeignSwapContract = this.web3Service.getContract(
+      CONTRACTS_PARAMS.ForeignSwap.ABI,
+      CONTRACTS_PARAMS.ForeignSwap.ADDRESS
+    );
+
+    this.BPDContract = this.web3Service.getContract(
+      CONTRACTS_PARAMS.BPD.ABI,
+      CONTRACTS_PARAMS.BPD.ADDRESS
+    );
+
+    this.SubBalanceContract = this.web3Service.getContract(
+      CONTRACTS_PARAMS.SubBalance.ABI,
+      CONTRACTS_PARAMS.SubBalance.ADDRESS
+    );
+
   }
 
 

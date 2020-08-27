@@ -12,6 +12,7 @@ import { StakingPageComponent } from './staking-page/staking-page.component';
 import {MinMaxDirective} from './directives/minmax/minmax';
 import {AngularFittextModule} from 'angular-fittext';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {HttpClientModule} from '@angular/common/http';
 
 
 export function initializeApp(
@@ -45,7 +46,8 @@ export function initializeApp(
     BrowserModule,
     AppRoutingModule,
     FormsModule,
-    AngularFittextModule
+    AngularFittextModule,
+    HttpClientModule
   ],
   providers: [
     {

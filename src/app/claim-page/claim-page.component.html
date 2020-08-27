@@ -8,7 +8,9 @@
       <div class="blocks-list_element width-33">
         <div class="blocks-list_item">
           <div class="blocks-list_item_title uppercase">Your Amount</div>
-          <div class="blocks-list_item_value" fittext [maxFontSize]="38">50,879,777,143.4973</div>
+          <div class="blocks-list_item_value" fittext [maxFontSize]="38">
+            {{account ? account?.balances.H2T.display || 0 : 0}}
+          </div>
           <div class="blocks-list_item_currency blocks-list_item_currency__hex">
             <span>HEX</span>
           </div>

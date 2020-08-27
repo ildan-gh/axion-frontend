@@ -30,6 +30,7 @@ export class ClaimPageComponent implements OnDestroy {
       if (!account || account.balances) {
         this.ngZone.run(() => {
           this.account = account;
+          console.log(this.account);
           window.dispatchEvent(new Event('resize'));
           if (account) {
             this.onChangeAccount.emit();
