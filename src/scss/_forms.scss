@@ -1,0 +1,354 @@
+// @import "./variables.scss";
+
+.axn {
+  &-form {
+    display: grid;
+    grid-gap: 10px;
+    cursor: default;
+    margin: 25px 0;
+
+    @for $i from 1 through 10 {
+      .axn-form-block:nth-child(#{10 - $i}) {
+        z-index: $i;
+      }
+    }
+
+    @include b(900) {
+      grid-gap: 15px;
+    }
+
+    &-border {
+      &-dashed {
+        &-right {
+          border-right: $clForm-Border;
+
+          @include b(900) {
+            border-right: none;
+          }
+        }
+        &-bottom {
+          border-bottom: $clForm-Border;
+        }
+      }
+    }
+
+    &-auction {
+      min-height: 220px;
+      height: max-content;
+    }
+
+    &-staking {
+      min-height: 270px;
+      height: max-content;
+    }
+
+    &-bottom {
+      margin-top: 30px;
+
+      @include b(900) {
+        margin-top: 10px;
+      }
+
+      &-mid {
+        margin-top: 10px;
+
+        @include b(900) {
+          margin-top: 10px;
+        }
+
+        .axn-form-block-sendmax-text {
+          margin-top: 10px;
+        }
+      }
+    }
+
+    &-bpd {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, 85px);
+      grid-gap: 15px;
+    }
+
+    &-base {
+      display: flex;
+      justify-content: space-between !important;
+      align-items: center;
+      flex-wrap: wrap;
+
+      &-1 {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-gap: 10px;
+      }
+
+      &-2 {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+
+        @include b(900) {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      &-3 {
+        grid-template-columns: repeat(3, minmax(250px, 350px));
+
+        @include b(900) {
+          grid-template-columns: 1fr;
+        }
+      }
+    }
+
+    &-3 {
+      grid-template-columns: minmax(250px, 350px) minmax(250px, 270px) minmax(
+          250px,
+          420px
+        );
+
+      @include b(900) {
+        grid-template-columns: 1fr;
+      }
+
+      &-1 {
+        grid-template-columns: minmax(250px, 440px) minmax(200px, 220px) minmax(
+            250px,
+            400px
+          );
+
+        @include b(900) {
+          grid-template-columns: 1fr;
+        }
+      }
+    }
+
+    &-accent {
+      background-color: $clForm-Accent-Background !important;
+    }
+
+    &-transparent {
+      background: none !important;
+      box-shadow: none !important;
+    }
+
+    input {
+      font-size: 18px;
+      font-weight: 300;
+      color: $clForm-Input;
+      padding: 5px 0;
+    }
+
+    &-arrow {
+      position: relative;
+
+      &:after {
+        content: "";
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        border-radius: 5em;
+        background-color: $clForm-Arrow-Background;
+        background-image: url("assets/images/base/arrow-white.svg");
+        background-repeat: no-repeat;
+        background-position: center;
+        right: -25px;
+        top: 50px;
+
+        @include b(900) {
+          right: 0;
+          bottom: -45px;
+          left: 0;
+          margin: 0 auto;
+          top: auto;
+          transform: rotate(90deg);
+        }
+      }
+    }
+
+    &-block {
+      background-color: $clForm-Block-Background;
+      box-shadow: $clForm-Block-Shadow;
+      border-radius: 12px;
+      padding: 20px 5px;
+
+      &-button {
+        * {
+          margin: 0 auto;
+        }
+      }
+
+      &-referal {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        * {
+          margin: 0;
+          font-weight: 300 !important;
+        }
+
+        input {
+          font-size: 16px !important;
+          color: $clForm-Block-Input !important;
+          width: 60%;
+        }
+
+        &-text {
+          margin-left: 5px;
+        }
+
+        &-link {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+
+          &-text {
+            font-weight: 300 !important;
+          }
+        }
+      }
+
+      &-pool {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-gap: 10px;
+        text-align: center;
+
+        &-title {
+          margin-top: 10px;
+          font-size: 14px;
+          text-transform: uppercase;
+        }
+
+        &-axn {
+          font-size: 20px !important;
+        }
+
+        &-uni {
+          font-size: 14px !important;
+        }
+
+        &-axn,
+        &-uni {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+
+          span {
+            &:nth-child(2) {
+              margin: 0 10px;
+            }
+          }
+        }
+      }
+
+      &-shares {
+        font-weight: 300;
+        text-align: left !important;
+
+        &-value {
+          font-size: 25px;
+          margin-right: 5px;
+          margin-bottom: 5px;
+
+          &-min {
+            font-size: 20px;
+            color: $clForm-Shares;
+            margin-bottom: 5px;
+          }
+        }
+
+        &-text {
+          font-size: 16px;
+
+          &-min {
+            font-size: 14px;
+            color: $clForm-Shares;
+            margin-top: 5px;
+          }
+        }
+      }
+
+      &-sendmax {
+        text-transform: uppercase;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        @include b(900) {
+          margin-bottom: 10px;
+        }
+
+        &-text {
+          display: flex;
+          flex-direction: column;
+          font-size: 14px;
+          color: $clForm-Sendmax;
+          margin-top: 5px;
+
+          @include b(900) {
+            margin-top: 10px;
+          }
+        }
+
+        &-value {
+          font-size: 10px;
+
+          &-mid {
+            font-size: 14px;
+          }
+        }
+      }
+
+      &-one {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-gap: 15px;
+        color: $clForm-Block-One;
+        text-transform: uppercase;
+        text-align: center;
+        padding: 10px 0 20px 0;
+        font-weight: 300;
+
+        * {
+          text-align: center;
+          justify-content: center;
+        }
+
+        .axn-cheap {
+          margin: 0 auto;
+        }
+
+        &-title {
+          color: $clForm-Block-One-Title;
+          font-size: 14px;
+        }
+
+        &-value {
+          font-size: 30px;
+          letter-spacing: -0.05em;
+
+          &-normal {
+            font-size: 18px;
+          }
+
+          &-mid {
+            font-size: 14px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+          }
+
+          &-bs {
+            font-size: 18px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+          }
+
+          b {
+            font-weight: normal;
+          }
+        }
+      }
+    }
+  }
+}

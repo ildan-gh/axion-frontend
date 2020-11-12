@@ -1,5 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
+import {TransactionSuccessModalComponent} from '../components/transactionSuccessModal/transaction-success-modal.component';
 import { AuctionPageComponent } from './auction-page.component';
 
 describe('AuctionPageComponent', () => {
@@ -8,7 +9,7 @@ describe('AuctionPageComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AuctionPageComponent ]
+      declarations: [ AuctionPageComponent, TransactionSuccessModalComponent ]
     })
     .compileComponents();
   }));

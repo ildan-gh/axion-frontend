@@ -1,0 +1,18 @@
+// @import "./variables.scss";
+.cdk-overlay-dark-backdrop {
+  background: $clDialog-Overlay-Dark-Backfrop-dark;
+}
+.mat-dialog-container {
+  color: $clDialog-Mat-Container-dark;
+  background-color: $clDialog-Mat-Container-Background-dark;
+}
+
+.dialog-block {
+  color: $clDialog-Block-dark;
+  background-color: $clDialog-Mat-Container-Background-dark;
+}
+
+.dialog-bottom {
+  background-color: $clDialog-Bottom-Background-dark;
+}
+

@@ -1,0 +1,131 @@
+// @import "./variables.scss";
+
+.standard-table {
+  text-align: center;
+  width: 100%;
+  border-spacing: 0 5px;
+
+  @include b(900) {
+    overflow: scroll;
+    display: block;
+    padding-bottom: 10px;
+  }
+
+  thead {
+    color: $clTable-Thead;
+    font-size: 16px;
+    line-height: 100%;
+
+    th {
+      padding: 10px 24px;
+      font-weight: 300 !important;
+
+      &.as-sort {
+        cursor: pointer;
+        user-select: none;
+
+        @include b(900) {
+          text-align: center;
+        }
+      }
+      &.active {
+        color: $clTable-Thead-Active;
+        .sort-indicator {
+          visibility: visible;
+        }
+      }
+      &.ask {
+        .sort-indicator {
+          &:before {
+            transform: rotate(225deg);
+            top: 0;
+          }
+        }
+      }
+      .sort-indicator {
+        visibility: hidden;
+        display: inline-block;
+        vertical-align: bottom;
+        width: 16px;
+        height: 16px;
+        border-radius: 4px;
+        background-color: $clTable-Thead-Sort;
+        margin-left: 6px;
+        text-align: center;
+        line-height: 16px;
+        margin-right: -22px;
+        &:before {
+          content: "";
+          display: inline-block;
+          width: 4px;
+          height: 4px;
+          border-width: 0 2px 2px 0;
+          border-style: solid;
+          border-color: $clTable-Thead-Sort-Before;
+          transform: rotate(45deg);
+          vertical-align: middle;
+          position: relative;
+          top: -2px;
+        }
+      }
+    }
+  }
+  tbody {
+    td {
+      padding: 24px 10px;
+      font-size: 18px;
+      line-height: 21px;
+      color: $clTable-Tbody-Td-Text;
+      white-space: nowrap;
+      text-align: center;
+      background: $clTable-Tbody-Td-Background;
+      font-weight: 300;
+
+      @include b(900) {
+        min-width: 120px;
+        text-align: center;
+      }
+
+      &:first-child {
+        border-bottom-left-radius: 12px;
+        border-top-left-radius: 12px;
+      }
+      &:last-child {
+        border-bottom-right-radius: 12px;
+        border-top-right-radius: 12px;
+      }
+      &.action-button {
+        padding: 15px;
+        button {
+          padding-top: 10px;
+          padding-bottom: 10px;
+        }
+      }
+      + td {
+        position: relative;
+        &:before {
+          content: "";
+          position: absolute;
+          left: 0;
+          top: 50%;
+          margin-top: -11px;
+          height: 22px;
+          width: 1px;
+          background-color: $clTable-Tbody-Td-Action-Button-Before-Background;
+        }
+      }
+    }
+  }
+}
+
+.table {
+  &__tooltip {
+    color: $clTooltip-Text !important;
+    background: $clTooltip-Background !important;
+    box-shadow: none !important;
+    border-radius: 12px;
+    font-size: 14px !important;
+    line-height: 16px !important;
+    margin: 0 !important;
+  }
+}

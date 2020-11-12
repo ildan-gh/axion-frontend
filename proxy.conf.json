@@ -1,9 +1,8 @@
 {
   "/api": {
-    "target": "http://axiondev.rocknblock.io",
+    "target": "https://axion2.rocknblock.io",
     "secure": false,
     "changeOrigin": true,
     "logLevel": "debug"
   }
 }
-

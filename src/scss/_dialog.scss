@@ -1,0 +1,185 @@
+// @import "./variables.scss";
+
+.cdk-global-overlay-wrapper,
+.cdk-overlay-container {
+  pointer-events: none;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+.cdk-overlay-container {
+  position: fixed;
+  z-index: 1000;
+}
+.cdk-global-overlay-wrapper {
+  display: flex;
+  position: absolute;
+  z-index: 1000;
+}
+.cdk-overlay-backdrop {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  opacity: 0;
+}
+.cdk-overlay-dark-backdrop {
+  background: $clDialog-Overlay-Dark-Backfrop;
+}
+.cdk-overlay-backdrop.cdk-overlay-backdrop-showing {
+  opacity: 1;
+}
+
+.cdk-overlay-pane {
+  position: absolute;
+  pointer-events: auto;
+  box-sizing: border-box;
+  z-index: 1000;
+  display: flex;
+  max-width: 100%;
+  max-height: 100%;
+}
+.mat-dialog-container {
+  padding: 0 !important;
+  overflow: hidden !important;
+  color: $clDialog-Mat-Container;
+  background-color: $clDialog-Mat-Container-Background;
+  border-radius: 20px !important;
+}
+
+.alert-window-title {
+  font-size: 22px;
+  text-align: center;
+  margin: 0 2em;
+}
+
+.alert-window-buttons {
+  padding: 10px 0;
+  .btn {
+    margin: 0 2%;
+  }
+}
+
+.dialog-block {
+  cursor: default;
+  color: $clDialog-Block;
+  &__content {
+    padding: 30px 20px;
+  }
+  .transaction-title,
+  .transaction-description {
+    text-align: center;
+    max-width: 390px;
+    margin: 0 auto 20px;
+  }
+  &__btn {
+    margin: 30px auto 0;
+    display: block;
+  }
+}
+
+.dialog-title {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 300;
+  text-transform: uppercase;
+  line-height: 1.3;
+}
+
+.dialog-description {
+  text-align: center;
+  padding: 30px 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  a {
+    flex-direction: row-reverse;
+    text-decoration: none !important;
+    text-transform: uppercase;
+
+    &:before {
+      margin-left: 10px;
+    }
+  }
+
+  i {
+    margin-right: 15px;
+    transition: 0.4s ease;
+    cursor: pointer;
+    &.icon_copy {
+      margin-left: -32px;
+    }
+    &:hover {
+      opacity: 0.6;
+      transition: 0.4s ease;
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+}
+
+.dialog-bottom {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 10px;
+  margin: 0 -20px -30px -20px;
+  background-color: $clDialog-Bottom-Background;
+
+  .axn-btn {
+    max-width: 200px;
+    width: 100%;
+    text-transform: uppercase;
+    margin: 0 10px;
+  }
+}
+
+.dialog-closer {
+  float: right;
+  margin-top: -8px;
+  margin-right: -8px;
+  background: none;
+  padding: 0;
+  border: 0 none;
+  cursor: pointer;
+  img {
+    width: 30px;
+    vertical-align: middle;
+  }
+}
+
+@media screen and (max-width: 800px) {
+  .custom-dialog-container {
+    max-width: 100% !important;
+    width: 90% !important;
+  }
+  .mat-dialog-content {
+    margin: 0 -4% !important;
+    padding: 0 4% !important;
+  }
+  .dialog-block {
+    overflow: auto !important;
+    &__content {
+      padding: 4%;
+    }
+  }
+}
+
+@media screen and (max-width: 580px) {
+  .custom-dialog-container {
+    width: 100% !important;
+    height: 100%;
+  }
+  .dialog-block {
+    height: 100%;
+  }
+}

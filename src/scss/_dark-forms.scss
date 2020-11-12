@@ -1,0 +1,68 @@
+// @import "./variables.scss";
+
+.axn {
+  &-form {
+    &-border {
+      &-dashed {
+        &-right {
+          border-right: $clForm-Border-dark;
+        }
+        &-bottom {
+          border-bottom: $clForm-Border-dark;
+        }
+      }
+    }
+
+    &-accent {
+      background-color: $clForm-Accent-Background-dark !important;
+    }
+
+    input {
+      color: $clForm-Input-dark;
+    }
+
+    &-arrow {
+      &:after {
+        background-color: $clForm-Arrow-Background-dark;
+      }
+    }
+
+    &-block {
+      background-color: $clForm-Block-Background-dark;
+      box-shadow: $clForm-Block-Shadow-dark;
+      &-referal {
+        input {
+          color: $clForm-Block-Input-dark !important;
+        }
+      }
+
+      &-shares {
+        &-value {
+          &-min {
+            color: $clForm-Shares-dark;
+          }
+        }
+
+        &-text {
+          &-min {
+            color: $clForm-Shares-dark;
+          }
+        }
+      }
+
+      &-sendmax {
+        &-text {
+          color: $clForm-Sendmax-dark;
+        }
+      }
+
+      &-one {
+        color: $clForm-Block-One-dark;
+        &-title {
+          color: $clForm-Block-One-Title-dark;
+        }
+      }
+    }
+  }
+}
+

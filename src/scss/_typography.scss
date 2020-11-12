@@ -1,0 +1,251 @@
+// @import "./variables.scss";
+
+p,
+span,
+a {
+  word-break: break-word;
+}
+
+.axn {
+  &-link {
+    text-decoration: none;
+    color: $clLink;
+    transition: 0.4s ease;
+
+    &:hover {
+      text-decoration: underline;
+      transition: 0.4s ease;
+    }
+  }
+
+  &-title {
+    font-style: normal;
+    font-weight: 300;
+    font-size: 28px;
+    color: $clTitle;
+
+    &-block {
+      text-align: center;
+
+      &-left {
+        text-align: left;
+        padding: 30px;
+      }
+
+      &-button {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+
+        @include b(750) {
+          display: grid;
+          grid-template-columns: 1fr;
+          grid-gap: 15px;
+        }
+
+        .axn-btn {
+          max-width: 200px;
+          padding: 10px;
+          margin: 0;
+        }
+
+        .axn-btn-reset {
+          max-width: 70px;
+          margin: 0;
+        }
+      }
+    }
+  }
+
+  &-text {
+    color: $clText;
+    font-size: 16px;
+    font-weight: normal;
+
+    @include b(550) {
+      font-size: 13px;
+    }
+
+    &-highligh {
+      font-weight: 300;
+      font-size: 30px;
+
+      @include b(550) {
+        font-size: 20px;
+      }
+    }
+
+    &-full-width {
+      width: 100%;
+      text-align: center;
+      display: block;
+      padding-bottom: 20px;
+    }
+
+    &-input {
+      font-size: 30px;
+      text-align: center;
+      color: $clText-Input;
+      font-weight: 300;
+      line-height: 1.5;
+      padding: 5px 0;
+      display: block;
+
+      @include b(750) {
+        line-height: 1.3;
+      }
+
+      @include b(550) {
+        font-size: 18px;
+        padding: 3px 0;
+      }
+    }
+
+    &-copied {
+      font-size: 10px;
+      margin-left: 10px;
+
+      @include b(750) {
+        margin-left: 0;
+        margin-top: 10px;
+      }
+    }
+  }
+
+  &-cheap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 30px;
+    min-width: 65px;
+    max-width: max-content;
+    font-size: 15px;
+    line-height: 1;
+    padding: 6px;
+    color: $clCheap-Text;
+    box-shadow: $clCheap-Shadow;
+    height: 18px;
+
+    &:before {
+      width: 20px !important;
+      height: 18px !important;
+      background-size: 20px 18px !important;
+      margin-right: 5px !important;
+    }
+  }
+}
+
+.p {
+  &-20 {
+    padding: 20px !important;
+  }
+
+  &-r {
+    &-10 {
+      padding-right: 10px;
+    }
+  }
+
+  &-tb {
+    &-5 {
+      padding-top: 5px !important;
+      padding-bottom: 5px !important;
+    }
+  }
+
+  &-l {
+    &-10 {
+      padding-left: 10px;
+
+      @include b(900) {
+        padding-left: 0;
+      }
+    }
+  }
+
+  &-b {
+    &-15 {
+      padding-bottom: 15px;
+    }
+
+    &-none {
+      padding-bottom: 0 !important;
+    }
+  }
+}
+
+.m {
+  &-t {
+    &-15 {
+      margin-top: 15px !important;
+    }
+
+    &-20 {
+      margin-top: 20px !important;
+    }
+
+    &-m {
+      &-20 {
+        margin-top: -20px;
+      }
+
+      &-35 {
+        margin-top: -35px;
+      }
+
+      &-25 {
+        margin-top: -25px;
+      }
+    }
+  }
+
+  &-a {
+    margin: 0 auto;
+  }
+}
+
+.b {
+  &-a {
+    &-c {
+      align-items: center;
+    }
+  }
+}
+
+.t {
+  &-fz {
+    &-14 {
+      font-size: 14px;
+
+      @include b(550) {
+        font-size: 12px;
+      }
+    }
+  }
+
+  &-fw {
+    &-light {
+      font-weight: 300 !important;
+    }
+  }
+
+  &-a {
+    &-c {
+      text-align: center;
+    }
+
+    &-r {
+      text-align: right;
+      @include b(750) {
+        text-align: center;
+      }
+    }
+  }
+
+  &-t {
+    &-u {
+      text-transform: uppercase;
+    }
+  }
+}

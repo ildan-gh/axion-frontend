@@ -1,0 +1,153 @@
+// Dark
+
+$clGreen-dark: #37c8b4;
+$clPurple-dark: #7185d6;
+$clRegLight-dark: #cf7575;
+$clGray-dark: #ffffff;
+$clGrayDark-dark: #ffffff;
+$clBlue-dark: #7185d6;
+$clWhite-dark: #ffffff;
+$clYellow-dark: #efb321;
+$clPink-dark: #ed18cc;
+$clGradient-Background-dark: linear-gradient(
+  90deg,
+  $clYellow-dark 0%,
+  $clPink-dark 100%
+);
+
+$clBody-Background-dark: #232839;
+$clBody-Text-dark: #ffffff;
+
+$clSliderTheme-Before-Background-dark: rgba(255, 255, 255, 0.5);
+$clSliderTheme-Border-dark: 1px solid rgba(255, 255, 255, 0.5);
+
+$clHeader-Background-dark: #232839;
+$clHeader-Active-Background-dark: #232839;
+$clHeader-Active-Shadow-dark: 0 3px 7px rgba(0, 0, 0, 0.09);
+$clHeader-Menu-Item-Text-dark: #ffffff;
+$clHeader-Menu-Item-Text-Link-dark: #ffffff;
+$clHeader-Menu-Item-Text-Link-Background-dark: #ffffff;
+
+$clNavbar-Background-dark: #232839;
+$clNavbar-Active-Background-dark: #232839;
+$clNavbar-Item-Text-dark: #ffffff;
+
+$clLeftDays-Background-dark: linear-gradient(0deg, #efd444, #efd444);
+$clLeftDays-After-Background-dark: linear-gradient(
+  to right,
+  rgba(239, 212, 68, 1) 0%,
+  rgba(239, 212, 68, 0) 100%
+);
+$clLeftDays-After-Background-1-dark: -webkit-linear-gradient(
+  left,
+  rgba(239, 212, 68, 1) 0%,
+  rgba(239, 212, 68, 0) 100%
+);
+$clLeftDays-After-Background-2-dark: -moz-linear-gradient(
+  left,
+  rgba(239, 212, 68, 1) 0%,
+  rgba(239, 212, 68, 0) 100%
+);
+$clLeftDays-After-Filter-dark: progid:DXImageTransform.Microsoft.gradient( startColorstr='#efd444', endColorstr='#00efd444',GradientType=1 );
+$clLeftDays-Before-Background-dark: linear-gradient(
+  to right,
+  rgba(239, 212, 68, 0) 0%,
+  rgba(239, 212, 68, 1) 100%
+);
+$clLeftDays-Before-Background-1-dark: -webkit-linear-gradient(
+  left,
+  rgba(239, 212, 68, 0) 0%,
+  rgba(239, 212, 68, 1) 100%
+);
+$clLeftDays-Before-Background-2-dark: -moz-linear-gradient(
+  left,
+  rgba(239, 212, 68, 0) 0%,
+  rgba(239, 212, 68, 1) 100%
+);
+$clLeftDays-Before-Filter-dark: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00efd444', endColorstr='#efd444',GradientType=1 );
+
+$clQuestion-Background-dark: #7185d6;
+$clQuestion-Tooltip-Background-dark: rgb(113, 125, 184);
+$clQuestion-Tooltip-Text-dark: #ffffff;
+$clQuestion-Tooltip-Shadow-dark: -20px -20px 30px rgba(113, 125, 184, 0.5),
+  20px 20px 40px rgba(113, 125, 184, 0.25);
+
+$clEllips-Container-Background-dark: #717274;
+
+$clText-dark: #ffffff;
+$clText-Input-dark: #ffffff;
+$clTitle-dark: #ffffff;
+$clLink-dark: #8670fa;
+
+$clTable-Thead-dark: #ffffff;
+$clTable-Thead-Active-dark: #37c8b4;
+$clTable-Thead-Sort-dark: #37c8b4;
+$clTable-Thead-Sort-Before-dark: #ffffff;
+$clTable-Tbody-Td-Text-dark: #ffffff;
+$clTable-Tbody-Td-Background-dark: rgb(120 138 206 / 35%);
+$clTable-Tbody-Td-Action-Button-Before-Background-dark: rgba(
+  255,
+  255,
+  255,
+  0.478
+);
+
+$clTooltip-Text-dark: #ffffff;
+$clTooltip-Background-dark: #717db8;
+
+$clCheap-Text-dark: #ffffff;
+$clCheap-Shadow-dark: 0px 5px 10px rgba(0, 0, 0, 0.1);
+
+$clForm-Border-dark: 1px dashed rgba(255, 255, 255, 0.5);
+$clForm-Accent-Background-dark: #4c598e;
+$clForm-Input-dark: #ffffff;
+$clForm-Arrow-Background-dark: #7185d6;
+$clForm-Block-Background-dark: #4c598e;
+// $clForm-Block-Shadow-dark: -20px -20px 30px rgba(94, 112, 191, 0.25),
+//   20px 20px 40px rgba(10, 17, 45, 0.25);
+$clForm-Block-Shadow-dark: 5px 5px 10px rgba(94, 112, 191, 0.25),
+  -5px -5px 10px rgba(10, 17, 45, 0.25);
+
+$clForm-Block-Input-dark: #ffffff;
+$clForm-Shares-dark: #ffffff;
+$clForm-Sendmax-dark: rgba(255, 255, 255, 0.5);
+$clForm-Block-One-dark: #ffffff;
+$clForm-Block-One-Title-dark: #ffffff;
+
+$clDialog-Overlay-Dark-Backfrop-dark: rgba(0, 0, 0, 0.35);
+$clDialog-Mat-Container-dark: #ffffff;
+$clDialog-Mat-Container-Background-dark: $clForm-Block-Background-dark;
+$clDialog-Block-dark: #ffffff;
+$clDialog-Bottom-Background-dark: rgba(0, 0, 0, 0.04);
+
+$clButton-Max-Border-dark: 1px solid #ffffff;
+$clButton-Max-Text-dark: #ffffff;
+$clButton-Gray-Text-dark: #ffffff;
+$clButton-Gray-Background-dark: #4d5a8c;
+$clButton-Gray-Shadow-dark: 5px 5px 10px rgba(94, 112, 191, 0.25),
+  -5px -5px 10px rgba(10, 17, 45, 0.25);
+$clButton-Gray-Hover-Text-dark: #ffffff;
+$clButton-Gray-Hover-Shadow-dark: -2px -2px 10px rgba(10, 17, 45, 0.25),
+  8px 8px 15px rgba(94, 112, 191, 0.25),
+  inset 3px 3px 3px rgba(10, 17, 45, 0.25),
+  inset -3px -3px 3px rgba(10, 17, 45, 0.25);
+// $clButton-Gray-Hover-Shadow-dark: -2px -2px 10px #5c6ba4,
+//   8px 8px 15px rgba(10, 17, 45, 0.25), inset 3px 3px 3px rgba(10, 17, 45, 0.25),
+//   inset -3px -3px 3px rgba(10, 17, 45, 0.25);
+$clButton-Metamask-Before-Background-dark: rgba(0, 0, 0, 0.15);
+$clButton-Metamask-Text-dark: #ffffff;
+$clButton-Purple-Background-dark: linear-gradient(0deg, #8670fa, #8670fa);
+$clButton-Purple-Text-dark: #ffffff;
+$clButton-Copy-Text-dark: #ffffff;
+$clButton-Copy-Border-dark: 1px solid #37c8b4;
+$clButton-Copy-Background-dark: linear-gradient(
+  0deg,
+  rgba(0, 0, 0, 0.2),
+  rgba(0, 0, 0, 0.2)
+);
+$clButton-Input-Text-dark: #ffffff;
+
+$imgIcon-Unicorn-dark: url("assets/images/icons/unicorn-dark-theme.svg");
+$imgButton-Arrow-Right-dark: url("assets/images/base/arrow-left-dark-theme.svg");
+$imgSwitch-Theme-dark: url("assets/images/base/white-theme.svg");
+// $imgStakingOk-1: url("assets/images/icons/ok-blue-icon-dark-theme.svg");

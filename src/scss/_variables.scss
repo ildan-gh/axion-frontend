@@ -1,0 +1,137 @@
+// White
+
+$clGreen: #37c8b4;
+$clPurple: #8670fa;
+$clRegLight: #cf7575;
+$clGray: #ffffffa6;
+$clGrayDark: #71727491;
+$clBlue: #4d588e;
+$clWhite: #ffffff;
+$clYellow: #efb321;
+$clPink: #ed18cc;
+$clGradient-Background: linear-gradient(90deg, $clYellow 0%, $clPink 100%);
+
+$clBody-Background: #e7eaef;
+$clBody-Text: #717274;
+
+$clSliderTheme-Before-Background: rgba(74, 85, 104, 0.5);
+$clSliderTheme-Border: 1px solid rgba(74, 85, 104, 0.5);
+
+$clHeader-Background: #e7eaef;
+$clHeader-Active-Background: #e7eaef;
+$clHeader-Active-Shadow: 0 3px 7px rgba(0, 0, 0, 0.09);
+$clHeader-Menu-Item-Text: #ffffff;
+$clHeader-Menu-Item-Text-Link: #717274;
+$clHeader-Menu-Item-Text-Link-Background: #717274;
+
+$clNavbar-Background: #8670fa;
+$clNavbar-Active-Background: #e7eaef;
+$clNavbar-Item-Text: #717274;
+
+$clLeftDays-Background: linear-gradient(0deg, #efd444, #efd444);
+$clLeftDays-After-Background: linear-gradient(
+  to right,
+  rgba(239, 212, 68, 1) 0%,
+  rgba(239, 212, 68, 0) 100%
+);
+$clLeftDays-After-Background-1: -webkit-linear-gradient(
+  left,
+  rgba(239, 212, 68, 1) 0%,
+  rgba(239, 212, 68, 0) 100%
+);
+$clLeftDays-After-Background-2: -moz-linear-gradient(
+  left,
+  rgba(239, 212, 68, 1) 0%,
+  rgba(239, 212, 68, 0) 100%
+);
+$clLeftDays-After-Filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#efd444', endColorstr='#00efd444',GradientType=1 );
+$clLeftDays-Before-Background: linear-gradient(
+  to right,
+  rgba(239, 212, 68, 0) 0%,
+  rgba(239, 212, 68, 1) 100%
+);
+$clLeftDays-Before-Background-1: -webkit-linear-gradient(
+  left,
+  rgba(239, 212, 68, 0) 0%,
+  rgba(239, 212, 68, 1) 100%
+);
+$clLeftDays-Before-Background-2: -moz-linear-gradient(
+  left,
+  rgba(239, 212, 68, 0) 0%,
+  rgba(239, 212, 68, 1) 100%
+);
+$clLeftDays-Before-Filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00efd444', endColorstr='#efd444',GradientType=1 );
+
+$clQuestion-Background: #717274;
+$clQuestion-Tooltip-Background: #717db8;
+$clQuestion-Tooltip-Text: #ffffff;
+$clQuestion-Tooltip-Shadow: -20px -20px 30px rgba(255, 255, 255, 0.5),
+  20px 20px 40px rgba(174, 174, 192, 0.25);
+
+$clEllips-Container-Background: #717274;
+
+$clText: #717274;
+$clText-Input: #717274;
+$clTitle: #717274;
+$clLink: #8670fa;
+
+$clTable-Thead: #717274;
+$clTable-Thead-Active: #37c8b4;
+$clTable-Thead-Sort: #37c8b4;
+$clTable-Thead-Sort-Before: #ffffff;
+
+$clTable-Tbody-Td-Text: #717274;
+$clTable-Tbody-Td-Background: #ffffff7a;
+$clTable-Tbody-Td-Action-Button-Before-Background: rgba(255, 255, 255, 0.1);
+
+$clTooltip-Text: #ffffff;
+$clTooltip-Background: #717db8;
+
+$clCheap-Text: #ffffff;
+$clCheap-Shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+
+$clForm-Border: 1px dashed rgba(113, 114, 116, 0.5);
+$clForm-Accent-Background: #e7ecf2;
+$clForm-Input: #717274;
+$clForm-Arrow-Background: #4e598f;
+$clForm-Block-Background: #e7eaef;
+$clForm-Block-Shadow: 5px 5px 10px #d2d5d9, -5px -5px 10px #fcffff;
+
+$clForm-Block-Input: #717274;
+$clForm-Shares: #717274;
+$clForm-Sendmax: rgba(113, 114, 116, 0.5);
+$clForm-Block-One: #717274;
+$clForm-Block-One-Title: #717274;
+
+$clDialog-Overlay-Dark-Backfrop: rgba(0, 0, 0, 0.35);
+$clDialog-Mat-Container: #717274;
+$clDialog-Mat-Container-Background: #eaeff6;
+$clDialog-Block: #717274;
+$clDialog-Bottom-Background: rgba(0, 0, 0, 0.04);
+
+$clButton-Max-Border: 1px solid #717274;
+$clButton-Max-Text: #717274;
+$clButton-Gray-Text: #717274;
+$clButton-Gray-Background: #eaeff6;
+$clButton-Gray-Shadow: -5px -5px 10px $clWhite,
+  8px 8px 15px rgba(10, 17, 45, 0.1);
+$clButton-Gray-Hover-Text: #666;
+$clButton-Gray-Hover-Shadow: 6px 6px 11px #d7dce2, -6px -6px 11px #fdffff,
+  inset 3px 3px 3px #d7dce2, inset -3px -3px 3px #fdffff;
+$clButton-Metamask-Before-Background: rgba(255, 255, 255, 0.5);
+$clButton-Metamask-Text: #717274;
+$clButton-Purple-Background: linear-gradient(0deg, #8670fa, #8670fa);
+$clButton-Purple-Text: #ffffff;
+$clButton-Copy-Text: #ffffff;
+$clButton-Copy-Border: 1px solid #37c8b4;
+$clButton-Copy-Background: linear-gradient(
+  0deg,
+  rgba(0, 0, 0, 0.2),
+  rgba(0, 0, 0, 0.2)
+);
+$clButton-Input-Text: #ffffff;
+
+$imgIcon-Unicorn: url("assets/images/icons/unicorn-white-theme.svg");
+$imgButton-Arrow-Right: url("assets/images/base/arrow-left-white-theme.svg");
+$imgSwitch-Theme: url("assets/images/base/dark-theme.svg");
+$imgStakingOk-1: url("assets/images/icons/ok-blue-icon-white-theme.svg");

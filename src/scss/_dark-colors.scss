@@ -1,0 +1,73 @@
+.cl {
+  &-aqua {
+    color: $clGreen-dark !important;
+
+    &-bg {
+      background-color: $clGreen-dark !important;
+    }
+  }
+
+  &-white {
+    color: $clWhite-dark !important;
+
+    &-bg {
+      background-color: $clWhite-dark !important;
+    }
+  }
+
+  &-green {
+    color: $clGreen-dark !important;
+
+    &-bg {
+      background-color: $clGreen-dark !important;
+    }
+  }
+
+  &-purple {
+    color: $clPurple-dark !important;
+
+    &-bg {
+      background-color: $clPurple-dark !important;
+    }
+  }
+
+  &-red {
+    &-light {
+      color: $clRegLight-dark !important;
+
+      &-bg {
+        background-color: $clRegLight-dark !important;
+      }
+    }
+  }
+
+  &-gray {
+    color: $clGray-dark !important;
+
+    &-dark {
+      color: $clGrayDark-dark !important;
+
+      &-bg {
+        background-color: $clGrayDark-dark !important;
+      }
+    }
+
+    &-bg {
+      background-color: $clGray-dark !important;
+    }
+  }
+
+  &-blue {
+    color: $clBlue-dark !important;
+
+    &-bg {
+      background-color: $clBlue-dark !important;
+    }
+  }
+
+  &-gradient {
+    &-bg {
+      background: $clGradient-Background-dark;
+    }
+  }
+}

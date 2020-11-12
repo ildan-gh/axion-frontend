@@ -1,175 +1,297 @@
-<div class="content-container">
-  <div class="content-block" [ngClass]="{'no-active': !account}">
-    <div class="content-block_title">
-      <span>HEX > Axion</span>
-      <span class="content-block_title_help"></span>
-    </div>
-    <div class="blocks-list">
-      <div class="blocks-list_element width-33">
-        <div class="blocks-list_item">
-          <div class="blocks-list_item_title uppercase">Your Amount</div>
-          <div class="blocks-list_item_value" fittext [maxFontSize]="38">
-            {{account ? account?.balances.HEX.display || 0 : 0}}
-          </div>
-          <div class="blocks-list_item_currency blocks-list_item_currency__hex">
-            <span>HEX</span>
-          </div>
-        </div>
-      </div>
-      <div class="blocks-list_group blocks-list_element width-66">
-        <div class="list">
-          <div class="blocks-list_item">
-            <div class="blocks-list_item_title uppercase">For Claim</div>
-            <div class="blocks-list_item_value blocks-list_item_value__positive" fittext [maxFontSize]="38">
-              {{(account ? account.claimableInfo.claim || 0 : 0) | bigNumberFormat : tokensDecimals['HEX2X'] : true : false : 4}}
-            </div>
-            <div class="blocks-list_item_currency blocks-list_item_currency__axn">
-              <span>AXN</span>
-            </div>
-          </div>
-          <div class="blocks-list_item">
-            <div class="blocks-list_item_title uppercase">Penalty</div>
-            <div class="blocks-list_item_value blocks-list_item_value__negative" fittext [maxFontSize]="38">
-              {{(account ? account.claimableInfo.penalty || 0 : 0) | bigNumberFormat : tokensDecimals['HEX2X'] : true : false : 4}}
-            </div>
-            <div class="blocks-list_item_currency blocks-list_item_currency__axn">
-              <span>AXN</span>
-            </div>
-          </div>
-        </div>
+<section class="axn-section" *ngIf="account">
+  <div class="axn-title-block">
+    <span class="axn-title">Convert HEX3T to AXN</span>
+    <div
+      #tooltip="matTooltip"
+      (click)="tooltip.toggle()"
+      class="question"
+      mat-raised-button
+      matTooltip="
+      Exchange HEX3T tokens to Axion at a 1:1 rate. To receive Axion tokens, send tokens to the Burn contract and burn them. The exchange will be available for 350 days, however, there is a Late Claim Penalty for late exchange.
 
-        <div class="blocks-list_group_btn" *ngIf="account && (!account.claimableInfo.claim.isZero() || !account.claimableInfo.penalty.isZero())">
-          <button class="btn btn__normal"
-                  (click)="claim()"
-                  [ngClass]="{progress: claimTokensProgress}"
-                  [disabled]="claimTokensProgress">
-            <span class="lds-ellipsis" *ngIf="claimTokensProgress">
-              <span class="lds-ellipsis-container">
-                <span></span><span></span><span></span><span></span>
-              </span>
-            </span>
-            <span>Claim</span>
-          </button>
-        </div>
-      </div>
-    </div>
+      The amount of the penalty is calculated by the formula:
+      Penalty = HEX3T amount * (day since free claim starts / 350)
+
+      All penalized tokens will be sent to the next day auction."
+      matTooltipClass="question__tooltip"
+    ></div>
   </div>
 
+  <div class="axn-form axn-form-3">
+    <div class="axn-form-block">
+      <div class="axn-form-block-one axn-form-arrow p-b-none">
+        <span class="axn-form-block-one-title">From</span>
+        <input
+          type="text"
+          required="required"
+          class="axn-input"
+          placeholder="0.0"
+          onfocus="this.placeholder = ''"
+          onblur="this.placeholder = '0.0'"
+          [appBigNumber]="{
+            decimals: tokensDecimals['H2T'],
+            min: 1,
+            max: account?.balances.H2T.wei
+          }"
+          [maxValueChange]="onChangeAccount"
+          (ngModelChange)="onChangeAmount()"
+          [(ngModel)]="formsData.swapAmount"
+          name="swap-amount"
+          autocomplete="off"
+        />
+        <span class="axn-cheap icon icon_hex cl-gradient-bg">HEX3T</span>
 
-  <div class="content-block" [ngClass]="{'no-active': !account}">
-    <div class="content-block_title">
-      <span>H2T > H2X</span>
-      <span class="content-block_title_help"></span>
-    </div>
-
-    <form #sendForm="ngForm" class="blocks-list">
-      <div class="blocks-list_group blocks-list_element blocks-list_form-group width-40">
-        <div class="list">
-          <div class="blocks-list_item" *ngIf="account?.balances">
-            <div class="blocks-list_item_title nowrap uppercase">Your amount</div>
-            <div class="blocks-list_item_value" fittext [maxFontSize]="38">
-              {{account ? account?.balances.H2T.display || 0 : 0}}
-            </div>
-            <div class="blocks-list_item_currency blocks-list_item_currency__h2t">
-              <span>H2T</span>
-            </div>
+        <div class="axn-form-base-2 axn-form-bottom">
+          <div class="axn-form-block-sendmax">
+            <span
+              class="axn-btn axn-btn-max"
+              (click)="
+                formsData.swapAmount = account?.balances.H2T.shortBigNumber.toString()
+              "
+            >
+              Send max
+            </span>
+            <span class="axn-form-block-sendmax-text">
+              Balance
+              <span class="axn-form-block-sendmax-value">
+                {{
+                  (account ? account?.balances.H2T.wei || 0 : 0)
+                    | bigNumberFormat: tokensDecimals.H2T:true:false:18
+                }}
+              </span>
+            </span>
           </div>
-          <div class="blocks-list_item" [ngClass]="{disabled: swapTokensProgress}">
-            <div class="blocks-list_item_title uppercase">Send to Swap</div>
-            <div class="form-group">
-              <div class="form-group_title uppercase">Enter amount</div>
-              <div class="form-group_input">
-                <input type="text"
-                       *ngIf="account"
-                       required="required"
-                       [appBigNumber]="{
-                          decimals: tokensDecimals['H2T'],
-                          min: 1,
-                          max: account?.balances.H2T.wei
-                       }"
-                       [maxValueChange]="onChangeAccount"
-                       [(ngModel)]="formsData.swapAmount"
-                       name="swap-amount">
-                <div class="form-group_input-btn">
-                  <button (click)="formsData.swapAmount = account?.balances.H2T.shortBigNumber.toString()">Send<br/>max</button>
-                </div>
-              </div>
-            </div>
-            <div class="blocks-list_group_btn without-margin">
-              <button class="btn btn__normal"
-                      [ngClass]="{progress: swapTokensProgress}"
-                      [disabled]="sendForm.invalid || swapTokensProgress" (click)="swapH2T()">
-                <span class="lds-ellipsis" *ngIf="swapTokensProgress">
-                  <span class="lds-ellipsis-container">
-                    <span></span><span></span><span></span><span></span>
-                  </span>
+          <div class="axn-form-block-button">
+            <button
+              class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-small"
+              [ngClass]="{ progress: swapTokensProgress }"
+              [disabled]="!dataSendForm || swapTokensProgress"
+              (click)="swapH2T()"
+            >
+              <span class="lds-ellipsis" *ngIf="swapTokensProgress">
+                <span class="lds-ellipsis-container">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
                 </span>
-                <span>Send</span>
-              </button>
-            </div>
+              </span>
+              <span class="axn-btn-text axn-btn-arrow-right">Send</span>
+            </button>
           </div>
         </div>
       </div>
+    </div>
 
-      <div class="blocks-list_element width-20" [ngClass]="{'in-update': updateSwapBalanceProgress}">
-        <div class="blocks-list_item">
-          <div class="blocks-list_item_title uppercase">SWAP Contract</div>
-          <div class="blocks-list_item_value" fittext [maxFontSize]="38">
-            {{(swapContractBalance || 0) | bigNumberFormat : 0 : true : false : false}}
-          </div>
-          <div class="blocks-list_item_currency blocks-list_item_currency__h2t">
-            <span>H2T</span>
-          </div>
-        </div>
-
-        <div class="blocks-list_group_btn">
-          <button class="btn btn__transparent"
-                  (click)="withdrawH2T()"
-                  [ngClass]="{progress: withdrawH2TProgress}"
-                  [disabled]="+swapContractBalance === 0 || withdrawH2TProgress">
+    <div class="axn-form-block">
+      <div class="axn-form-block-one axn-form-arrow">
+        <span class="axn-form-block-one-title">Swap contract</span>
+        <span
+          class="axn-form-block-one-value-bs"
+          matTooltipClass="table__tooltip"
+          mat-raised-button
+          matTooltip="{{
+            swapContractBalance.fullValue || 0
+              | bigNumberFormat: tokensDecimals.HEX2X:true:false:18
+          }}"
+        >
+          {{
+            swapContractBalance.fullValue || 0
+              | bigNumberFormat: tokensDecimals.HEX2X:true:false:2
+          }}
+        </span>
+        <span class="axn-cheap icon icon_hex cl-gradient-bg">HEX3T</span>
+        <div class="axn-form-block-button axn-form-bottom">
+          <button
+            class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid"
+            (click)="withdrawH2T()"
+            [ngClass]="{ progress: withdrawH2TProgress }"
+            [disabled]="+swapContractBalance.value === 0 || withdrawH2TProgress"
+          >
             <span class="lds-ellipsis" *ngIf="withdrawH2TProgress">
               <span class="lds-ellipsis-container">
-                <span></span><span></span><span></span><span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
               </span>
             </span>
-            <span>Draw back</span>
+            <span class="axn-btn-text axn-btn-arrow-left">Draw Back</span>
           </button>
         </div>
       </div>
+    </div>
 
-      <div class="blocks-list_group blocks-list_element width-40">
-        <div class="list">
-          <div class="blocks-list_item width-50">
-            <div class="blocks-list_item_title uppercase">For Claim</div>
-            <div class="blocks-list_item_value blocks-list_item_value__positive" fittext [maxFontSize]="38">0</div>
-            <div class="blocks-list_item_currency blocks-list_item_currency__axn">
-              <span>AXN</span>
-            </div>
-          </div>
-          <div class="blocks-list_item width-50">
-            <div class="blocks-list_item_title uppercase">Penalty</div>
-            <div class="blocks-list_item_value blocks-list_item_value__negative" fittext [maxFontSize]="38">
-              50,879,777,143.4973
-            </div>
-            <div class="blocks-list_item_currency blocks-list_item_currency__axn">
-              <span>AXN</span>
-            </div>
-          </div>
+    <div class="axn-form-block">
+      <div class="axn-form-base-2">
+        <div class="axn-form-block-one axn-form-border-dashed-right">
+          <span class="axn-form-block-one-title">To</span>
+          <span
+            class="axn-form-block-one-value-bs"
+            matTooltipClass="table__tooltip"
+            mat-raised-button
+            matTooltip="{{
+              toSwap || 0 | bigNumberFormat: tokensDecimals.HEX2X:true:false:18
+            }}"
+          >
+            {{
+              toSwap || 0 | bigNumberFormat: tokensDecimals.HEX2X:true:false:2
+            }}
+          </span>
+          <span class="axn-cheap icon icon_axn cl-blue-bg">AXN</span>
         </div>
-        <div class="blocks-list_group_btn">
-          <button class="btn btn__normal"
-                  (click)="burnH2T()"
-                  [ngClass]="{progress: burnTokensProgress}"
-                  [disabled]="burnTokensProgress">
-            <span class="lds-ellipsis" *ngIf="burnTokensProgress">
-              <span class="lds-ellipsis-container">
-                <span></span><span></span><span></span><span></span>
-              </span>
-            </span>
-            <span>Burn</span>
-          </button>
+        <div class="axn-form-block-one">
+          <span class="axn-form-block-one-title">Penalty</span>
+          <span
+            class="axn-form-block-one-value-bs"
+            matTooltipClass="table__tooltip"
+            mat-raised-button
+            matTooltip="{{
+              clacPenalty || 0
+                | bigNumberFormat: tokensDecimals.HEX2X:true:false:18
+            }}"
+          >
+            {{
+              clacPenalty || 0
+                | bigNumberFormat: tokensDecimals.HEX2X:true:false:2
+            }}
+          </span>
+          <span class="axn-cheap icon icon_axn cl-blue-bg">AXN</span>
         </div>
       </div>
-    </form>
+      <div class="axn-form-block-button axn-form-bottom">
+        <button
+          class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-big"
+          (click)="burnH2T()"
+          [ngClass]="{ progress: burnTokensProgress }"
+          [disabled]="
+            swapContractBalance.fullValueNumber === 0 || burnTokensProgress
+          "
+        >
+          <span class="lds-ellipsis" *ngIf="burnTokensProgress">
+            <span class="lds-ellipsis-container">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </span>
+          </span>
+          <span class="axn-btn-text">SWAP</span>
+        </button>
+      </div>
+    </div>
   </div>
-</div>
+</section>
+
+<section class="axn-section" *ngIf="account">
+  <div class="axn-title-block">
+    <span class="axn-title">Freeclaim AXN with HEX</span>
+    <div
+      #tooltip2="matTooltip"
+      (click)="tooltip2.toggle()"
+      class="question"
+      mat-raised-button
+      matTooltip="Get Axion for HEX tokens for free at a rate of 1: 1. All free claimed Axion tokens will be automatically staked for 350 days.
+
+    The amount of the free claim is limited to 10M Axion, tokens over the limit will be sent to the Weekly Auction.
+
+    The exchange will be available for 350 days, however, there is a Late Claim Penalty for late exchange. The amount of the penalty is calculated by the formula:
+    Penalty = (HEX + Shares amount) * (day since free claim starts / 350)
+
+    Tokens from the penalty will be distributed in the following way: 349/350 will be sent to the next day auction; 1/350 for distribution at the end of the year at BigPayDay."
+      matTooltipClass="question__tooltip"
+    ></div>
+  </div>
+
+  <div class="axn-form axn-form-base-3">
+    <div class="axn-form-block axn-form-accent">
+      <div class="axn-form-block-one axn-form-arrow">
+        <span class="axn-form-block-one-title">From</span>
+        <span
+          class="axn-form-block-one-value"
+          matTooltipClass="table__tooltip"
+          mat-raised-button
+          matTooltip="{{
+            (account ? account.snapshot.show_hex || 0 : 0)
+              | bigNumberFormat: tokensDecimals.HEX:true:false:18
+          }}"
+        >
+          <b>
+            {{
+              (account ? account.snapshot.show_hex || 0 : 0)
+                | bigNumberFormat: tokensDecimals.HEX:true:false:2
+            }}
+          </b>
+        </span>
+        <span class="axn-cheap cl-gradient-bg">HEX</span>
+      </div>
+    </div>
+
+    <div class="axn-form-block axn-form-accent">
+      <div class="axn-form-block-one">
+        <span class="axn-form-block-one-title">To</span>
+        <span
+          class="axn-form-block-one-value"
+          matTooltipClass="table__tooltip"
+          mat-raised-button
+          matTooltip="{{
+            (account ? account.claimableInfo.claim || 0 : 0)
+              | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+          }}"
+        >
+          {{
+            (account ? account.claimableInfo.claim || 0 : 0)
+              | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+          }}
+        </span>
+        <span class="axn-cheap icon icon_axn cl-blue-bg">AXN</span>
+      </div>
+    </div>
+
+    <div class="axn-form-block axn-form-accent">
+      <div class="axn-form-block-one">
+        <span class="axn-form-block-one-title">Penalty</span>
+        <span
+          class="axn-form-block-one-value"
+          matTooltipClass="table__tooltip"
+          mat-raised-button
+          matTooltip="{{
+            (account ? account.claimableInfo.penalty || 0 : 0)
+              | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+          }}"
+        >
+          {{
+            (account ? account.claimableInfo.penalty || 0 : 0)
+              | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+          }}
+        </span>
+        <span class="axn-cheap icon icon_axn cl-blue-bg">AXN</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="axn-form-block axn-form-transparent">
+    <div class="axn-form-block-button">
+      <button
+        class="axn-btn axn-btn-gray axn-btn-form"
+        (click)="claim()"
+        [ngClass]="{ progress: claimTokensProgress }"
+        [disabled]="
+          account.snapshot.user_dont_have_hex ||
+          account.claimableInfo.claim.isZero() ||
+          claimTokensProgress
+        "
+      >
+        <span class="lds-ellipsis" *ngIf="claimTokensProgress">
+          <span class="lds-ellipsis-container">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+        </span>
+        <span class="axn-btn-text">CLAIM</span>
+      </button>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,110 @@
+body {
+  &.dark {
+
+    @import 'dark-colors';
+    @import 'dark-typography.scss';
+    @import 'dark-buttons.scss';
+    @import 'dark-forms.scss';
+    @import 'dark-dialog.scss';
+    @import 'dark-icons.scss';
+    @import 'dark-tables.scss';
+
+    background: $clBody-Background-dark;
+    color: $clBody-Text-dark;
+
+    &:-webkit-scrollbar {
+      background-color: $clPurple-dark;
+    }
+
+
+    .header {
+      @include b(990) {
+        background-color: $clHeader-Background-dark;
+      }
+      .cdk-global-scrollblock &, &.active {
+        background-color: $clHeader-Active-Background-dark;
+        box-shadow: $clHeader-Active-Shadow-dark;
+      }
+
+      &-navbar {
+        background-color: $clNavbar-Background-dark;
+        @include b(990) {
+          background: $clNavbar-Background-dark;
+        }
+
+        &.active {
+          @include b(990) {
+            background-color: $clNavbar-Active-Background-dark;
+          }
+        }
+        &-item {
+          a {
+            @include b(990) {
+              color: $clNavbar-Item-Text-dark;
+            }
+          }
+        }
+      }
+
+      &-menu {
+        &_item {
+          color: $clHeader-Menu-Item-Text-dark;
+          a {
+            color: $clHeader-Menu-Item-Text-Link-dark;
+            &:before {
+              background-color: $clHeader-Menu-Item-Text-Link-Background-dark;
+            }
+          }
+        }
+      }
+    }
+
+    .left-days-info {
+      background: $clLeftDays-Background-dark;
+      &:after {
+        left: 0;
+        background: $clLeftDays-After-Background-dark;
+        background: $clLeftDays-After-Background-1-dark;
+        background: $clLeftDays-After-Background-2-dark;
+        filter: $clLeftDays-After-Filter-dark;
+      }
+
+      &:before {
+        background: $clLeftDays-Before-Background-dark;
+        background: $clLeftDays-Before-Background-1-dark;
+        background: $clLeftDays-Before-Background-2-dark;
+        filter: $clLeftDays-Before-Filter-dark;
+      }
+    }
+
+
+    .question {
+      background: $clQuestion-Background-dark;
+      &__tooltip {
+        color: $clQuestion-Tooltip-Text-dark !important;
+        background: $clQuestion-Tooltip-Background-dark !important;
+        box-shadow: $clQuestion-Tooltip-Shadow-dark;
+      }
+    }
+
+
+
+    .lds-ellipsis {
+      &-container {
+        span {
+          background: $clEllips-Container-Background-dark;
+        }
+      }
+    }
+
+    .slider {
+      border: $clSliderTheme-Border-dark;
+    }
+
+    .slider:before {
+      background-color: $clSliderTheme-Before-Background-dark;
+    }
+
+
+  }
+}

@@ -1,0 +1,101 @@
+
+// mainnet
+
+/*
+  For mainnet set param "production" to true
+  If you need to show button (add to metamask) - add chain in array [1,2,3,4,5 ....] (mainnet chain = 1)
+  */
+
+{
+  "settings": {
+    "checkerDays": 3600000,
+    "checkerAuctionPool": 15000,
+    "checkerStakingInfo": 3600000,
+    "checkerBPD": 3600000,
+
+    "production": true,
+    "chainsForButtonAddToMetamask": [1, 3],
+    "network": "mainnet",
+    "net": 1,
+
+    "time": {
+      "seconds": 86400,
+      "display": "days"
+    }
+  },
+  "minutes": {
+    "name": "Minutes",
+    "shortName": "Min",
+    "lowerName": "minutes"
+  },
+  "days": {
+    "name": "Days",
+    "shortName": "Days",
+    "lowerName": "days"
+  }
+}
+
+// ropsten
+{
+  "settings": {
+    "checkerDays": 3600000,
+    "checkerAuctionPool": 15000,
+    "checkerStakingInfo": 3600000,
+    "checkerBPD": 3600000,
+
+    "production": false,
+    "chainsForButtonAddToMetamask": [1, 3],
+
+    "network": "ropsten",
+    "net": 3,
+    "tonkenUrl": "https://ropsten.etherscan.io/token/",
+
+    "time": {
+      "seconds": 86400,
+      "display": "days"
+    }
+  },
+  "minutes": {
+    "name": "Minutes",
+    "shortName": "Min",
+    "lowerName": "minutes"
+  },
+  "days": {
+    "name": "Days",
+    "shortName": "Days",
+    "lowerName": "days"
+  }
+}
+
+
+// rinkeby
+{
+  "settings": {
+    "checkerDays": 5000,
+    "checkerAuctionPool": 5000,
+    "checkerStakingInfo": 3600000,
+    "checkerBPD": 3600000,
+
+    "production": false,
+    "chainsForButtonAddToMetamask": [1, 3],
+
+    "network": "rinkeby",
+    "tonkenUrl": "https://rinkeby.etherscan.io/token/",
+    "net": 4,
+
+    "time": {
+      "seconds": 900,
+      "display": "minutes"
+    }
+  },
+  "minutes": {
+    "name": "Minutes",
+    "shortName": "Min",
+    "lowerName": "minutes"
+  },
+  "days": {
+    "name": "Days",
+    "shortName": "Days",
+    "lowerName": "days"
+  }
+}

@@ -1,0 +1,75 @@
+// @import "./variables.scss";
+
+.cl {
+  &-aqua {
+    color: $clGreen !important;
+
+    &-bg {
+      background-color: $clGreen !important;
+    }
+  }
+
+  &-white {
+    color: $clWhite !important;
+
+    &-bg {
+      background-color: $clWhite !important;
+    }
+  }
+
+  &-green {
+    color: $clGreen !important;
+
+    &-bg {
+      background-color: $clGreen !important;
+    }
+  }
+
+  &-purple {
+    color: $clPurple !important;
+
+    &-bg {
+      background-color: $clPurple !important;
+    }
+  }
+
+  &-red {
+    &-light {
+      color: $clRegLight !important;
+
+      &-bg {
+        background-color: $clRegLight !important;
+      }
+    }
+  }
+
+  &-gray {
+    color: $clGray !important;
+
+    &-dark {
+      color: $clGrayDark !important;
+
+      &-bg {
+        background-color: $clGrayDark !important;
+      }
+    }
+
+    &-bg {
+      background-color: $clGray !important;
+    }
+  }
+
+  &-blue {
+    color: $clBlue !important;
+
+    &-bg {
+      background-color: $clBlue !important;
+    }
+  }
+
+  &-gradient {
+    &-bg {
+      background: $clGradient-Background;
+    }
+  }
+}

@@ -1,148 +1,412 @@
-<div class="content-container">
+<section class="axn-section" *ngIf="account">
+  <div class="axn-title-block">
+    <span class="axn-title">Auction</span>
+    <div
+      #tooltip2="matTooltip"
+      (click)="tooltip2.toggle()"
+      class="question"
+      mat-raised-button
+      matTooltip="
+      The auction raffling accumulated Axion tokens between users in proportion to the participants' stakes in Ethereum. Axion's auction price is can't be lower than the Uniswap price minus 10%, unspent Auction Axion transferred to Weekly Auction.
 
+      When the user places a bet in ETH: 80% of the received ETH at the same time is used to buy back Axion on Uniswap and received Axions are used to replenish the Staking contract; 20% of the received ETH is the company's profit.
 
-  <div class="content-block" [ngClass]="{'no-active': !account}">
-    <div class="content-block_title">
-      <span>Auction</span>
-      <span class="content-block_title_help"></span>
-    </div>
-
-    <form #sendForm="ngForm" class="blocks-list blocks-list__small-size blocks-list__full-width">
-      <div class="blocks-list_group blocks-list_element blocks-list_form-group width-40">
-        <div class="list">
-          <div class="blocks-list_item">
-            <div class="blocks-list_item_title nowrap uppercase">Your amount</div>
-            <div class="blocks-list_item_value">{{account?.balances?.ETH.display}}</div>
-            <div class="blocks-list_item_currency blocks-list_item_currency__eth">
-              <span>ETH</span>
-            </div>
-          </div>
-          <div class="blocks-list_item">
-            <div class="blocks-list_item_title uppercase">Send to Swap</div>
-            <div class="form-group">
-              <div class="form-group_title uppercase">Enter amount</div>
-              <div class="form-group_input">
-                <input type="text"
-                       *ngIf="account"
-                       required="required"
-                       [appBigNumber]="{
-                          decimals: tokensDecimals['ETH'],
-                          min: 1,
-                          max: account?.balances.ETH.wei
-                       }"
-                       [maxValueChange]="onChangeAccount"
-                       [(ngModel)]="formsData.auctionAmount"
-                       name="swap-amount">
-                <div class="form-group_input-btn">
-                  <button (click)="formsData.auctionAmount = account?.balances.ETH.shortBigNumber.toString()">Send<br/>max</button>
-                </div>
-              </div>
-            </div>
-            <div class="blocks-list_group_btn without-margin">
-              <button class="btn btn__normal"
-                      [ngClass]="{progress: sendAuctionProgress}"
-                      [disabled]="sendForm.invalid || sendAuctionProgress" (click)="sendETHToAuction()">
-                <span class="lds-ellipsis" *ngIf="sendAuctionProgress">
-                  <span class="lds-ellipsis-container">
-                    <span></span><span></span><span></span><span></span>
-                  </span>
-                </span>
-                <span>Send</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="blocks-list_element width-20">
-        <div class="blocks-list_item">
-          <div class="blocks-list_item_title uppercase">Auction Contract</div>
-          <div class="blocks-list_item_value" fittext [maxFontSize]="38">
-            {{(auctionInfo?.currentUserBalance.eth || 0) | bigNumberFormat : 18 : true : false : 18}}
-          </div>
-          <div class="blocks-list_item_currency blocks-list_item_currency__eth">
-            <span>ETH</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="blocks-list_group blocks-list_element width-40">
-        <div class="blocks-list_item_title uppercase">Auction pool</div>
-        <div class="list">
-          <div class="blocks-list_item">
-            <div class="blocks-list_item_value blocks-list_item_value__positive" fittext [maxFontSize]="38">
-              {{(auctionInfo?.axnPool || 0) | bigNumberFormat : tokensDecimals?.HEX2X : true : false : 18}}
-            </div>
-            <div class="blocks-list_item_currency blocks-list_item_currency__axn">
-              <span>AXN</span>
-            </div>
-          </div>
-          <div class="blocks-list_item">
-            <div class="blocks-list_item_value" fittext [maxFontSize]="38">
-              {{(auctionInfo?.ethPool || 0) | bigNumberFormat : tokensDecimals?.ETH : true : false : 18}}
-            </div>
-            <div class="blocks-list_item_currency blocks-list_item_currency__eth">
-              <span>ETH</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </form>
+      All Axion got from the Auction including referral bonuses will be autostaked for 14 days."
+      matTooltipClass="question__tooltip"
+    ></div>
   </div>
 
-  <div class="content-block" *ngIf="auctionsList?.length">
-    <div class="content-block_title text-left">
-      <span>Completed Auctions</span>
-    </div>
-    <table class="standard-table text-left" cellpadding="0" cellspacing="0" border="0">
-      <thead class="text-left">
-      <tr>
-        <th (click)="sortAuctions('start')" class="as-sort"
-            [ngClass]="{active: currentSort['field'] === 'start', ask: currentSort['ask']}">
-          Date
-          <span class="sort-indicator"></span>
-        </th>
-        <th (click)="sortAuctions('token')" class="as-sort"
-            [ngClass]="{active: currentSort['field'] === 'token', ask: currentSort['ask']}">
-          HEX2X Total
-          <span class="sort-indicator"></span>
-        </th>
-        <th (click)="sortAuctions('eth')" class="as-sort"
-            [ngClass]="{active: currentSort['field'] === 'eth', ask: currentSort['ask']}">
-          ETH Total
-          <span class="sort-indicator"></span>
-        </th>
-        <th (click)="sortAuctions('accountTokenBalance')" class="as-sort"
-            [ngClass]="{active: currentSort['field'] === 'accountTokenBalance', ask: currentSort['ask']}">
-          Your HEX2X
-          <span class="sort-indicator"></span>
-        </th>
-        <th width="10">&nbsp;</th>
-      </tr>
-      </thead>
-      <tbody class="text-left">
-      <tr *ngFor="let auction of auctionsList">
-        <td>{{auction.start | date : 'dd.MM.yyyy'}}</td>
-        <td>{{auction.token | bigNumberFormat : tokensDecimals['HEX2X'] : true : false : 4}}</td>
-        <td>{{auction.eth | bigNumberFormat : tokensDecimals['ETH'] : true : false : 4}}</td>
-        <td [colSpan]="auction.accountETHBalance.isZero() ? 2 : 1">
-          {{auction.accountTokenBalance | bigNumberFormat : tokensDecimals['HEX2X'] : true : false : 4}}
-        </td>
-        <td class="action-button"*ngIf="!auction.accountETHBalance.isZero()">
-          <button class="btn btn__transparent" (click)="auctionWithdraw(auction)"
-                  [ngClass]="{progress: auction.withdrawProgress}"
-                  [disabled]="auction.withdrawProgress">
-                <span class="lds-ellipsis" *ngIf="auction.withdrawProgress">
-                  <span class="lds-ellipsis-container">
-                    <span></span><span></span><span></span><span></span>
-                  </span>
+  <div class="axn-form axn-form-base-2">
+    <div class="axn-form-block axn-form-auction">
+      <div class="axn-form-block-one axn-form-arrow p-b-none">
+        <span class="axn-form-block-one-title">Input</span>
+        <input
+          type="text"
+          *ngIf="account"
+          required="required"
+          class="axn-input"
+          placeholder="0.0"
+          onfocus="this.placeholder = ''"
+          onblur="this.placeholder = '0.0'"
+          [appBigNumber]="{
+            decimals: tokensDecimals['ETH'],
+            min: 1,
+            max: account?.balances.ETH.wei
+          }"
+          [maxValueChange]="onChangeAccount"
+          (ngModelChange)="onChangeAmount()"
+          [(ngModel)]="formsData.auctionAmount"
+          autocomplete="off"
+        />
+        <span class="axn-cheap icon icon_eth cl-purple-bg">ETH</span>
+
+        <div class="axn-form-base-2 axn-form-bottom">
+          <div class="axn-form-block-sendmax">
+            <span
+              class="axn-btn axn-btn-max"
+              (click)="
+                formsData.auctionAmount = account?.balances.ETH.shortBigNumber.toString()
+              "
+              >Send max</span
+            >
+            <span class="axn-form-block-sendmax-text">
+              Balance
+              <span class="axn-form-block-sendmax-value">{{
+                account?.balances?.ETH.shortBigNumber
+              }}</span></span
+            >
+          </div>
+          <div class="axn-form-block-button" *ngIf="poolInfo.axn > 0">
+            <button
+              class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-small"
+              [ngClass]="{ progress: sendAuctionProgress }"
+              [disabled]="!dataSendForm || sendAuctionProgress"
+              (click)="sendETHToAuction()"
+            >
+              <span class="lds-ellipsis" *ngIf="sendAuctionProgress">
+                <span class="lds-ellipsis-container">
+                  <span></span><span></span><span></span><span></span>
                 </span>
-            <span>&nbsp;&nbsp;Withdraw&nbsp;&nbsp;</span>
-          </button>
-        </td>
-      </tr>
+              </span>
+              <span class="axn-btn-text axn-btn-arrow-right">SEND</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="axn-form-block">
+      <div class="axn-form-base-2">
+        <div class="axn-form-block-one axn-form-border-dashed-right">
+          <span class="axn-form-block-one-title">AXN Pool</span>
+          <span
+            class="axn-form-block-one-value-small p-tb-5"
+            matTooltipClass="table__tooltip"
+            mat-raised-button
+            matTooltip="{{ poolInfo.axn || 0 }}"
+          >
+            {{ poolInfo.axn || 0 }}
+          </span>
+          <span class="axn-cheap icon icon_axn cl-blue-bg">AXN</span>
+        </div>
+        <div class="axn-form-block-one">
+          <span class="axn-form-block-one-title">ETH Pool</span>
+          <span
+            class="axn-form-block-one-value-small p-tb-5"
+            matTooltipClass="table__tooltip"
+            mat-raised-button
+            matTooltip="{{
+              poolInfo.eth
+                | bigNumberFormat: tokensDecimals['ETH']:true:false:18
+            }}"
+          >
+            {{
+              poolInfo.eth | bigNumberFormat: tokensDecimals["ETH"]:true:false:2
+            }}
+          </span>
+          <span class="axn-cheap icon icon_eth cl-purple-bg">ETH</span>
+        </div>
+      </div>
+      <div class="axn-form-block-pool axn-form-bottom">
+        <span class="axn-form-block-pool-title">Auction price</span>
+        <div class="axn-form-block-pool-axn">
+          <span class="icon icon-flex icon__axion"
+            >{{ poolInfo.axnToEth }} AXN</span
+          >
+          <span class="cl-purple">=</span>
+          <span class="icon icon-flex icon__eth-purple cl-purple">1 ETH</span>
+        </div>
+
+        <span class="axn-form-block-pool-title">Uniswap price</span>
+        <div class="axn-form-block-pool-uni">
+          <span class="icon icon-flex icon__axion-gray cl-gray-dark"
+            >{{ poolInfo.uniToEth || 0 }} AXN</span
+          >
+          <span class="cl-gray-dark">=</span>
+          <span class="cl-gray-dark">1 ETH</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="axn-section" *ngIf="account">
+  <div class="axn-form-block axn-form-auction" style="min-height: auto">
+    <div
+      class="p-20"
+      [ngClass]="{ 'axn-form-border-dashed-bottom': referalAddress }"
+    >
+      <div class="axn-title-block">
+        <span class="axn-title">Referral program</span>
+        <div
+          class="question"
+          #tooltip="matTooltip"
+          (click)="tooltip.toggle()"
+          mat-raised-button
+          matTooltip="By submitting a referral link to the auction, both the auction participant and the link provider receive bonus Axion. The participant of the auction (referral) receives an additional 10% to the amount of the credit, the referee (who provided the link) receives an additional 20% of the amount of the credit.
+
+          Any user can participate in the referral program, even those who do not have Axion tokens on their balance."
+          matTooltipClass="question__tooltip"
+        ></div>
+      </div>
+      <div class="axn-form-block-button axn-form-block-referal m-t-20">
+        <span
+          *ngIf="referalLink === ''"
+          (click)="generateRefLink()"
+          class="axn-btn axn-btn-gray"
+          style="max-width: 200px"
+          >Generate referral link</span
+        >
+
+        <input
+          *ngIf="referalLink != ''"
+          class="axn-input"
+          (click)="$event.target.select()"
+          readonly
+          [value]="referalLink"
+        />
+
+        <button
+          *ngIf="referalLink != ''"
+          class="axn-btn axn-btn-gray"
+          style="max-width: 100px; margin-left: 10px"
+          ngxClipboard
+          [cbContent]="referalLink"
+          (cbOnSuccess)="onCopied()"
+        >
+          Copy
+        </button>
+
+        <span class="axn-form-block-referal-text" *ngIf="addressCopy">
+          address copied
+        </span>
+      </div>
+    </div>
+    <div
+      class="axn-form-block-referal-link p-20"
+      *ngIf="account && referalAddress"
+    >
+      <span class="axn-form-block-referal-link-text">
+        Referrer address
+        <span class="cl-purple">{{ referalAddress }}</span></span
+      >
+      <span
+        (click)="resetRef()"
+        class="axn-btn axn-btn-gray t-t-u"
+        style="max-width: 100px; margin: 0"
+        >Reset</span
+      >
+    </div>
+  </div>
+</section>
+
+<section class="axn-section" *ngIf="account && showAuctions">
+  <div class="axn-form-block p-20">
+    <div class="axn-title-block axn-title-block-left">
+      <span class="axn-title">My Bets</span>
+    </div>
+    <span
+      class="axn-text t-a-c t-t-u axn-text-full-width"
+      *ngIf="!hasAuctionList"
+    >
+      You have no bets
+    </span>
+
+    <table
+      class="standard-table"
+      cellpadding="0"
+      cellspacing="0"
+      border="0"
+      *ngIf="hasAuctionList"
+    >
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>AXN in pool</th>
+          <th>ETH in pool</th>
+          <th>My ETH</th>
+          <th>My AXN</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let auction of auctionsList">
+          <!-- <td>{{ auction.start_date | date: "dd.MM.yyyy" }}</td> -->
+          <td>{{ auction.start_date | date: "shortDate" }}</td>
+          <td>
+            <span
+              matTooltipClass="table__tooltip"
+              mat-raised-button
+              matTooltip="{{
+                auction.axn_pool
+                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+              }}"
+            >
+              {{
+                auction.axn_pool
+                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+              }}
+            </span>
+          </td>
+          <td>
+            <span
+              matTooltipClass="table__tooltip"
+              mat-raised-button
+              matTooltip="{{
+                auction.eth_pool
+                  | bigNumberFormat: tokensDecimals['ETH']:true:false:18
+              }}"
+            >
+              {{
+                auction.eth_pool
+                  | bigNumberFormat: tokensDecimals["ETH"]:true:false:2
+              }}
+            </span>
+          </td>
+          <td>
+            <span
+              matTooltipClass="table__tooltip"
+              mat-raised-button
+              matTooltip="{{
+                auction.eth_bet
+                  | bigNumberFormat: tokensDecimals['ETH']:true:false:18
+              }}"
+            >
+              {{
+                auction.eth_bet
+                  | bigNumberFormat: tokensDecimals["ETH"]:true:false:2
+              }}
+            </span>
+          </td>
+          <td>
+            <span
+              matTooltipClass="table__tooltip"
+              mat-raised-button
+              matTooltip="{{
+                auction.winnings | bigNumberFormat: false:true:false:18
+              }}"
+            >
+              {{ auction.winnings | bigNumberFormat: false:true:false:2 }}
+            </span>
+          </td>
+          <td class="action-button">
+            <button
+              *ngIf="auction.status === 'withdraw'"
+              class="axn-btn axn-btn-gray"
+              style="margin: auto"
+              (click)="auctionWithdraw(auction)"
+              [ngClass]="{ progress: auction.withdrawProgress }"
+              [disabled]="auction.withdrawProgress"
+            >
+              <span class="lds-ellipsis" *ngIf="auction.withdrawProgress">
+                <span class="lds-ellipsis-container">
+                  <span></span><span></span><span></span><span></span>
+                </span>
+              </span>
+              <span class="t-fz-14">&nbsp;&nbsp;WITHDRAW&nbsp;&nbsp;</span>
+            </button>
+            <span
+              class="icon icon-flex icon__ok t-cl-green t-t-u t-fz-14 m-a"
+              *ngIf="auction.status === 'complete'"
+              >withdrawn</span
+            >
+            <span
+              class="axn-text t-cl-purple t-t-u t-fz-14"
+              *ngIf="auction.status === 'progress'"
+              >in progress</span
+            >
+          </td>
+        </tr>
       </tbody>
     </table>
   </div>
+</section>
 
-</div>
+<section class="axn-section" *ngIf="account && showAuctions">
+  <div class="axn-form-block p-20">
+    <div class="axn-title-block axn-title-block-left">
+      <span class="axn-title">Auctions</span>
+    </div>
+    <table class="standard-table" cellpadding="0" cellspacing="0" border="0">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>AXN in pool</th>
+          <th>ETH in pool</th>
+          <th>Completion</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let auction of auctions">
+          <!-- <td>{{ auction.time.date | date: "dd.MM.yyyy" }}</td> -->
+          <td>{{ auction.time.date | date: "shortDate" }}</td>
+          <td>
+            <span
+              matTooltipClass="table__tooltip"
+              mat-raised-button
+              matTooltip="{{
+                auction.data.axn_pool
+                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+              }}"
+            >
+              {{
+                auction.data.axn_pool
+                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+              }}
+            </span>
+          </td>
+          <td>
+            <span
+              matTooltipClass="table__tooltip"
+              mat-raised-button
+              matTooltip="{{
+                auction.data.eth_pool
+                  | bigNumberFormat: tokensDecimals['ETH']:true:false:18
+              }}"
+            >
+              {{
+                auction.data.eth_pool
+                  | bigNumberFormat: tokensDecimals["ETH"]:true:false:2
+              }}
+            </span>
+          </td>
+          <td>
+            <span class="t-cl-purple" *ngIf="auction.time.state === 'feature'"
+              >Not started</span
+            >
+            <span class="t-cl-green" *ngIf="auction.time.state === 'progress'">
+              <ng-container *ngIf="auctionTimer">
+                <span>{{ auctionTimer }}</span>
+              </ng-container></span
+            >
+            <span class="t-cl-gray" *ngIf="auction.time.state === 'finished'"
+              >Closed</span
+            >
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<ng-template #warningModal class="dialog-block" mat-dialog-content>
+  <div class="dialog-block__content">
+    <div class="dialog-title">Attention!</div>
+
+    <div class="dialog-description">
+      Your bid too low, you might get nothing from the auction
+    </div>
+
+    <div class="dialog-bottom">
+      <button class="axn-btn axn-btn-gray" type="button" mat-dialog-close>
+        <span>Close</span>
+      </button>
+      <button
+        class="axn-btn axn-btn-gray"
+        type="button"
+        (click)="successLowProfit()"
+      >
+        <span>Ok</span>
+      </button>
+    </div>
+  </div>
+</ng-template>

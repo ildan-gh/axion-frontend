@@ -1,0 +1,62 @@
+// @import "./variables.scss";
+
+.axn {
+  &-btn {
+    &-max {
+      border: $clButton-Max-Border-dark;
+      color: $clButton-Max-Text-dark;
+    }
+
+    &-gray {
+      color: $clButton-Gray-Text-dark;
+      background-color: $clButton-Gray-Background-dark;
+      box-shadow: $clButton-Gray-Shadow-dark;
+      &:not([disabled]) {
+        &:hover {
+          box-shadow: $clButton-Gray-Hover-Shadow-dark;
+          color: $clButton-Gray-Hover-Text-dark;
+        }
+      }
+    }
+
+    &-metamask {
+      &:before {
+        background-color: $clButton-Metamask-Before-Background-dark;
+      }
+
+      &-text {
+        color: $clButton-Metamask-Text-dark;
+      }
+    }
+
+
+    &-arrow {
+      &-left {
+        @include before-img(block, 19px, 14px, r) {
+          background-image: $imgButton-Arrow-Right-dark;
+        }
+      }
+
+      &-right {
+        @include after-img(block, 17px, 17px, r) {
+          background-image: $imgButton-Arrow-Right-dark;
+        }
+      }
+    }
+
+    &-purple {
+      background: $clButton-Purple-Background-dark;
+      color: $clButton-Purple-Text-dark;
+    }
+
+    &-copy {
+      background: $clButton-Copy-Background-dark;
+      color: $clButton-Copy-Text-dark;
+      border: $clButton-Copy-Border-dark;
+    }
+  }
+
+  &-input {
+    color: $clButton-Input-Text-dark;
+  }
+}

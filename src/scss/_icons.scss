@@ -1,0 +1,136 @@
+.icon {
+  &:before {
+    content: "";
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+  }
+
+  &-flex {
+    cursor: default;
+    display: flex;
+    align-items: center;
+    border-radius: 12px;
+    // font-size: 16px;
+    width: max-content;
+
+    &:before {
+      margin-right: 10px;
+    }
+  }
+
+  &_metamask {
+    @include before-img(block, 30px, 30px, r) {
+      background-size: cover;
+      background-size: 30px 30px;
+      background-image: url("assets/images/metamask.svg");
+    }
+  }
+
+  &_hex {
+    @include before-img(block, 28px, 24px, r) {
+      background-image: url("assets/images/icons/hex-icon.svg");
+    }
+  }
+
+  &_eth {
+    @include before-img(block, 28px, 24px, r) {
+      background-image: url("assets/images/icons/eth-icon.svg");
+    }
+  }
+
+  &_share {
+    @include before-img(block, 17px, 17px, r) {
+      background-image: url("assets/images/icons/share-icon.svg");
+    }
+  }
+
+  &_copy {
+    @include before-img(block, 17px, 17px, r) {
+      background-image: url("assets/images/icons/copy-icon.svg");
+    }
+  }
+
+  &_ok-1 {
+    @include before-img(block, 10px, 10px, r) {
+      background-image: $imgStakingOk-1;
+      margin-right: 5px;
+    }
+  }
+
+  &_no {
+    @include before-img(block, 10px, 10px, r) {
+      background-image: url("assets/images/icons/no-icon.svg");
+      margin-right: 5px;
+    }
+  }
+
+  &_axn {
+    @include before-img(block, 28px, 24px, r) {
+      background-image: url("assets/images/icons/hex-icon.svg");
+    }
+  }
+
+  &_switch-theme {
+    @include before-img(block, 16px, 16px, r) {
+      background-image: $imgSwitch-Theme;
+    }
+  }
+
+  &__axion-small {
+    @include before-img(block, 18px, 16px, r) {
+      background-size: cover;
+      background-image: url("assets/images/icons/axion-icon.svg");
+    }
+  }
+
+  &__axion-gray {
+    padding-left: 6px;
+
+    @include before-img(block, 22px, 24px, r) {
+      background-image: $imgIcon-Unicorn;
+    }
+  }
+
+  &__ok {
+    @include before-img(block, 14px, 12px, r) {
+      background-image: url("assets/images/icons/ok-icon.svg");
+      margin-right: 5px !important;
+    }
+  }
+
+  &__axion {
+    @include before-img(block, 28px, 24px, r) {
+      background-image: url("assets/images/icons/axion-icon.svg");
+    }
+  }
+
+  &__metamask {
+    @include before-img(block, 28px, 24px, r) {
+      background-image: url("assets/images/metamask.svg");
+    }
+  }
+
+  &__hex3t {
+    @include before-img(block, 28px, 24px, r) {
+      background-size: contain;
+      background-image: url("assets/images/icons/hex3t-icon.png");
+    }
+  }
+
+  &__eth-purple {
+    @include before-img(block, 12px, 19px, r) {
+      background-image: url("assets/images/icons/eth-purple-icon.svg");
+    }
+  }
+
+  &__eth-gray {
+    @include before-img(block, 12px, 19px, r) {
+      background-image: url("assets/images/icons/eth-gray-icon.svg");
+    }
+  }
+}

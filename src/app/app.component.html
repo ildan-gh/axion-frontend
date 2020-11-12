@@ -1,9 +1,20 @@
-<header class="header">
-  <div class="content-container">
+<header class="header" [ngClass]="{ active: isHeaderActive }">
+  <div class="axn">
     <div class="header-content">
-      <img class="header-logo" src="./assets/images/logo.svg"/>
+      <img
+        *ngIf="theme === 'white'"
+        class="header-logo"
+        src="./assets/images/base/axion-logo-full.svg"
+        alt="axion logo"
+      />
+      <img
+        *ngIf="theme === 'dark'"
+        class="header-logo"
+        src="./assets/images/base/axion-logo-full-dark.svg"
+        alt="axion logo"
+      />
       <ul class="header-menu">
-        <li class="header-menu_item">
+        <li *ngIf="leftDaysInfoShow" class="header-menu_item">
           <a routerLink="claim" routerLinkActive="active-link">Claim</a>
         </li>
         <li class="header-menu_item">
@@ -13,102 +24,185 @@
           <a routerLink="staking" routerLinkActive="active-link">Staking</a>
         </li>
         <li class="header-menu_item">
-          <button class="metamask-button" (click)="subscribeAccount()" [ngClass]="{'no-clickable': !!account}">
-            <img class="metamask-button_icon" src="./assets/images/metamask.svg"/>
-            <span class="metamask-button_text">{{account ? account.address : 'MetaMask'}}</span>
+          <div class="icon icon-flex icon_switch-theme">
+            <label class="switch">
+              <input
+                class="switch-input"
+                [checked]="themeSwitch"
+                type="checkbox"
+              />
+              <span (click)="changeTheme()" class="slider round"></span>
+            </label>
+          </div>
+        </li>
+        <li class="header-menu_item" *ngIf="addToMetamask">
+          <span
+            class="axn-btn axn-btn-gray"
+            (click)="addToken()"
+            style="margin-left: 25px"
+            >Add to MetaMask</span
+          >
+        </li>
+        <li class="header-menu_item">
+          <button
+            class="icon icon-flex icon_metamask axn-btn-metamask"
+            (click)="subscribeAccount()"
+            style="margin-left: 25px"
+            [ngClass]="{ 'no-clickable': !!account }"
+          >
+            <div class="axn-btn-metamask-block">
+              <span class="axn-btn-metamask-text">{{
+                account ? account.address : "MetaMask"
+              }}</span>
+            </div>
           </button>
         </li>
       </ul>
+      <div
+        *ngIf="theme === 'white'"
+        class="header-navbar-btn"
+        (click)="openNavbar()"
+      >
+        <img
+          src="./assets/images/styling/navbar-btn.svg"
+          alt=""
+          *ngIf="!isNavbarOpen"
+        />
+        <img
+          src="./assets/images/styling/navbar-btn-close.svg"
+          alt=""
+          *ngIf="isNavbarOpen"
+        />
+      </div>
+      <div
+        *ngIf="theme === 'dark'"
+        class="header-navbar-btn"
+        (click)="openNavbar()"
+      >
+        <img
+          src="./assets/images/styling/navbar-btn-dark.svg"
+          alt=""
+          *ngIf="!isNavbarOpen"
+        />
+        <img
+          src="./assets/images/styling/navbar-btn-close-dark.svg"
+          alt=""
+          *ngIf="isNavbarOpen"
+        />
+      </div>
+    </div>
+    <div class="header-navbar" [ngClass]="{ active: isNavbarOpen }">
+      <div *ngIf="leftDaysInfoShow" class="header-navbar-item">
+        <a
+          routerLink="claim"
+          routerLinkActive="active-link"
+          (click)="openNavbar()"
+          >Claim</a
+        >
+      </div>
+      <div class="header-navbar-item">
+        <a
+          routerLink="auction"
+          routerLinkActive="active-link"
+          (click)="openNavbar()"
+          >Auction</a
+        >
+      </div>
+      <div class="header-navbar-item">
+        <a
+          routerLink="staking"
+          routerLinkActive="active-link"
+          (click)="openNavbar()"
+          >Staking</a
+        >
+      </div>
+      <div class="header-navbar-item" *ngIf="addToMetamask">
+        <span class="axn-btn axn-btn-gray" (click)="addToken()"
+          >Add to MetaMask</span
+        >
+      </div>
+      <div class="header-navbar-item">
+        <div class="icon icon-flex icon_switch-theme">
+          <label class="switch">
+            <input
+              class="switch-input"
+              [checked]="themeSwitch"
+              type="checkbox"
+            />
+            <span (click)="changeTheme()" class="slider round"></span>
+          </label>
+        </div>
+      </div>
+      <div class="header-navbar-item">
+        <button
+          class="icon icon-flex icon_metamask axn-btn-metamask"
+          (click)="subscribeAccount()"
+          [ngClass]="{ 'no-clickable': !!account }"
+        >
+          <div class="axn-btn-metamask-block">
+            <span class="axn-btn-metamask-text">{{
+              account ? account.address : "MetaMask"
+            }}</span>
+          </div>
+        </button>
+      </div>
     </div>
   </div>
 </header>
 
-<div class="content-container">
-  <div class="left-days-info" #runString [ngClass]="{visibility: leftDaysInfo }">
-    <span class="repeat-content" *ngFor="let item of runLineCountArray">
-      <b>{{ leftDaysInfo?.leftDays || 350 }}</b>&nbsp;<b>days</b>
-      left for Claiming H2X
-    </span>
+<div class="axn">
+  <div
+    class="left-days-info"
+    [ngClass]="{ visibility: leftDaysInfoShow && account && bannerForClaim }"
+    #runString
+  >
+    <ng-container *ngIf="leftDaysInfoShow && account && bannerForClaim">
+      <span class="repeat-content" *ngFor="let item of runLineCountArray">
+        <ng-container *ngIf="chainNetwork === 'rinkeby'">
+          <b
+            >{{ leftDaysInfo.showTime.h }}h {{ leftDaysInfo.showTime.m }}m
+            {{ leftDaysInfo.showTime.s }}s</b
+          >
+        </ng-container>
+        <ng-container *ngIf="chainNetwork === 'ropsten'">
+          <b>{{ leftDaysInfo?.dateEnd }}</b
+          >&nbsp;<b>Days</b>
+        </ng-container>
+
+        <ng-container *ngIf="chainNetwork === 'mainnet'">
+          <b>{{ leftDaysInfo?.dateEnd }}</b
+          >&nbsp;<b>Days</b>
+        </ng-container>
+
+        <span *ngIf="bannerForClaim">left for Claiming AXN</span>
+      </span>
+    </ng-container>
+    <ng-container *ngIf="!leftDaysInfoShow || !account || !bannerForClaim">
+      <span class="repeat-content"></span>
+    </ng-container>
   </div>
 </div>
-<router-outlet></router-outlet>
-<div class="content-container" *ngIf="tableInfo">
-  <div class="results-table">
 
-    <div class="results-table_row">
-      <div class="results-table_cells-group">
-        <div class="results-table_cell results-table_cell__label">
-          Daily Auction
-        </div>
-        <div class="results-table_cell results-table_cell__value">
-          {{ tableInfo.DailyAuction | number }}
-        </div>
-      </div>
-      <div class="results-table_cells-group">
-        <div class="results-table_cell results-table_cell__label">
-          BigPayDay 1
-        </div>
-        <div class="results-table_cell results-table_cell__value">
-          {{ tableInfo.BPDInfo[0] | number }}
+<div class="axn">
+  <router-outlet></router-outlet>
+
+  <section class="axn-section" *ngIf="!account">
+    <div class="axn-container t-a-c">
+      <span class="axn-text">Enter by Metamask</span>
+      <div class="axn-form-block axn-form-transparent">
+        <div class="axn-form-block-button">
+          <button
+            class="axn-btn axn-btn-gray axn-btn-form"
+            (click)="subscribeAccount()"
+            [ngClass]="{ 'no-clickable': !!account }"
+            [disabled]="!!account"
+          >
+            <span class="axn-text icon-flex icon icon__metamask t-t-u">{{
+              account ? account.address : "MetaMask"
+            }}</span>
+          </button>
         </div>
       </div>
     </div>
-
-    <div class="results-table_row">
-      <div class="results-table_cells-group">
-        <div class="results-table_cell results-table_cell__label">
-          Weekly Auction
-        </div>
-        <div class="results-table_cell results-table_cell__value">
-          {{tableInfo.WeeklyAuction | number}}
-        </div>
-      </div>
-      <div class="results-table_cells-group">
-        <div class="results-table_cell results-table_cell__label">
-          BigPayDay 2
-        </div>
-        <div class="results-table_cell results-table_cell__value">
-          {{ tableInfo.BPDInfo[1] | number }}
-        </div>
-      </div>
-    </div>
-
-    <div class="results-table_row">
-      <div class="results-table_cells-group">
-        <div class="results-table_cell results-table_cell__label">
-          Total Supply
-        </div>
-        <div class="results-table_cell results-table_cell__value">
-          {{tableInfo.totalSupply | number}}
-        </div>
-      </div>
-      <div class="results-table_cells-group">
-        <div class="results-table_cell results-table_cell__label">
-          BigPayDay 3
-        </div>
-        <div class="results-table_cell results-table_cell__value">
-          {{ tableInfo.BPDInfo[2] | number }}
-        </div>
-      </div>
-    </div>
-
-    <div class="results-table_row">
-      <div class="results-table_cells-group">
-        <div class="results-table_cell results-table_cell__label">
-          Staking
-        </div>
-        <div class="results-table_cell results-table_cell__value">
-          {{tableInfo.staking | number}}
-        </div>
-      </div>
-      <div class="results-table_cells-group">
-        <div class="results-table_cell results-table_cell__label">
-          BigPayDay 4
-        </div>
-        <div class="results-table_cell results-table_cell__value">
-          {{ tableInfo.BPDInfo[3] | number }}
-        </div>
-      </div>
-    </div>
-  </div>
+  </section>
 </div>

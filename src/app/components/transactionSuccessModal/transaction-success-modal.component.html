@@ -1,0 +1,23 @@
+<div class="dialog-block" mat-dialog-content>
+  <div class="dialog-block__content">
+    <div class="dialog-title">
+      Transaction <br /><span class="cl-blue">completed successfully</span>
+    </div>
+
+    <div class="dialog-description">
+      <i class="icon icon_copy" ngxClipboard [cbContent]="ethLink"></i>
+      <a
+        target="_blank"
+        href="{{ ethLink }}"
+        class="icon icon_share axn-btn axn-btn-gray t-t-u"
+        >Etherscan</a
+      >
+    </div>
+
+    <div class="dialog-bottom">
+      <button class="axn-btn axn-btn-gray" (click)="closeModal()" type="button">
+        <span>Close</span>
+      </button>
+    </div>
+  </div>
+</div>

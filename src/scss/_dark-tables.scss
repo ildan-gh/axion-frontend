@@ -1,0 +1,36 @@
+// @import "./variables.scss";
+
+.standard-table {
+  thead {
+    color: $clTable-Thead-dark;
+    th {
+      &.active {
+        color: $clTable-Thead-Active-dark;
+      }
+      .sort-indicator {
+        background-color: $clTable-Thead-Sort-dark;
+        &:before {
+          border-color: $clTable-Thead-Sort-Before-dark;
+        }
+      }
+    }
+  }
+  tbody {
+    td {
+      color: $clTable-Tbody-Td-Text-dark;
+      background: $clTable-Tbody-Td-Background-dark;
+      + td {
+        &:before {
+          background-color: $clTable-Tbody-Td-Action-Button-Before-Background-dark;
+        }
+      }
+    }
+  }
+}
+
+.table {
+  &__tooltip {
+    color: $clTooltip-Text-dark !important;
+    background: $clTooltip-Background-dark !important;
+  }
+}
