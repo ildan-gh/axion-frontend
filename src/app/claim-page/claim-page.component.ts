@@ -58,7 +58,6 @@ export class ClaimPageComponent implements OnInit, OnDestroy {
     private appComponent: AppComponent,
     private router: Router
   ) {
-
     this.initPage();
 
     this.tokensDecimals = this.contractService.getCoinsDecimals();
@@ -72,7 +71,7 @@ export class ClaimPageComponent implements OnInit, OnDestroy {
           .then((result: { leftDaysInfo: number }) => {
             if (result.leftDaysInfo < 0) {
               this.leftDaysInfoChecker = false;
-              this.router.navigate(["auction"]);
+              this.router.navigate(["auction"], { preserveQueryParams: true });
             } else {
               this.checkDays();
             }
@@ -89,13 +88,14 @@ export class ClaimPageComponent implements OnInit, OnDestroy {
           this.ngZone.run(() => {
             this.account = account;
             if (account) {
-
               this.contractService
                 .getEndDateTimeCurrent()
                 .then((result: { leftDaysInfo: number }) => {
                   if (result.leftDaysInfo < 0) {
                     this.leftDaysInfoChecker = false;
-                    this.router.navigate(["auction"]);
+                    this.router.navigate(["auction"], {
+                      preserveQueryParams: true,
+                    });
                   } else {
                     this.leftDaysInfoChecker = true;
                     this.checkDays();
