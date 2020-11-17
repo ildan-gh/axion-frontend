@@ -111,7 +111,7 @@
         <span class="axn-form-block-pool-title">Auction price</span>
         <div class="axn-form-block-pool-axn">
           <span class="icon icon-flex icon__axion"
-            >{{ poolInfo.axnToEth }} AXN</span
+            >{{ poolInfo.axnToEth | bigNumberFormat: 0:true:false:18 }} AXN</span
           >
           <span class="cl-purple">=</span>
           <span class="icon icon-flex icon__eth-purple cl-purple">1 ETH</span>
@@ -120,7 +120,7 @@
         <span class="axn-form-block-pool-title">Uniswap price</span>
         <div class="axn-form-block-pool-uni">
           <span class="icon icon-flex icon__axion-gray cl-gray-dark"
-            >{{ poolInfo.uniToEth || 0 }} AXN</span
+            >{{ poolInfo.uniToEth | bigNumberFormat: 0:true:false:18 || 0 }} AXN</span
           >
           <span class="cl-gray-dark">=</span>
           <span class="cl-gray-dark">1 ETH</span>
