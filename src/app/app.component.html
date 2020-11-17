@@ -1,18 +1,20 @@
 <header class="header" [ngClass]="{ active: isHeaderActive }">
   <div class="axn">
     <div class="header-content">
-      <img
-        *ngIf="theme === 'white'"
-        class="header-logo"
-        src="./assets/images/base/axion-logo-full.svg"
-        alt="axion logo"
-      />
-      <img
-        *ngIf="theme === 'dark'"
-        class="header-logo"
-        src="./assets/images/base/axion-logo-full-dark.svg"
-        alt="axion logo"
-      />
+      <a href="https://axion.network">
+        <img
+          *ngIf="theme === 'white'"
+          class="header-logo"
+          src="./assets/images/base/axion-logo-full.svg"
+          alt="axion logo"
+        />
+        <img
+          *ngIf="theme === 'dark'"
+          class="header-logo"
+          src="./assets/images/base/axion-logo-full-dark.svg"
+          alt="axion logo"
+        />
+      </a>
       <ul class="header-menu">
         <li *ngIf="leftDaysInfoShow" class="header-menu_item">
           <a
