@@ -116,6 +116,21 @@
       }
     }
   }
+  &.with-weekly {
+    thead {
+      th {
+        padding-bottom: 20px;
+      }
+    }
+    tbody {
+      tr:first-child {
+        td {
+          position: relative;
+          top: -10px;
+        }
+      }
+    }
+  }
 }
 
 .table {

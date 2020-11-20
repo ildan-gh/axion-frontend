@@ -191,16 +191,14 @@ export class AuctionPageComponent implements OnDestroy {
 
   public getUserAuctions() {
     this.contractService.getUserAuctions().then((auctions) => {
-      const auctions1 = auctions;
-
-      auctions1.sort((a, b) =>
+      auctions.sort((a, b) =>
         new Date(a.start_date).getDate() < new Date(b.start_date).getDate()
           ? 1
           : -1
       );
 
-      this.hasAuctionList = auctions1.length !== 0;
-      this.auctionsList = auctions1;
+      this.hasAuctionList = auctions.length !== 0;
+      this.auctionsList = auctions;
 
       this.referalLink = "";
     });

@@ -1255,142 +1255,61 @@ export class ContractService {
   }
 
   public getAuctionsData(auctionId: number, start: number) {
-    const setDate = (itemId: number, isRemove?: boolean) => {
-      if (isRemove) {
-        return moment(
-          moment(new Date())
-            .set({
-              h: new Date(start).getHours(),
-              m: new Date(start).getMinutes(),
-              s: new Date(start).getSeconds(),
-            })
-            .subtract(auctionId - (itemId - 1), "days")
-        );
-      } else {
-        return moment(new Date())
-          .set({
-            h: new Date(start).getHours(),
-            m: new Date(start).getMinutes(),
-            s: new Date(start).getSeconds(),
-          })
-          .add(itemId + 1 - auctionId, "days");
-      }
-    };
+    auctionId = +auctionId;
+    const oneDayInMS = this.secondsInDay * 1000;
 
-    return new Promise((resolve) => {
-      let auctions: any;
+    // Next weekly auction ID
+    const newWeeklyAuctionId = 7 * Math.ceil(auctionId / 7);
 
-      if (auctionId === 0) {
-        auctions = [
-          {
-            id: auctionId,
-            data: {},
+    const newDaysAuctionId = auctionId + 1;
+    const auctionIds = [auctionId - 1, auctionId, newDaysAuctionId];
+
+    if (newWeeklyAuctionId !== newDaysAuctionId) {
+      auctionIds.push(newWeeklyAuctionId);
+    }
+    const nowDateTS = new Date().getTime();
+    const auctionsPromises = auctionIds.map((id) => {
+      return this.Auction.methods
+        .reservesOf(id)
+        .call()
+        .then((auctionData) => {
+          const startDateTS = start + oneDayInMS * id;
+          const endDateTS = startDateTS + oneDayInMS;
+          return {
+            id: id,
+            isWeekly: newWeeklyAuctionId === id,
             time: {
-              state: "progress",
-              date: moment(new Date()).set({
-                h: new Date(start).getHours(),
-                m: new Date(start).getMinutes(),
-                s: new Date(start).getSeconds(),
-              }),
+              date: moment(startDateTS),
+              state: (nowDateTS > startDateTS && nowDateTS < endDateTS) ?
+                'progress' : (nowDateTS > endDateTS) ? 'finished' : 'feature',
             },
-          },
-        ];
-      } else {
-        auctions = [
-          {
-            id: auctionId - 1,
-            data: {},
-            time: {
-              state: "finished",
-              date: setDate(auctionId, true),
-            },
-          },
-          {
-            id: auctionId,
-            data: {},
-            time: {
-              state: "progress",
-              date: moment(new Date()).set({
-                h: new Date(start).getHours(),
-                m: new Date(start).getMinutes(),
-                s: new Date(start).getSeconds(),
-              }),
-            },
-          },
-        ];
-      }
-
-      let featureId = auctionId;
-      let nowId = auctionId;
-
-      do {
-        nowId = nowId + 1;
-        featureId = nowId / 7;
-      } while (featureId % 1 !== 0);
-
-      if (nowId === auctionId + 1) {
-        auctions.push({
-          id: auctionId + 1,
-          data: {},
-          time: {
-            state: "feature",
-            date: setDate(auctionId),
-          },
-        });
-      } else {
-        auctions.push(
-          {
-            id: auctionId + 1,
-            data: {},
-            time: {
-              state: "feature",
-              date: setDate(auctionId),
-            },
-          },
-          {
-            id: nowId,
-            data: {},
-            time: {
-              state: "feature",
-              date: setDate(nowId - 1),
-            },
-          }
-        );
-      }
-
-      auctions.map((t) => {
-        return this.Auction.methods
-          .reservesOf(t.id)
-          .call()
-          .then((auctionData) => {
-            const data = {
+            data: {
               axn_pool: new BigNumber(auctionData.token),
-              eth_pool: new BigNumber(auctionData.eth),
-            };
-            t.data = data;
+              eth_pool: new BigNumber(auctionData.eth)
+            }
+          };
+        });
+    });
 
-            return t;
-          });
+    return Promise.all(auctionsPromises).then((results) => {
+      return results.sort((auction1, auction2) => {
+        return auction1.id < auction2.id ? 1 : auction1.id > auction2.id ? -1 : 0;
       });
-
-      auctions.sort((a, b) => (a.id < b.id ? 1 : -1));
-
-      resolve(auctions);
     });
   }
 
   public getAuctions() {
     return new Promise((resolve) => {
-      return this.Auction.methods
+      this.Auction.methods
         .start()
         .call()
         .then((start) => {
-          return this.Auction.methods
+          this.Auction.methods
             .calculateStepsFromStart()
             .call()
             .then((auctionId) => {
-              // console.log(auctionId);
-              this.getAuctionsData(Number(auctionId), start * 1000).then(
+              const msStartTime = start * 1000;
+              this.getAuctionsData(auctionId, msStartTime).then(
                 (auctions) => {
                   resolve(auctions);
                 }
@@ -1435,11 +1354,12 @@ export class ContractService {
                     .auctionBetOf(id, this.account.address)
                     .call()
                     .then(async (accountBalance) => {
-                      // console.log("auctionBetOf", accountBalance);
+
                       auctionInfo.eth_bet = new BigNumber(accountBalance.eth);
-                      const startTS =
-                        (+start + this.secondsInDay * (+id + 1)) * 1000;
+
+                      const startTS = (+start + this.secondsInDay * id) * 1000;
                       const endTS = moment(startTS + this.secondsInDay * 1000);
+
                       auctionInfo.start_date = new Date(startTS);
 
                       const uniPercent = await this.Auction.methods

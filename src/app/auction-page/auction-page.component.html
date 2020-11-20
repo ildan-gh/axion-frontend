@@ -7,11 +7,11 @@
       class="question"
       mat-raised-button
       matTooltip="
-      The auction raffling accumulated Axion tokens between users in proportion to the participants' stakes in Ethereum. Axion's auction price is can't be lower than the Uniswap price minus 10%, unspent Auction Axion transferred to Weekly Auction.
+      This auction raffles accumulated Axion tokens between users, in proportion to the participants' bid in Ethereum. The auction price can't be lower than the Uniswap price minus 10%. Any leftover Axion from the auction rolls over into the next weekly auction.
 
-      When the user places a bet in ETH: 80% of the received ETH at the same time is used to buy back Axion on Uniswap and received Axions are used to replenish the Staking contract; 20% of the received ETH is the company's profit.
+      When the user places a bid in ETH: 80% of the received ETH is instantly used to buy back Axion on Uniswap and the received AXN is used to replenish the Staking contract; 19% of the received ETH is the company's profit; 1% goes to The Eden Reforestation Project, with each $0.10 planting a tree.
 
-      All Axion got from the Auction including referral bonuses will be autostaked for 14 days."
+      All Axion received from the Auction including referral bonuses will be autostaked for 14 days upon withdrawal."
       matTooltipClass="question__tooltip"
     ></div>
   </div>
@@ -203,13 +203,13 @@
 <section class="axn-section" *ngIf="account && showAuctions">
   <div class="axn-form-block p-20">
     <div class="axn-title-block axn-title-block-left">
-      <span class="axn-title">My Bets</span>
+      <span class="axn-title">My Bids</span>
     </div>
     <span
       class="axn-text t-a-c t-t-u axn-text-full-width"
       *ngIf="!hasAuctionList"
     >
-      You have no bets
+      You have no bids
     </span>
 
     <table
@@ -230,7 +230,6 @@
       </thead>
       <tbody>
         <tr *ngFor="let auction of auctionsList">
-          <!-- <td>{{ auction.start_date | date: "dd.MM.yyyy" }}</td> -->
           <td>{{ auction.start_date | date: "shortDate" }}</td>
           <td>
             <span
@@ -326,7 +325,7 @@
     <div class="axn-title-block axn-title-block-left">
       <span class="axn-title">Auctions</span>
     </div>
-    <table class="standard-table" cellpadding="0" cellspacing="0" border="0">
+    <table class="standard-table with-weekly" cellpadding="0" cellspacing="0" border="0">
       <thead>
         <tr>
           <th>Date</th>
@@ -337,7 +336,6 @@
       </thead>
       <tbody>
         <tr *ngFor="let auction of auctions">
-          <!-- <td>{{ auction.time.date | date: "dd.MM.yyyy" }}</td> -->
           <td>{{ auction.time.date | date: "shortDate" }}</td>
           <td>
             <span
