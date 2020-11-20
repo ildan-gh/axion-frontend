@@ -236,8 +236,8 @@ export class ClaimPageComponent implements OnInit, OnDestroy {
 
   public updateUserSnapshot() {
     if (
-      !this.account.snapshot.user_dont_have_hex &&
-      !this.account.completeClaim.have_forClaim
+      !this.account.snapshot.nothingToClaim &&
+      !this.account.completeClaim.hasClaimed
     ) {
       setTimeout(() => {
         this.contractService.updateUserSnapshot();
