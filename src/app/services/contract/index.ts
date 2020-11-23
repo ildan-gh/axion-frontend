@@ -1184,55 +1184,27 @@ export class ContractService {
       ? ref.toLowerCase()
       : "0x0000000000000000000000000000000000000000".toLowerCase();
 
-    const dataForFee = await this.web3Service.encodeFunctionCall(
-      "bet",
-      "function",
-      [
-        {
-          internalType: "uint256",
-          name: "deadline",
-          type: "uint256",
-        },
-        { internalType: "address", name: "ref", type: "address" },
-      ],
-      [date, refLink]
-    );
-
+    const gasLimit = this.account.balances.ETH.wei;
     const gasPrice = await this.web3Service.gasPrice();
+    const estimatedGas = await this.Auction.methods.bet(date, refLink)
+      .estimateGas({from: this.account.address, gas:gasLimit, value: amount});
 
-    return new Promise((resolve, reject) => {
-      return this.web3Service
-        .estimateGas(
-          this.account.address,
-          this.CONTRACTS_PARAMS.Auction.ADDRESS,
-          amount,
-          dataForFee,
-          gasPrice
-        )
-        .then((res) => {
-          const feeRate = res;
-          const newAmount = new BigNumber(amount).minus(feeRate * gasPrice);
-          if (newAmount.isNegative()) {
-            reject({
-              msg: "Not enough gas",
-            });
-            return;
-          }
-          return this.Auction.methods
-            .bet(date, refLink)
-            .send({
-              from: this.account.address,
-              value: newAmount,
-              gasPrice,
-              gasLimit: feeRate,
-            })
-            .then((res) => {
-              return this.checkTransaction(res).then((res) => {
-                resolve(res);
-              });
-            });
-        });
-    });
+    const newAmount = new BigNumber(amount).minus(estimatedGas * gasPrice);
+    if (newAmount.isNegative()) {
+      throw new Error("Not enough gas")
+      return;
+    }
+    return this.Auction.methods
+      .bet(date, refLink)
+      .send({
+        from: this.account.address,
+        value: newAmount,
+        gasPrice,
+        gasLimit: estimatedGas,
+      })
+      .then((res) => {
+        return this.checkTransaction(res)
+      });
   }
 
   public async sendETHToAuction(amount, ref?) {
@@ -1262,7 +1234,7 @@ export class ContractService {
     const yesterdaysAuctionId = todaysAuctionId - 1;
     const tomorrowsAuctionId = todaysAuctionId + 1;
     const nextWeeklyAuctionId = 7 * Math.ceil(todaysAuctionId === 0 ? 1 : todaysAuctionId / 7);
-    
+
     const auctionIds = [todaysAuctionId, tomorrowsAuctionId];
 
     if (yesterdaysAuctionId >= 0){
@@ -1275,7 +1247,7 @@ export class ContractService {
       if (lastWeeklyAuctionId >= 0) {
         auctionIds.unshift(lastWeeklyAuctionId);
       }
-      
+
       auctionIds.push(todaysAuctionId + 7);
     } else {
       const lastWeeklyAuctionId = nextWeeklyAuctionId - 7;

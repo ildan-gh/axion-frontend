@@ -299,11 +299,11 @@ export class AuctionPageComponent implements OnDestroy {
           });
         },
         (err) => {
-          if (err.msg) {
+          if (err.message) {
             this.dialog.open(MetamaskErrorComponent, {
               width: "400px",
               data: {
-                msg: err.msg,
+                msg: err.message,
               },
             });
           }

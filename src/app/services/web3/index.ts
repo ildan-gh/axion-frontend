@@ -61,14 +61,6 @@ export class MetamaskService {
     });
   }
 
-  public estimateGas(from, to, value, data, gasPrice) {
-    return this.Web3.eth
-      .estimateGas({ from, to, value, data, gasPrice })
-      .then((res) => {
-        return res;
-      });
-  }
-
   public async addToken(tokenOptions) {
     try {
       const wasAdded = await this.metaMaskWeb3.request({
