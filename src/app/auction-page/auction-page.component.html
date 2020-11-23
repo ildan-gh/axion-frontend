@@ -52,7 +52,7 @@
             <span class="axn-form-block-sendmax-text">
               Balance
               <span class="axn-form-block-sendmax-value">{{
-                account?.balances?.ETH.shortBigNumber
+                account?.balances?.ETH.shortBigNumber | bigNumberFormat: 0:true:false:2
               }}</span></span
             >
           </div>
@@ -85,7 +85,7 @@
             mat-raised-button
             matTooltip="{{ poolInfo.axn || 0 }}"
           >
-            {{ poolInfo.axn || 0 }}
+            {{ poolInfo.axn | bigNumberFormat: 0:true:false:2 || 0 }}
           </span>
           <span class="axn-cheap icon icon_axn cl-blue-bg">AXN</span>
         </div>
