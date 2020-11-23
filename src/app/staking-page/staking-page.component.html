@@ -182,11 +182,11 @@
           </div>
           <div class="axn-form-block-shares">
             <!-- <span class="axn-form-block-shares-value cl-blue">{{
-              stakeDays | date: "dd.MM.y"
+              depositEndDate | date: "dd.MM.y"
             }}</span
             > -->
             <span class="axn-form-block-shares-value cl-blue">{{
-              stakeDays | date: "shortDate"
+              depositEndDate | date: "shortDate"
             }}</span
             ><br />
             <span class="axn-form-block-shares-text-min">Ends</span>
@@ -198,8 +198,8 @@
               <span
                 class="icon icon-flex axn-form-block-shares-text-min"
                 [ngClass]="{
-                  'icon_ok-1': stakeDays > item.dateEnd,
-                  icon_no: stakeDays < item.dateEnd
+                  'icon_ok-1': shouldCheckBoxForBPD($index),
+                  icon_no: !shouldCheckBoxForBPD($index)
                 }"
                 >BPD {{ $index + 1 }}</span
               >

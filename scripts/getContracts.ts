@@ -98,7 +98,6 @@ function sleep(ms:number) {
         "checkerStakingInfo": 3600000,
         "checkerBPD": 3600000,
 
-        "production": true,
         "chainsForButtonAddToMetamask": [1],
         "network": "mainnet",
         "tonkenUrl": "https://etherscan.io/token/",

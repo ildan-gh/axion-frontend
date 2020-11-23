@@ -34,7 +34,7 @@ export class StakingPageComponent implements OnDestroy {
   private accountSubscribe;
   public shareRate = 0;
   public hasBigPayDay = false;
-  public stakeDays: any;
+  public depositEndDate: any;
   public startDay = new Date();
   public share: any = {};
   public onChangeAccount: EventEmitter<any> = new EventEmitter();
@@ -145,6 +145,11 @@ export class StakingPageComponent implements OnDestroy {
     }, this.settingsData.settings.checkerBPD);
   }
 
+  public shouldCheckBoxForBPD(index) {
+    return this.formsData.depositDays > 349 &&
+           this.depositEndDate > this.bpd[index].dateEnd
+  }
+
   public depositList() {
     this.contractService.getAccountStakes().then((res) => {
       this.depositsLists = res;
@@ -218,10 +223,10 @@ export class StakingPageComponent implements OnDestroy {
         : (new BigNumber(rate) as any);
     }
 
-    this.stakeDays =
+    this.depositEndDate =
       Date.now() +
       this.formsData.depositDays *
-        this.contractService.settingsApp.settings.time.seconds *
+        this.settingsData.settings.time.seconds *	
         1000;
 
     const sharefull = new BigNumber(amount).div(

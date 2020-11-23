@@ -63,8 +63,8 @@ export class ContractService {
       net: 3,
 
       time: {
-        seconds: 900,
-        display: "minutes",
+        seconds: 86400,
+        display: "days",
       },
     },
     minutes: {
@@ -160,7 +160,7 @@ export class ContractService {
     ];
 
     return Promise.all(promises).then((result) => {
-      const IS_PRODUCTION = this.settingsApp.settings.production;
+      const IS_PRODUCTION = environment.production;
       this.CONTRACTS_PARAMS =
         result[1][
           IS_PRODUCTION ? "mainnet" : this.settingsApp.settings.network

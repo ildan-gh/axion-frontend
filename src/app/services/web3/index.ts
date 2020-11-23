@@ -4,8 +4,7 @@ import { Observable } from "rxjs";
 import { WEB3_CONSTANTS } from "./constants";
 // import { settingsData } from "../../params";
 import { AppConfig } from "src/app/appconfig";
-
-// const IS_PRODUCTION = location.protocol === "https:";
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: "root",
@@ -15,7 +14,6 @@ export class MetamaskService {
 
   private usedNetworkVersion: number;
   private net: string;
-  private IS_PRODUCTION: boolean;
 
   private networks = {
     production: "mainnet",
@@ -27,8 +25,7 @@ export class MetamaskService {
 
     this.networks.testnet = settingsApp.settings.network;
 
-    this.IS_PRODUCTION = settingsApp.settings.production;
-    this.usedNetworkVersion = settingsApp.settings.production
+    this.usedNetworkVersion = environment.production
       ? 1
       : settingsApp.settings.net;
     this.net =
