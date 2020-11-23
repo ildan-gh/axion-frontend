@@ -1254,19 +1254,41 @@ export class ContractService {
       });
   }
 
-  public getAuctionsData(auctionId: number, start: number) {
-    auctionId = +auctionId;
+  public getAuctionsData(todaysAuctionId: number, start: number) {
+    todaysAuctionId = +todaysAuctionId;
+
     const oneDayInMS = this.secondsInDay * 1000;
 
-    // Next weekly auction ID
-    const newWeeklyAuctionId = 7 * Math.ceil(auctionId / 7);
+    const yesterdaysAuctionId = todaysAuctionId - 1;
+    const tomorrowsAuctionId = todaysAuctionId + 1;
+    const nextWeeklyAuctionId = 7 * Math.ceil(todaysAuctionId === 0 ? 1 : todaysAuctionId / 7);
+    
+    const auctionIds = [todaysAuctionId, tomorrowsAuctionId];
 
-    const newDaysAuctionId = auctionId + 1;
-    const auctionIds = [auctionId - 1, auctionId, newDaysAuctionId];
-
-    if (newWeeklyAuctionId !== newDaysAuctionId) {
-      auctionIds.push(newWeeklyAuctionId);
+    if (yesterdaysAuctionId >= 0){
+      auctionIds.unshift(yesterdaysAuctionId);
     }
+
+    if (nextWeeklyAuctionId === todaysAuctionId) {
+      const lastWeeklyAuctionId = todaysAuctionId - 7;
+
+      if (lastWeeklyAuctionId >= 0) {
+        auctionIds.unshift(lastWeeklyAuctionId);
+      }
+      
+      auctionIds.push(todaysAuctionId + 7);
+    } else {
+      const lastWeeklyAuctionId = nextWeeklyAuctionId - 7;
+
+      if (lastWeeklyAuctionId !== yesterdaysAuctionId && lastWeeklyAuctionId !== todaysAuctionId) {
+        auctionIds.unshift(lastWeeklyAuctionId);
+      }
+
+      if (nextWeeklyAuctionId !== tomorrowsAuctionId){
+        auctionIds.push(nextWeeklyAuctionId);
+      }
+    }
+
     const nowDateTS = new Date().getTime();
     const auctionsPromises = auctionIds.map((id) => {
       return this.Auction.methods
@@ -1277,7 +1299,7 @@ export class ContractService {
           const endDateTS = startDateTS + oneDayInMS;
           return {
             id: id,
-            isWeekly: newWeeklyAuctionId === id,
+            isWeekly: id % 7 === 0,
             time: {
               date: moment(startDateTS),
               state: (nowDateTS > startDateTS && nowDateTS < endDateTS) ?

@@ -16,6 +16,11 @@
     }
   }
   tbody {
+    tr.weekly-auction {
+      td {
+        background: $clBlue-dark;
+      }
+    }
     td {
       color: $clTable-Tbody-Td-Text-dark;
       background: $clTable-Tbody-Td-Background-dark;

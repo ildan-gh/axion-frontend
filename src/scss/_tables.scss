@@ -71,6 +71,12 @@
     }
   }
   tbody {
+    tr.weekly-auction {
+      td {
+        background: $clBlue;
+        color: $clWhite;
+      }
+    }
     td {
       padding: 24px 10px;
       font-size: 18px;
@@ -112,21 +118,6 @@
           height: 22px;
           width: 1px;
           background-color: $clTable-Tbody-Td-Action-Button-Before-Background;
-        }
-      }
-    }
-  }
-  &.with-weekly {
-    thead {
-      th {
-        padding-bottom: 20px;
-      }
-    }
-    tbody {
-      tr:first-child {
-        td {
-          position: relative;
-          top: -10px;
         }
       }
     }
