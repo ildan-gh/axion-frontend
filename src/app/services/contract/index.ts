@@ -1,13 +1,13 @@
-import { async } from "@angular/core/testing";
-import { MetamaskService } from "../web3";
-import { Contract } from "web3-eth-contract";
-import { Observable, Subscriber } from "rxjs";
+import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import BigNumber from "bignumber.js";
-import { HttpClient } from "@angular/common/http";
 import * as moment from "moment";
+import { Observable, Subscriber } from "rxjs";
+import { Contract } from "web3-eth-contract";
+import { environment } from '../../../environments/environment';
 // import { settingsData } from "../../params";
 import { AppConfig } from "../../appconfig";
+import { MetamaskService } from "../web3";
 
 // export const stakingMaxDays = 5555;
 export const stakingMaxDays = 1820;
@@ -134,7 +134,7 @@ export class ContractService {
   private initAll() {
     const promises = [
       this.httpService
-        .get(`/assets/js/settings.json?v=${new Date().getTime()}`)
+        .get(`${environment.configDomain}/settings.json`)
         .toPromise()
         .then((config) => {
           if (config) {
@@ -149,7 +149,7 @@ export class ContractService {
           this.config.setConfig(this.settingsApp);
         }),
       this.httpService
-        .get(`/assets/js/constants.json?v=${new Date().getTime()}`)
+        .get(`${environment.configDomain}/constants.json`)
         .toPromise()
         .then((result) => {
           return result;
