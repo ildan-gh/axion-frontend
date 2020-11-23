@@ -99,9 +99,9 @@
     }
 
     &-3 {
-      grid-template-columns: minmax(250px, 350px) minmax(250px, 270px) minmax(
+      grid-template-columns: minmax(250px, 400px) minmax(250px, 320px) minmax(
           250px,
-          420px
+          470px
         );
 
       @include b(900) {
@@ -109,9 +109,9 @@
       }
 
       &-1 {
-        grid-template-columns: minmax(250px, 440px) minmax(200px, 220px) minmax(
+        grid-template-columns: minmax(250px, 490px) minmax(200px, 270px) minmax(
             250px,
-            400px
+            450px
           );
 
         @include b(900) {
