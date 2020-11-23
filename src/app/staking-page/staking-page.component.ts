@@ -247,7 +247,7 @@ export class StakingPageComponent implements OnDestroy {
     deposit.oldUpdate = new Date().getTime();
     const fullAge = deposit.end.getTime() - deposit.start.getTime();
     const backAge = new Date().getTime() - deposit.start.getTime();
-    deposit.progress = Math.min(Math.round(backAge / (fullAge / 100)), 100);
+    deposit.progress = Math.min(Math.floor(backAge / (fullAge / 100)), 100);
     return deposit.progress;
   }
 
