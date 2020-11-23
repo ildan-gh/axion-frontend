@@ -90,7 +90,7 @@
       }
 
       &-3 {
-        grid-template-columns: repeat(3, minmax(250px, 350px));
+        grid-template-columns: repeat(3, minmax(250px, 400px));
 
         @include b(900) {
           grid-template-columns: 1fr;
