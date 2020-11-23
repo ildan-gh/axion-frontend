@@ -367,7 +367,7 @@
               {{
                 deposit.interest
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
-              }}</span
+              }}&nbsp;AXN</span
             >
           </td>
           <td class="action-button">
@@ -406,13 +406,12 @@
           <th>End date</th>
           <th>Principal</th>
           <th>BigPayDay</th>
+          <th>Interest</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let deposit of depositsLists.closed">
-          <!-- <td>{{ deposit.start | date: "dd.MM.yyyy" }}</td> -->
           <td>{{ deposit.start | date: "shortDate" }}</td>
-          <!-- <td>{{ deposit.end | date: "dd.MM.yyyy" }}</td> -->
           <td>{{ deposit.end | date: "shortDate" }}</td>
           <td>
             <span
@@ -426,7 +425,7 @@
               {{
                 deposit.amount
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
-              }}</span
+              }}&nbsp;AXN</span
             >
           </td>
           <td>
@@ -441,7 +440,22 @@
               {{
                 deposit.bigPayDay
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
-              }}&nbsp; AXN</span
+              }}&nbsp;AXN</span
+            >
+          </td>
+          <td>
+            <span
+              matTooltipClass="table__tooltip"
+              mat-raised-button
+              matTooltip="{{
+                deposit.interest
+                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+              }}"
+            >
+              {{
+                deposit.interest
+                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+              }}</span
             >
           </td>
         </tr>
