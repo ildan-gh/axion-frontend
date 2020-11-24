@@ -1,6 +1,6 @@
 <section class="axn-section" *ngIf="account">
   <div class="axn-title-block">
-    <span class="axn-title">Auction</span>
+    <span class="axn-title" (hover)="tooltip2.toggle()">Auction</span>
     <div
       #tooltip2="matTooltip"
       (click)="tooltip2.toggle()"
@@ -11,8 +11,12 @@
 
       When the user places a bid in ETH: 80% of the received ETH is instantly used to buy back Axion on Uniswap and the received AXN is used to replenish the Staking contract; 19% of the received ETH is the company's profit; 1% goes to The Eden Reforestation Project, with each $0.10 planting a tree.
 
-      All Axion received from the Auction including referral bonuses will be autostaked for 14 days upon withdrawal."
-      matTooltipClass="question__tooltip"
+      All Axion received from the Auction including referral bonuses will be autostaked for 14 days upon withdrawal.
+
+      There is a chance the auction gets oversold, and everyone who bids will receive a lower amount of AXN compared to buying on Uniswap.
+
+      If entering within the last hour or so, please be sure to use a high gas fee. If your transaction does not complete by auction cut off, your ETH will be entered into the next days auction.  We cannot be responsible for this and cannot provide any refunds."
+      matTooltipClass="question__tooltip question__extrawidth"
     ></div>
   </div>
 
@@ -324,6 +328,15 @@
   <div class="axn-form-block p-20">
     <div class="axn-title-block axn-title-block-left">
       <span class="axn-title">Auctions</span>
+      <div
+        class="question"
+        #tooltip="matTooltip"
+        (click)="tooltip.toggle()"
+        mat-raised-button
+        matTooltip="Auctions run daily, with a weekly mega auction every Friday.
+        Each auction starts at 07:02 UTC / 23:02 PST and lasts for 24 hours."
+        matTooltipClass="question__tooltip"
+      ></div>
     </div>
     <table class="standard-table" cellpadding="0" cellspacing="0" border="0">
       <thead>
@@ -335,8 +348,8 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let auction of auctions" [ngClass]="{'weekly-auction': auction.isWeekly}">
-          <td>{{ auction.time.date | date: "shortDate" }}</td>
+        <tr *ngFor="let auction of auctions" [ngClass]="{'weekly-auction': auction.isWeekly, 'active-auction': auction.time.state === 'progress'}">
+          <td class="date">{{ auction.time.date | date: "shortDate" }}<span class="label" *ngIf="auction.isWeekly">WEEKLY</span></td>
           <td>
             <span
               matTooltipClass="table__tooltip"

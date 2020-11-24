@@ -344,6 +344,11 @@ body {
     border-radius: 12px;
     font-size: 14px !important;
     line-height: 16px !important;
+
+  }
+
+  &__extrawidth {
+    max-width: 400px !important;
   }
 }
 

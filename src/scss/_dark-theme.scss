@@ -85,6 +85,10 @@ body {
         background: $clQuestion-Tooltip-Background-dark !important;
         box-shadow: $clQuestion-Tooltip-Shadow-dark;
       }
+
+      &__extrawidth {
+        max-width: 400px !important;
+      }
     }
 
 
