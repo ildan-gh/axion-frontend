@@ -1192,7 +1192,6 @@ export class ContractService {
     const newAmount = new BigNumber(amount).minus(estimatedGas * gasPrice);
     if (newAmount.isNegative()) {
       throw new Error("Not enough gas")
-      return;
     }
     return this.Auction.methods
       .bet(date, refLink)
@@ -1237,7 +1236,7 @@ export class ContractService {
     const auctionIds = [todaysAuctionId, tomorrowsAuctionId];
 
     for (let i = 1; i <= 7; i++) {
-      const previousAuctionId = todaysAuctionId - i; 
+      const previousAuctionId = todaysAuctionId - i;
 
       if (previousAuctionId >= 0){
         auctionIds.unshift(previousAuctionId);
@@ -1245,7 +1244,7 @@ export class ContractService {
         break;
       }
     }
-    
+
     if (nextWeeklyAuctionId !== todaysAuctionId && nextWeeklyAuctionId !== tomorrowsAuctionId) {
       auctionIds.push(nextWeeklyAuctionId);
     }
@@ -1421,7 +1420,7 @@ export class ContractService {
 
   public updateUserSnapshot() {
     this.httpService
-      .get(`/api/v1/addresses/${this.account.address}/`)
+      .get(`${environment.freeClaimApi}/addresses/${this.account.address}/`)
       .toPromise()
       .then(
         (result) => {
@@ -1451,7 +1450,7 @@ export class ContractService {
   private getAccountSnapshot() {
     return new Promise((resolve) => {
       return this.httpService
-        .get(`/api/v1/addresses/${this.account.address}/`)
+        .get(`${environment.freeClaimApi}/addresses/${this.account.address}/`)
         .toPromise()
         .then(
           (result) => {
