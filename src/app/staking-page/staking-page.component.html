@@ -420,7 +420,6 @@
           <th>End date</th>
           <th>Principal</th>
           <th>BigPayDay</th>
-          <th>Interest</th>
         </tr>
       </thead>
       <tbody>
@@ -455,21 +454,6 @@
                 deposit.bigPayDay
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
               }}&nbsp;AXN</span
-            >
-          </td>
-          <td>
-            <span
-              matTooltipClass="table__tooltip"
-              mat-raised-button
-              matTooltip="{{
-                deposit.interest
-                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
-              }}"
-            >
-              {{
-                deposit.interest
-                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
-              }}</span
             >
           </td>
         </tr>
