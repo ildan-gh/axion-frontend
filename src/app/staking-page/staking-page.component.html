@@ -305,10 +305,24 @@
       </thead>
       <tbody>
         <tr *ngFor="let deposit of depositsLists.opened">
-          <!-- <td>{{ deposit.start | date: "dd.MM.yyyy" }}</td> -->
-          <td>{{ deposit.start | date: "shortDate" }}</td>
-          <!-- <td>{{ deposit.end | date: "dd.MM.yyyy" }}</td> -->
-          <td>{{ deposit.end | date: "shortDate" }}</td>
+          <td>
+            <span
+              matTooltipClass="table__tooltip"
+              mat-raised-button
+              matTooltip="{{ deposit.start | date: 'long' }}"
+            >
+              {{ deposit.start | date: "shortDate" }}</span
+            >
+          </td>
+          <td>
+            <span
+              matTooltipClass="table__tooltip"
+              mat-raised-button
+              matTooltip="{{ deposit.end | date: 'long' }}"
+            >
+              {{ deposit.end | date: "shortDate" }}</span
+            >
+          </td>
           <td>{{ getProgress(deposit) }}%</td>
           <td>
             <span
