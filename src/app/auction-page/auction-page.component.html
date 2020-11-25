@@ -227,7 +227,15 @@
       </thead>
       <tbody>
         <tr *ngFor="let auction of activeBids">
-          <td>{{ auction.start_date | date: "shortDate" }}</td>
+          <td>
+            <span
+              matTooltipClass="table__tooltip"
+              mat-raised-button
+              matTooltip="{{ auction.start_date | date: 'long' }}"
+            >
+              {{ auction.start_date | date: "shortDate" }}</span
+            >
+          </td>
           <td>
             <span
               matTooltipClass="table__tooltip"
@@ -333,7 +341,15 @@
       </thead>
       <tbody>
         <tr *ngFor="let auction of withdrawnBids">
-          <td>{{ auction.start_date | date: "shortDate" }}</td>
+          <td>
+            <span
+              matTooltipClass="table__tooltip"
+              mat-raised-button
+              matTooltip="{{ auction.start_date | date: 'long' }}"
+            >
+              {{ auction.start_date | date: "shortDate" }}</span
+            >
+          </td>
           <td>
             <span
               matTooltipClass="table__tooltip"
@@ -395,7 +411,15 @@
       </thead>
       <tbody>
         <tr *ngFor="let auction of auctions" [ngClass]="{'weekly-auction': auction.isWeekly, 'active-auction': auction.time.state === 'progress'}">
-          <td class="date">{{ auction.time.date | date: "shortDate" }}<span class="label" *ngIf="auction.isWeekly">WEEKLY</span></td>
+          <td class="date">
+            <span
+              matTooltipClass="table__tooltip"
+              mat-raised-button
+              matTooltip="{{ auction.time.date | date: 'long' }}"
+            >
+              {{ auction.time.date | date: "shortDate" }}<span class="label" *ngIf="auction.isWeekly">WEEKLY</span></span
+            >
+          </td>
           <td>
             <span
               matTooltipClass="table__tooltip"
