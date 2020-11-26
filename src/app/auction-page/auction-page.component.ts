@@ -199,7 +199,7 @@ export class AuctionPageComponent implements OnDestroy {
           : -1
       );
 
-      this.activeBids = auctions.filter(auction => auction.status === 'progress');
+      this.activeBids = auctions.filter(auction => auction.status !== 'complete');
       this.withdrawnBids = auctions.filter(auction => auction.status === 'complete');
 
       this.hasActiveBids = this.activeBids.length !== 0;
