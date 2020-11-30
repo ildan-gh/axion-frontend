@@ -12,7 +12,7 @@ import { MetamaskService } from "../web3";
 // export const stakingMaxDays = 5555;
 export const stakingMaxDays = 1820;
 
-interface DepositInterface {
+export interface DepositInterface {
   start: Date;
   end: Date;
   shares: BigNumber;
@@ -20,6 +20,7 @@ interface DepositInterface {
   isActive: boolean;
   sessionId: string;
   bigPayDay: BigNumber;
+  interest: BigNumber;
   withdrawProgress?: boolean;
   isMatured: boolean;
 }
@@ -1088,7 +1089,7 @@ export class ContractService {
                               isActive: oneSession.sessionIsActive,
                               sessionId,
                               bigPayDay: new BigNumber(result[0]),
-                              interest,
+                              interest: new BigNumber(interest),
                               penalty: new BigNumber(resultInterest[1]),
                               forWithdraw: new BigNumber(resultInterest[0]),
                               isMatured: nowMs > endMs

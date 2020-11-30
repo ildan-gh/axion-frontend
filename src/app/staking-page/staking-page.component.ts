@@ -6,7 +6,7 @@ import {
   TemplateRef,
   ViewChild,
 } from "@angular/core";
-import { ContractService, stakingMaxDays } from "../services/contract";
+import { ContractService, stakingMaxDays, DepositInterface } from "../services/contract";
 import BigNumber from "bignumber.js";
 import { AppConfig } from "../appconfig";
 import { MatDialog } from "@angular/material/dialog";
@@ -44,10 +44,13 @@ export class StakingPageComponent implements OnDestroy {
   } = {};
   public depositTokensProgress: boolean;
   public depositsLists: {
-    opened?: any;
-    closed?: any;
-    matured?: any;
+    opened?: DepositInterface[];
+    closed?: DepositInterface[];
+    matured?: DepositInterface[];
   };
+
+  public openedDepositTotals: any;
+
   @ViewChild("depositForm", { static: false }) depositForm;
 
   @ViewChild("warningModal", {
@@ -154,9 +157,27 @@ export class StakingPageComponent implements OnDestroy {
   }
 
   public depositList() {
-    this.contractService.getAccountStakes().then((res) => {
+    this.contractService.getAccountStakes().then((res: {
+      closed: DepositInterface[];
+      opened: DepositInterface[];
+      matured: DepositInterface[];
+    }) => {
       this.depositsLists = res;
-      // console.log("user deposits lists", this.depositsLists);
+
+      let openedDeposits : DepositInterface[] = res.opened.concat(res.matured);
+
+      if (openedDeposits.length) {
+        this.openedDepositTotals = { 
+          principal: openedDeposits.map(x => x.amount).reduce((total, x) => total.plus(x)),
+          interest: openedDeposits.map(x => x.interest).reduce((total, x) => total.plus(x)),
+          shares: openedDeposits.map(x => x.shares).reduce((total, x) => total.plus(x)),
+          bigPayDay: openedDeposits.map(x => x.bigPayDay).reduce((total, x) => total.plus(x))
+        };
+  
+        this.openedDepositTotals.total = this.openedDepositTotals.principal
+          .plus(this.openedDepositTotals.interest)
+          .plus(this.openedDepositTotals.bigPayDay);
+      }
 
       this.applySort("opened");
       this.applySort("closed");
