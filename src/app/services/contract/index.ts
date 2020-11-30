@@ -21,6 +21,7 @@ interface DepositInterface {
   sessionId: string;
   bigPayDay: BigNumber;
   withdrawProgress?: boolean;
+  isMatured: boolean;
 }
 
 @Injectable({
@@ -1047,11 +1048,13 @@ export class ContractService {
   public getAccountStakes(): Promise<{
     closed: DepositInterface[];
     opened: DepositInterface[];
+    matured: DepositInterface[];
   }> {
     return this.StakingContract.methods
       .sessionsOf_(this.account.address)
       .call()
       .then((sessions) => {
+        const nowMs = Date.now();
         const sessionsPromises: DepositInterface[] = sessions.map(
           (sessionId) => {
             return this.StakingContract.methods
@@ -1075,10 +1078,11 @@ export class ContractService {
                           .call({ from: this.account.address })
                           .then((resultInterest) => {
                             const interest = res;
+                            const endMs = oneSession.end * 1000;
 
                             return {
                               start: new Date(oneSession.start * 1000),
-                              end: new Date(oneSession.end * 1000),
+                              end: new Date(endMs),
                               shares: new BigNumber(oneSession.shares),
                               amount: new BigNumber(oneSession.amount),
                               isActive: oneSession.sessionIsActive,
@@ -1087,6 +1091,7 @@ export class ContractService {
                               interest,
                               penalty: new BigNumber(resultInterest[1]),
                               forWithdraw: new BigNumber(resultInterest[0]),
+                              isMatured: nowMs > endMs
                             };
                           });
                       });
@@ -1101,8 +1106,11 @@ export class ContractService {
                 return new BigNumber(deposit.shares).toNumber() <= 0;
               }),
               opened: allDeposits.filter((deposit: DepositInterface) => {
-                return new BigNumber(deposit.shares).toNumber() > 0;
+                return !deposit.isMatured && new BigNumber(deposit.shares).toNumber() > 0;
               }),
+              matured: allDeposits.filter((deposit: DepositInterface) => {
+                return deposit.isMatured && new BigNumber(deposit.shares).toNumber() > 0;
+              })
             };
           }
         );

@@ -284,6 +284,129 @@
 
 <section
   class="axn-section"
+  *ngIf="depositsLists?.matured.length && tokensDecimals"
+>
+  <div class="axn-form-block p-20">
+    <div class="axn-title-block p-20">
+      <span class="axn-title">Matured Deposits</span>
+    </div>
+    <table class="standard-table" cellpadding="0" cellspacing="0" border="0">
+      <thead>
+        <tr>
+          <th>Start date</th>
+          <th>End date</th>
+          <th>Progress</th>
+          <th>Principal</th>
+          <th>Shares</th>
+          <th>BigPayDay</th>
+          <th>Interest</th>
+          <th width="10">&nbsp;</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let deposit of depositsLists.matured">
+          <td>
+            <span
+              matTooltipClass="table__tooltip"
+              mat-raised-button
+              matTooltip="{{ deposit.start | date: 'long' }}"
+            >
+              {{ deposit.start | date: "shortDate" }}</span
+            >
+          </td>
+          <td>
+            <span
+              matTooltipClass="table__tooltip"
+              mat-raised-button
+              matTooltip="{{ deposit.end | date: 'long' }}"
+            >
+              {{ deposit.end | date: "shortDate" }}</span
+            >
+          </td>
+          <td>{{ getProgress(deposit) }}%</td>
+          <td>
+            <span
+              matTooltipClass="table__tooltip"
+              mat-raised-button
+              matTooltip="{{
+                deposit.amount
+                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+              }}"
+            >
+              {{
+                deposit.amount
+                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+              }}&nbsp;AXN</span
+            >
+          </td>
+          <td>
+            <span
+              matTooltipClass="table__tooltip"
+              mat-raised-button
+              matTooltip="{{
+                deposit.shares
+                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+              }}"
+            >
+              {{
+                deposit.shares
+                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+              }}</span
+            >
+          </td>
+          <td>
+            <span
+              matTooltipClass="table__tooltip"
+              mat-raised-button
+              matTooltip="{{
+                deposit.bigPayDay
+                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+              }}"
+            >
+              {{
+                deposit.bigPayDay
+                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+              }}&nbsp;AXN</span
+            >
+          </td>
+          <td>
+            <span
+              matTooltipClass="table__tooltip"
+              mat-raised-button
+              matTooltip="{{
+                deposit.interest
+                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+              }}"
+            >
+              {{
+                deposit.interest
+                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+              }}&nbsp;AXN</span
+            >
+          </td>
+          <td class="action-button">
+            <button
+              class="axn-btn axn-btn-gray"
+              (click)="depositWithdraw(deposit)"
+              [ngClass]="{ progress: deposit.withdrawProgress }"
+              [disabled]="deposit.withdrawProgress"
+            >
+              <span class="lds-ellipsis" *ngIf="deposit.withdrawProgress">
+                <span class="lds-ellipsis-container">
+                  <span></span><span></span><span></span><span></span>
+                </span>
+              </span>
+              <span class="t-fw-light">&nbsp;&nbsp;Withdraw&nbsp;&nbsp;</span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section
+  class="axn-section"
   *ngIf="depositsLists?.opened.length && tokensDecimals"
 >
   <div class="axn-form-block table-container p-20">

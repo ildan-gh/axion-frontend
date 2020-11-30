@@ -46,6 +46,7 @@ export class StakingPageComponent implements OnDestroy {
   public depositsLists: {
     opened?: any;
     closed?: any;
+    matured?: any;
   };
   @ViewChild("depositForm", { static: false }) depositForm;
 
@@ -67,9 +68,11 @@ export class StakingPageComponent implements OnDestroy {
   public currentSort: {
     opened: any;
     closed: any;
+    matured: any;
   } = {
     opened: {},
     closed: {},
+    matured: {}
   };
 
   public bpd: any = [];
@@ -157,6 +160,7 @@ export class StakingPageComponent implements OnDestroy {
 
       this.applySort("opened");
       this.applySort("closed");
+      this.applySort("matured");
       window.dispatchEvent(new Event("resize"));
       this.getStakingInfo();
       this.stakingInfoChecker = true;
