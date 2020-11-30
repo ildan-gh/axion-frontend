@@ -38,7 +38,7 @@
     }
 
     &-staking {
-      min-height: 270px;
+      min-height: 280px;
       height: max-content;
     }
 
@@ -78,6 +78,7 @@
         display: grid;
         grid-template-columns: 1fr;
         grid-gap: 10px;
+        float: left;
       }
 
       &-2 {
@@ -96,6 +97,10 @@
           grid-template-columns: 1fr;
         }
       }
+
+      &-4 {
+        float: right;
+      }
     }
 
     &-3 {
@@ -109,9 +114,9 @@
       }
 
       &-1 {
-        grid-template-columns: minmax(250px, 490px) minmax(200px, 270px) minmax(
-            250px,
-            450px
+        grid-template-columns: minmax(250px, 480px) minmax(150px, 180px) minmax(
+            300px,
+            550px
           );
 
         @include b(900) {
@@ -243,6 +248,10 @@
       &-shares {
         font-weight: 300;
         text-align: left !important;
+
+        &-right {
+          text-align: right !important;
+        }
 
         &-value {
           font-size: 25px;
