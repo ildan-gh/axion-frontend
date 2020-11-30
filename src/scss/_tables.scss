@@ -6,8 +6,6 @@
   border-spacing: 0 5px;
 
   @include b(900) {
-    overflow: scroll;
-    display: block;
     padding-bottom: 10px;
   }
 
