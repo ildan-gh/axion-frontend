@@ -171,9 +171,6 @@
         </div>
         <div class="axn-form-base p-b-15 axn-form-border-dashed-bottom">
           <div class="axn-form-block-shares p-l-10">
-            <!-- <span class="axn-form-block-shares-value cl-blue">{{
-              startDay | date: "dd.MM.y"
-            }}</span> -->
             <span class="axn-form-block-shares-value cl-blue">{{
               startDay | date: "shortDate"
             }}</span>
@@ -181,10 +178,6 @@
             <span class="axn-form-block-shares-text-min">Start Day</span>
           </div>
           <div class="axn-form-block-shares">
-            <!-- <span class="axn-form-block-shares-value cl-blue">{{
-              depositEndDate | date: "dd.MM.y"
-            }}</span
-            > -->
             <span class="axn-form-block-shares-value cl-blue">{{
               depositEndDate | date: "shortDate"
             }}</span
@@ -203,9 +196,6 @@
                 }"
                 >BPD {{ $index + 1 }}</span
               >
-              <!-- <span class="axn-form-block-shares-text-min cl-blue">{{
-                item.dateEnd | date: "dd.MM.yyyy"
-              }}</span> -->
               <span class="axn-form-block-shares-text-min cl-blue">{{
                 item.dateEnd | date: "shortDate"
               }}</span>
@@ -293,10 +283,10 @@
     <table class="standard-table" cellpadding="0" cellspacing="0" border="0">
       <thead>
         <tr>
-          <th>Principal</th>
+          <th>Principal AXN</th>
           <th>Shares</th>
-          <th>BigPayDay</th>
-          <th>Interest</th>
+          <th>BigPayDay AXN</th>
+          <th>Interest AXN</th>
           <th>Total AXN</th>
         </tr>
       </thead>
@@ -314,7 +304,7 @@
               {{
                 openedDepositTotals.principal
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
-              }}&nbsp;AXN</span
+              }}</span
             >
           </td>
           <td>
@@ -344,7 +334,7 @@
               {{
                 openedDepositTotals.bigPayDay
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
-              }}&nbsp;AXN</span
+              }}</span
             >
           </td>
           <td>
@@ -359,7 +349,7 @@
               {{
                 openedDepositTotals.interest
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
-              }}&nbsp;AXN</span
+              }}</span
             >
           </td>
           <td>
@@ -374,7 +364,7 @@
               {{
                 openedDepositTotals.total
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
-              }}&nbsp;AXN</span
+              }}</span
             >
           </td>
         </tr>
@@ -397,10 +387,10 @@
           <th>Start date</th>
           <th>End date</th>
           <th>Progress</th>
-          <th>Principal</th>
+          <th>Principal AXN</th>
           <th>Shares</th>
-          <th>BigPayDay</th>
-          <th>Interest</th>
+          <th>BigPayDay AXN</th>
+          <th>Interest AXN</th>
           <th width="10">&nbsp;</th>
         </tr>
       </thead>
@@ -437,7 +427,7 @@
               {{
                 deposit.amount
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
-              }}&nbsp;AXN</span
+              }}</span
             >
           </td>
           <td>
@@ -467,7 +457,7 @@
               {{
                 deposit.bigPayDay
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
-              }}&nbsp;AXN</span
+              }}</span
             >
           </td>
           <td>
@@ -482,7 +472,7 @@
               {{
                 deposit.interest
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
-              }}&nbsp;AXN</span
+              }}</span
             >
           </td>
           <td class="action-button">
@@ -520,10 +510,10 @@
           <th>Start date</th>
           <th>End date</th>
           <th>Progress</th>
-          <th>Principal</th>
+          <th>Principal AXN</th>
           <th>Shares</th>
-          <th>BigPayDay</th>
-          <th>Interest</th>
+          <th>BigPayDay AXN</th>
+          <th>Interest AXN</th>
           <th width="10">&nbsp;</th>
         </tr>
       </thead>
@@ -560,7 +550,7 @@
               {{
                 deposit.amount
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
-              }}&nbsp;AXN</span
+              }}</span
             >
           </td>
           <td>
@@ -590,7 +580,7 @@
               {{
                 deposit.bigPayDay
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
-              }}&nbsp;AXN</span
+              }}</span
             >
           </td>
           <td>
@@ -605,7 +595,7 @@
               {{
                 deposit.interest
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
-              }}&nbsp;AXN</span
+              }}</span
             >
           </td>
           <td class="action-button">
@@ -642,8 +632,8 @@
         <tr>
           <th>Start date</th>
           <th>End date</th>
-          <th>Principal</th>
-          <th>BigPayDay</th>
+          <th>Principal AXN</th>
+          <th>BigPayDay AXN</th>
         </tr>
       </thead>
       <tbody>
@@ -662,7 +652,7 @@
               {{
                 deposit.amount
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
-              }}&nbsp;AXN</span
+              }}</span
             >
           </td>
           <td>
@@ -677,7 +667,7 @@
               {{
                 deposit.bigPayDay
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
-              }}&nbsp;AXN</span
+              }}</span
             >
           </td>
         </tr>

@@ -22,7 +22,7 @@ import { MinMaxDirective } from "./directives/minmax/minmax";
 import { AngularFittextModule } from "angular-fittext";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { HttpClientModule } from "@angular/common/http";
-import { MatDialogModule, MatTooltipModule } from "@angular/material";
+import { MatDialogModule, MatTooltipModule, MAT_HAMMER_OPTIONS  } from "@angular/material";
 import { AppConfig } from "./appconfig";
 
 export function initializeApp(injector: Injector) {
@@ -86,6 +86,10 @@ registerLocaleData(localeGB, "en-gb");
       useFactory: (LocaleService: { locale: string }) => LocaleService.locale,
       // useFactory: (LocaleService) => LocaleService.initCulture(),
     },
+    {
+      provide: MAT_HAMMER_OPTIONS,
+      useValue: { cssProps: { userSelect: true } }
+    }
   ],
   bootstrap: [AppComponent],
 })
