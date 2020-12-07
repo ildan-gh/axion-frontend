@@ -720,15 +720,9 @@ export class ContractService {
                 auctionPriceFromPool = new BigNumber(auctionReserves.token).div(auctionReserves.eth);
               }
 
-              this.UniswapV2Router02.methods
-                .getAmountsOut(this.ether.toString(), [
-                  this.CONTRACTS_PARAMS.HEX2X.ADDRESS,
-                  this.CONTRACTS_PARAMS.WETH.ADDRESS,
-                ])
-                .call()
+              this.getAmountsOutAsync(this.ether.toString())
                 .then(async (value) => {
-                  const axn = new BigNumber(value[1]).div(this.ether);
-                  const uniswapPrice = new BigNumber(1).div(axn);
+                  const uniswapPrice = new BigNumber(value[1]).div(this.ether);
 
                   data.uniToEth = uniswapPrice.dp(2);
 
@@ -1181,8 +1175,11 @@ export class ContractService {
     if (newAmount.isNegative()) {
       throw new Error("Not enough gas")
     }
+
+    const amountOutMin = await this.getAmountOutMinAsync(amount);
+
     return this.Auction.methods
-      .bet(date, refLink)
+      .bet(amountOutMin, date, refLink)
       .send({
         from: this.account.address,
         value: newAmount,
@@ -1202,8 +1199,10 @@ export class ContractService {
       ? ref.toLowerCase()
       : "0x0000000000000000000000000000000000000000".toLowerCase();
 
+    const amountOutMin = await this.getAmountOutMinAsync(amount);
+
     return this.Auction.methods
-      .bet(date, refLink)
+      .bet(amountOutMin, date, refLink)
       .send({
         from: this.account.address,
         value: amount,
@@ -1211,6 +1210,20 @@ export class ContractService {
       .then((res) => {
         return this.checkTransaction(res);
       });
+  }
+
+  private async getAmountOutMinAsync(amount: string) : Promise<string> {
+    const amountOut = new BigNumber((await this.getAmountsOutAsync(amount))[1]);
+    return amountOut.times(1 - environment.slippageTolerancePercent / 100).dp(0).toString(10);
+  }
+
+  private getAmountsOutAsync(amount: string) : Promise<string[]> {
+    return this.UniswapV2Router02.methods
+      .getAmountsOut(amount, [
+        this.CONTRACTS_PARAMS.WETH.ADDRESS,
+        this.CONTRACTS_PARAMS.HEX2X.ADDRESS
+      ])
+      .call();
   }
 
   public getAuctionsData(todaysAuctionId: number, start: number) {

@@ -5,7 +5,8 @@
 export const environment = {
   production: false,
   configDomain: 'assets/js',
-  freeClaimApi: 'https://api.axion.network'
+  freeClaimApi: 'https://api.axion.network',
+  slippageTolerancePercent: 0.5
 };
 
 /*
