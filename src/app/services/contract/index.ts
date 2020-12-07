@@ -1168,7 +1168,7 @@ export class ContractService {
 
     const gasLimit = this.account.balances.ETH.wei;
     const gasPrice = await this.web3Service.gasPrice();
-    const estimatedGas = await this.Auction.methods.bet(date, refLink)
+    const estimatedGas = await this.Auction.methods.bet(0, date, refLink)
       .estimateGas({from: this.account.address, gas:gasLimit, value: amount});
 
     const newAmount = new BigNumber(amount).minus(estimatedGas * gasPrice);
@@ -1176,7 +1176,7 @@ export class ContractService {
       throw new Error("Not enough gas")
     }
 
-    const amountOutMin = await this.getAmountOutMinAsync(amount);
+    const amountOutMin = await this.getAmountOutMinAsync(newAmount.toString());
 
     return this.Auction.methods
       .bet(amountOutMin, date, refLink)
