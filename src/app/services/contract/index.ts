@@ -5,7 +5,6 @@ import * as moment from "moment";
 import { Observable, Subscriber } from "rxjs";
 import { Contract } from "web3-eth-contract";
 import { environment } from '../../../environments/environment';
-// import { settingsData } from "../../params";
 import { AppConfig } from "../../appconfig";
 import { MetamaskService } from "../web3";
 
@@ -49,6 +48,9 @@ export class ContractService {
   private tokensDecimals: any = {
     ETH: 18,
   };
+
+  private readonly ether = Math.pow(10, 18);
+
   public account;
   private allAccountSubscribers = [];
   private allTransactionSubscribers = [];
@@ -81,7 +83,6 @@ export class ContractService {
     },
   };
 
-  private dateToEnd: any;
   private swapDaysPeriod: any;
   private secondsInDay: any;
   private startDate: any;
@@ -699,13 +700,12 @@ export class ContractService {
             .call()
             .then((auctionReserves) => {
               const data = {} as any;
-              const amount = Math.pow(10, this.tokensDecimals.HEX2X);
 
               data.eth = new BigNumber(auctionReserves.eth);
 
               data.axn = parseFloat(
                 new BigNumber(auctionReserves.token)
-                  .div(amount)
+                  .div(this.ether)
                   .toFixed(8)
                   .toString()
               );
@@ -721,39 +721,31 @@ export class ContractService {
               }
 
               this.UniswapV2Router02.methods
-                .getAmountsOut(amount.toString(), [
+                .getAmountsOut(this.ether.toString(), [
                   this.CONTRACTS_PARAMS.HEX2X.ADDRESS,
                   this.CONTRACTS_PARAMS.WETH.ADDRESS,
                 ])
                 .call()
-                .then((value) => {
-                  const axn = new BigNumber(value[1]).div(amount);
+                .then(async (value) => {
+                  const axn = new BigNumber(value[1]).div(this.ether);
                   const uniswapPrice = new BigNumber(1).div(axn);
 
                   data.uniToEth = uniswapPrice.dp(2);
 
-                  this.Auction.methods
-                    .uniswapPercent()
-                    .call()
-                    .then((uniswapPercent) => {
-                      const discount = 1 + uniswapPercent / 100;
-                      
-                      if (auctionPriceFromPool.isZero()) {
-                        const uniswapDiscountedPrice = uniswapPrice.times(discount);
+                  if (auctionPriceFromPool.isZero()) {
+                    const uniswapDiscountedPrice = await this.adjustPriceAsync(uniswapPrice);
 
-                        data.axnToEth = uniswapDiscountedPrice.dp(2);
-                      } else {
-                        const uniswapDiscountedAveragePrice = uniswapAveragePrice
-                          .div(amount)
-                          .times(discount);
+                    data.axnToEth = uniswapDiscountedPrice.dp(2);
+                  } else {
+                    const uniswapDiscountedAveragePrice = 
+                      await this.adjustPriceAsync(uniswapAveragePrice.div(this.ether));
 
-                        data.axnToEth = BigNumber.minimum(
-                          uniswapDiscountedAveragePrice,	
-                          auctionPriceFromPool
-                        ).dp(2);
-                      }
-                      resolve(data);
-                    });
+                    data.axnToEth = BigNumber.minimum(
+                      uniswapDiscountedAveragePrice,	
+                      auctionPriceFromPool
+                    ).dp(2);
+                  }
+                  resolve(data);
                 });
             });
         });
@@ -789,10 +781,7 @@ export class ContractService {
 
                 const dateEnd = leftDays;
 
-                const dateToEnd = a - b;
                 const showTime = leftDays;
-
-                this.dateToEnd = dateToEnd;
 
                 return {
                   startDate: fullStartDate,
@@ -817,10 +806,7 @@ export class ContractService {
 
       const leftDays = Math.floor((a - b) / (this.secondsInDay * 1000));
       const dateEnd = leftDays;
-      const dateToEnd = a - b;
       const showTime = leftDays;
-
-      this.dateToEnd = dateToEnd;
 
       resolve({
         startDate: fullStartDate,
@@ -1346,18 +1332,10 @@ export class ContractService {
 
                       auctionInfo.start_date = new Date(startTS);
 
-                      const uniPercent = await this.Auction.methods
-                        .uniswapPercent()
-                        .call();
-
                       // START FORMULA
 
-                      const uniswapPriceWithPercent = new BigNumber(
-                        auctionData.uniswapMiddlePrice
-                      )
-                        .times(1 + uniPercent / 100)
-                        .div(Math.pow(10, 18))
-                        .dp(0);
+                      const uniswapPriceWithPercent = (await this.adjustPriceAsync(
+                        new BigNumber(auctionData.uniswapMiddlePrice))).div(this.ether).dp(0);
 
                       const poolPrice = new BigNumber(auctionData.token).div(
                         auctionData.eth
@@ -1407,6 +1385,18 @@ export class ContractService {
             return Promise.all(auctionsPromises);
           });
       });
+  }
+
+  private async adjustPriceAsync(price: BigNumber) : Promise<BigNumber> {
+    const discountPercent = await this.Auction.methods
+      .discountPercent()
+      .call();
+
+    const premiumPercent = await this.Auction.methods
+      .premiumPercent()
+      .call();
+
+    return price.times(1 + (discountPercent - premiumPercent) / 100);
   }
 
   public withdrawFromAuction(auctionId) {

@@ -1,8 +1,6 @@
 import { Injectable } from "@angular/core";
 import Web3 from "web3";
 import { Observable } from "rxjs";
-import { WEB3_CONSTANTS } from "./constants";
-// import { settingsData } from "../../params";
 import { AppConfig } from "src/app/appconfig";
 import { environment } from '../../../environments/environment';
 
