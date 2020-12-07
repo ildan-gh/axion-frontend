@@ -23,7 +23,6 @@
     }
     td {
       color: $clTable-Tbody-Td-Text-dark;
-      background: $clTable-Tbody-Td-Background-dark;
       + td {
         &:before {
           background-color: $clTable-Tbody-Td-Action-Button-Before-Background-dark;

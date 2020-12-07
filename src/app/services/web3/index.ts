@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
-import Web3 from "web3";
 import { Observable } from "rxjs";
 import { AppConfig } from "src/app/appconfig";
+import Web3 from "web3";
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -15,7 +15,7 @@ export class MetamaskService {
 
   private networks = {
     production: "mainnet",
-    testnet: "rinkeby",
+    testnet: "ropsten",
   };
 
   constructor(private config: AppConfig) {

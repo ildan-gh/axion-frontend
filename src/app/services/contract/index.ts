@@ -731,11 +731,11 @@ export class ContractService {
 
                     data.axnToEth = uniswapDiscountedPrice.dp(2);
                   } else {
-                    const uniswapDiscountedAveragePrice = 
+                    const uniswapDiscountedAveragePrice =
                       await this.adjustPriceAsync(uniswapAveragePrice.div(this.ether));
 
                     data.axnToEth = BigNumber.minimum(
-                      uniswapDiscountedAveragePrice,	
+                      uniswapDiscountedAveragePrice,
                       auctionPriceFromPool
                     ).dp(2);
                   }
