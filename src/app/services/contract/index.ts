@@ -1214,7 +1214,9 @@ export class ContractService {
 
   private async getAmountOutMinAsync(amount: string) : Promise<string> {
     const amountOut = new BigNumber((await this.getAmountsOutAsync(amount))[1]);
-    return amountOut.times(1 - environment.slippageTolerancePercent / 100).dp(0).toString(10);
+    return amountOut.times(
+      (100 - environment.slippageTolerancePercent - environment.auctionRecipientPercent) / 100)
+        .dp(0).toString(10);
   }
 
   private getAmountsOutAsync(amount: string) : Promise<string[]> {
