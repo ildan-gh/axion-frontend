@@ -1386,7 +1386,7 @@ export class ContractService {
                       if (check > 0) {
                         auctionInfo.status = "progress";
                       } else {
-                        if (userWinnings.toNumber() > 0) {
+                        if (!accountBalance.withdrawn) {
                           auctionInfo.status = "withdraw";
                         } else {
                           auctionInfo.status = "complete";

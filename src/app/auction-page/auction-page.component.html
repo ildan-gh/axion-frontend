@@ -337,6 +337,8 @@
           <th>Date</th>
           <th>AXN in pool</th>
           <th>ETH in pool</th>
+          <th>My ETH</th>
+          <th>My AXN</th>
         </tr>
       </thead>
       <tbody>
@@ -378,6 +380,32 @@
                 auction.eth_pool
                   | bigNumberFormat: tokensDecimals["ETH"]:true:false:2
               }}
+            </span>
+          </td>
+          <td>
+            <span
+              matTooltipClass="table__tooltip"
+              mat-raised-button
+              matTooltip="{{
+                auction.eth_bet
+                  | bigNumberFormat: tokensDecimals['ETH']:true:false:18
+              }}"
+            >
+              {{
+                auction.eth_bet
+                  | bigNumberFormat: tokensDecimals["ETH"]:true:false:2
+              }}
+            </span>
+          </td>
+          <td>
+            <span
+              matTooltipClass="table__tooltip"
+              mat-raised-button
+              matTooltip="{{
+                auction.winnings | bigNumberFormat: false:true:false:18
+              }}"
+            >
+              {{ auction.winnings | bigNumberFormat: false:true:false:2 }}
             </span>
           </td>
         </tr>
