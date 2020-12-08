@@ -634,9 +634,8 @@
           <th>End date</th>
           <th>Principal AXN</th>
           <th>BigPayDay AXN</th>
-          <th>Interest AXN</th>
           <th>Penalty AXN</th>
-          <th>Returned AXN</th>
+          <th>Payout AXN</th>
         </tr>
       </thead>
       <tbody>
@@ -678,21 +677,6 @@
               matTooltipClass="table__tooltip"
               mat-raised-button
               matTooltip="{{
-                deposit.interest
-                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
-              }}"
-            >
-              {{
-                deposit.interest
-                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
-              }}</span
-            >
-          </td>
-          <td>
-            <span
-              matTooltipClass="table__tooltip"
-              mat-raised-button
-              matTooltip="{{
                 deposit.penalty
                   | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
               }}"
@@ -708,12 +692,12 @@
               matTooltipClass="table__tooltip"
               mat-raised-button
               matTooltip="{{
-                deposit.total
+                deposit.interest
                   | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
               }}"
             >
               {{
-                deposit.total
+                deposit.interest
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
               }}</span
             >

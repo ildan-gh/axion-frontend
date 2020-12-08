@@ -25,7 +25,6 @@ export interface Stake {
   forWithdraw: BigNumber;
   isMatured: boolean;
   isWithdrawn: boolean;
-  total: BigNumber;
 }
 
 @Injectable({
@@ -1079,7 +1078,7 @@ export class ContractService {
                             const interest = res;
                             const endMs = session.end * 1000;
 
-                            const stake: Stake = {
+                            return {
                               start: new Date(session.start * 1000),
                               end: new Date(endMs),
                               shares: new BigNumber(session.shares),
@@ -1091,19 +1090,8 @@ export class ContractService {
                               penalty: !session.withdrawn ? new BigNumber(resultInterest[1]) : new BigNumber(session.penalty),
                               forWithdraw: new BigNumber(resultInterest[0]),
                               isMatured: nowMs > endMs,
-                              isWithdrawn: session.withdrawn,
-                              total: null
+                              isWithdrawn: session.withdrawn
                             };
-
-                            if (stake.isWithdrawn){
-                              if (stake.penalty.isGreaterThan(stake.amount)) {
-                                stake.penalty = stake.amount;
-                              }
-
-                              stake.total = stake.amount.plus(stake.bigPayDay).plus(stake.interest).minus(stake.penalty);
-                            }
-
-                            return stake;
                           });
                       });
                   });
