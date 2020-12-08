@@ -64,7 +64,6 @@ export class AuctionPageComponent implements OnDestroy {
   public checker = undefined;
 
   public sendAuctionProgress: boolean;
-  public auctionInfo: any;
   public activeBids: any[];
   public withdrawnBids: any[];
   
@@ -75,6 +74,7 @@ export class AuctionPageComponent implements OnDestroy {
 
   public auctions: any;
   public auctionsIntervals: [];
+  public completedAuctions: any;
 
   public currentSort: any = {};
 
@@ -100,11 +100,6 @@ export class AuctionPageComponent implements OnDestroy {
               this.getAuctions();
               this.onChangeAmount();
               this.onChangeAccount.emit();
-
-              this.contractService.getAuctionInfo().then((result) => {
-                this.auctionInfo = result;
-                window.dispatchEvent(new Event("resize"));
-              });
 
               this.getUserAuctions();
 
@@ -177,15 +172,14 @@ export class AuctionPageComponent implements OnDestroy {
   }
 
   public getAuctions() {
-    this.contractService.getAuctions().then((res) => {
-      this.auctions = res;
+    this.contractService.getAuctions().then((res: Array<any>) => {
+      this.auctions = res.filter(x => x.time.state !== "finished");
+      this.completedAuctions = res.filter(x => x.time.state === "finished");
 
-      this.auctions.map((auction) => {
-        if (auction.time.state === "progress") {
-          this.setNewDayTimer(auction.time.date);
-          this.newAuctionDay = false;
-        }
-      });
+      let todaysAuction = this.auctions
+        .find((auction) => auction.time.state === "progress");
+      this.setNewDayTimer(todaysAuction.time.date);
+      this.newAuctionDay = false;
 
       this.showAuctions = true;
     });
@@ -194,7 +188,7 @@ export class AuctionPageComponent implements OnDestroy {
   public getUserAuctions() {
     this.contractService.getUserAuctions().then((auctions) => {
       auctions.sort((a, b) =>
-        new Date(a.start_date).getDate() < new Date(b.start_date).getDate()
+        new Date(a.startDate).getDate() < new Date(b.startDate).getDate()
           ? 1
           : -1
       );
@@ -256,8 +250,8 @@ export class AuctionPageComponent implements OnDestroy {
     setTimeout(() => {
       this.contractService.getAuctionPool().then((info: any) => {
         // console.log(info);
-        if (info.axnToEth.toNumber() === 0) {
-          info.axnToEth = this.poolInfo.axnToEth;
+        if (info.axnPerEth.toNumber() === 0) {
+          info.axnPerEth = this.poolInfo.axnPerEth;
         }
 
         this.poolInfo = info;
