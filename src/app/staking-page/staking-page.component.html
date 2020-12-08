@@ -507,8 +507,8 @@
     <table class="standard-table" cellpadding="0" cellspacing="0" border="0">
       <thead>
         <tr>
-          <th>Start date</th>
-          <th>End date</th>
+          <th>Start</th>
+          <th>End</th>
           <th>Progress</th>
           <th>Principal AXN</th>
           <th>Shares</th>
@@ -604,6 +604,7 @@
               (click)="depositWithdraw(deposit)"
               [ngClass]="{ progress: deposit.withdrawProgress }"
               [disabled]="deposit.withdrawProgress"
+              *ngIf="!deposit.isWithdrawn"
             >
               <span class="lds-ellipsis" *ngIf="deposit.withdrawProgress">
                 <span class="lds-ellipsis-container">
@@ -611,6 +612,20 @@
                 </span>
               </span>
               <span class="t-fw-light">&nbsp;&nbsp;Withdraw&nbsp;&nbsp;</span>
+            </button>
+            <button
+              class="axn-btn axn-btn-gray"
+              (click)="bpdWithdraw(deposit)"
+              [ngClass]="{ progress: deposit.withdrawProgress }"
+              [disabled]="deposit.withdrawProgress"
+              *ngIf="deposit.isWithdrawn && deposit.isBpdWithdraw && !deposit.isBpdWithdrawn"
+            >
+              <span class="lds-ellipsis" *ngIf="deposit.withdrawProgress">
+                <span class="lds-ellipsis-container">
+                  <span></span><span></span><span></span><span></span>
+                </span>
+              </span>
+              <span class="t-fw-light">&nbsp;&nbsp;Withdraw BPD&nbsp;&nbsp;</span>
             </button>
           </td>
         </tr>

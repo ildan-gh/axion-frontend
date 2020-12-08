@@ -16,13 +16,14 @@ export interface Stake {
   end: Date;
   shares: BigNumber;
   amount: BigNumber;
-  isActive: boolean;
   sessionId: string;
   bigPayDay: BigNumber;
   interest: BigNumber;
   penalty: BigNumber;
   withdrawProgress?: boolean;
   forWithdraw: BigNumber;
+  isBpdWithdraw: boolean;
+  isBpdWithdrawn: boolean;
   isMatured: boolean;
   isWithdrawn: boolean;
 }
@@ -791,7 +792,6 @@ export class ContractService {
                 const leftDays = Math.floor((a - b) / (this.secondsInDay * 1000));
 
                 const dateEnd = leftDays;
-
                 const showTime = leftDays;
 
                 return {
@@ -1043,77 +1043,77 @@ export class ContractService {
     return bpd;
   }
 
-  public getAccountStakes(): Promise<{
+  public async getWalletStakesAsync(): Promise<{
     closed: Stake[];
     opened: Stake[];
     matured: Stake[];
   }> {
-    return this.StakingContract.methods
+    const walletStakeIds = await this.StakingContract.methods
       .sessionsOf_(this.account.address)
-      .call()
-      .then((sessions) => {
-        const nowMs = Date.now();
-        const sessionsPromises: Stake[] = sessions.map(
-          (sessionId) => {
-            return this.StakingContract.methods
-              .sessionDataOf(this.account.address, sessionId)
-              .call()
-              .then((session) => {
-                return this.SubBalanceContract.methods
-                  .calculateSessionPayout(sessionId)
-                  .call()
-                  .then((result) => {
-                    return this.StakingContract.methods
-                      .calculateStakingInterest(
-                        sessionId,
-                        this.account.address,
-                        session.shares
-                      )
-                      .call()
-                      .then((res) => {
-                        return this.StakingContract.methods
-                          .getAmountOutAndPenalty(sessionId, res)
-                          .call({ from: this.account.address })
-                          .then((resultInterest) => {
-                            const interest = res;
-                            const endMs = session.end * 1000;
+      .call();
 
-                            return {
-                              start: new Date(session.start * 1000),
-                              end: new Date(endMs),
-                              shares: new BigNumber(session.shares),
-                              amount: new BigNumber(session.amount),
-                              isActive: session.sessionIsActive,
-                              sessionId,
-                              bigPayDay: new BigNumber(result[0]),
-                              interest: !session.withdrawn ? new BigNumber(interest) : new BigNumber(session.interest),
-                              penalty: !session.withdrawn ? new BigNumber(resultInterest[1]) : new BigNumber(session.penalty),
-                              forWithdraw: new BigNumber(resultInterest[0]),
-                              isMatured: nowMs > endMs,
-                              isWithdrawn: session.withdrawn
-                            };
-                          });
-                      });
-                  });
-              });
-          }
-        );
-        return Promise.all(sessionsPromises).then(
-          (allDeposits: Stake[]) => {
-            return {
-              closed: allDeposits.filter((deposit: Stake) => {
-                return deposit.isWithdrawn;
-              }),
-              opened: allDeposits.filter((deposit: Stake) => {
-                return !deposit.isMatured && !deposit.isWithdrawn;
-              }),
-              matured: allDeposits.filter((deposit: Stake) => {
-                return deposit.isMatured && !deposit.isWithdrawn;
-              })
-            };
-          }
-        );
-      });
+    const nowMs = Date.now();
+    const stakePromises: Stake[] = walletStakeIds.map(
+      async (stakeId) => {
+        const stake = await this.StakingContract.methods
+          .sessionDataOf(this.account.address, stakeId)
+          .call();
+
+        const bigPayDayPayout = await this.SubBalanceContract.methods
+          .calculateSessionPayout(stakeId)
+          .call();
+
+        const bigPayDaySession = await this.SubBalanceContract.methods
+          .stakeSessions(stakeId)
+          .call();
+
+        const stakingInterest = await this.StakingContract.methods
+          .calculateStakingInterest(
+            stakeId,
+            this.account.address,
+            stake.shares
+          )
+          .call();
+
+        const payoutAndPenalty = await this.StakingContract.methods
+          .getAmountOutAndPenalty(stakeId, stakingInterest)
+          .call({ from: this.account.address });
+
+        const interest = stakingInterest;
+        const endMs = stake.end * 1000;
+        const bigPayDay = new BigNumber(bigPayDayPayout[0]);
+
+        return {
+          start: new Date(stake.start * 1000),
+          end: new Date(endMs),
+          shares: new BigNumber(stake.shares),
+          amount: new BigNumber(stake.amount),
+          sessionId: stakeId,
+          bigPayDay: bigPayDay,
+          interest: !stake.withdrawn ? new BigNumber(interest) : new BigNumber(stake.interest),
+          penalty: !stake.withdrawn ? new BigNumber(payoutAndPenalty[1]) : new BigNumber(stake.penalty),
+          forWithdraw: new BigNumber(payoutAndPenalty[0]),
+          isMatured: nowMs > endMs,
+          isWithdrawn: stake.withdrawn,
+          isBpdWithdraw: stake.withdrawn && !bigPayDay.isZero(),
+          isBpdWithdrawn: bigPayDaySession.withdrawn
+        };
+      }
+    );
+    
+    const walletStakes = await Promise.all(stakePromises);
+
+    return {
+      closed: walletStakes.filter((stake: Stake) => {
+        return stake.isWithdrawn && !stake.isBpdWithdraw || stake.isBpdWithdrawn;
+      }),
+      opened: walletStakes.filter((stake: Stake) => {
+        return !stake.isMatured && !stake.isWithdrawn || stake.isBpdWithdraw && !stake.isBpdWithdrawn;
+      }),
+      matured: walletStakes.filter((stake: Stake) => {
+        return stake.isMatured && !stake.isWithdrawn || stake.isBpdWithdraw && !stake.isBpdWithdrawn;
+      })
+    };
   }
 
   public unstake(sessionId) {
@@ -1138,7 +1138,7 @@ export class ContractService {
 
   public stakingWithdraw(sessionId) {
     return this.SubBalanceContract.methods
-      .withdraw(sessionId)
+      .withdrawPayout(sessionId)
       .call()
       .then((res) => {
         return res;

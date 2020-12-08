@@ -157,7 +157,7 @@ export class StakingPageComponent implements OnDestroy {
   }
 
   public depositList() {
-    this.contractService.getAccountStakes().then((res: {
+    this.contractService.getWalletStakesAsync().then((res: {
       closed: Stake[];
       opened: Stake[];
       matured: Stake[];
@@ -337,13 +337,13 @@ export class StakingPageComponent implements OnDestroy {
 
   public confirmWithdrawData;
 
-  public depositWithdraw(deposit, withoutConfirm?) {
+  public depositWithdraw(deposit: Stake, withoutConfirm?) {
     if (!withoutConfirm) {
       if (!deposit.penalty.isZero()) {
         const openedWarning = this.dialog.open(this.warningModal, {});
         const oneDayInSeconds = this.contractService.getMSecondsInDay();
         const nowTS = Date.now();
-        const endTS = Date.parse(deposit.end);
+        const endTS = deposit.end.getTime();
         const endTwoWeeks = endTS + oneDayInSeconds * AVAILABLE_DAYS_AFTER_END;
         const late = nowTS < endTS ? "Early" : nowTS > endTwoWeeks ? "Late" : "Normal";
         this.confirmWithdrawData = {
@@ -356,27 +356,30 @@ export class StakingPageComponent implements OnDestroy {
         return;
       }
     }
+    
     deposit.withdrawProgress = true;
 
     this.contractService
       .unstake(deposit.sessionId)
-      .then((res) => {
-        // console.log("deposit unstake step 1", res);
-        this.contractService.getSessionStats(deposit.sessionId).then((res2) => {
-          // console.log("deposit unstake step 2", res2);
+      .then(() => {
+        this.depositList();
+        this.contractService.updateHEX2XBalance(true);
+        deposit.withdrawProgress = false;
+      })
+      .catch(() => {
+        deposit.withdrawProgress = false;
+      });
+  }
 
-          if (res2 > 0) {
-            this.contractService
-              .stakingWithdraw(deposit.sessionId)
-              .then((res3) => {
-                // console.log("deposit unstake step 3", res3);
-                this.contractService.updateHEX2XBalance(true);
-                deposit.withdrawProgress = false;
-              });
-          } else {
-            this.depositList();
-          }
-        });
+  public bpdWithdraw(deposit) {
+    deposit.withdrawProgress = true;
+
+    this.contractService
+      .stakingWithdraw(deposit.sessionId)
+      .then(() => {
+        this.depositList();
+        this.contractService.updateHEX2XBalance(true);
+        deposit.withdrawProgress = false;
       })
       .catch(() => {
         deposit.withdrawProgress = false;
