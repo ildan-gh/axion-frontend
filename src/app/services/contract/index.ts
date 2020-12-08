@@ -11,7 +11,7 @@ import { MetamaskService } from "../web3";
 // export const stakingMaxDays = 5555;
 export const stakingMaxDays = 1820;
 
-export interface DepositInterface {
+export interface Stake {
   start: Date;
   end: Date;
   shares: BigNumber;
@@ -20,8 +20,12 @@ export interface DepositInterface {
   sessionId: string;
   bigPayDay: BigNumber;
   interest: BigNumber;
+  penalty: BigNumber;
   withdrawProgress?: boolean;
+  forWithdraw: BigNumber;
   isMatured: boolean;
+  isWithdrawn: boolean;
+  total: BigNumber;
 }
 
 @Injectable({
@@ -1041,21 +1045,21 @@ export class ContractService {
   }
 
   public getAccountStakes(): Promise<{
-    closed: DepositInterface[];
-    opened: DepositInterface[];
-    matured: DepositInterface[];
+    closed: Stake[];
+    opened: Stake[];
+    matured: Stake[];
   }> {
     return this.StakingContract.methods
       .sessionsOf_(this.account.address)
       .call()
       .then((sessions) => {
         const nowMs = Date.now();
-        const sessionsPromises: DepositInterface[] = sessions.map(
+        const sessionsPromises: Stake[] = sessions.map(
           (sessionId) => {
             return this.StakingContract.methods
               .sessionDataOf(this.account.address, sessionId)
               .call()
-              .then((oneSession) => {
+              .then((session) => {
                 return this.SubBalanceContract.methods
                   .calculateSessionPayout(sessionId)
                   .call()
@@ -1064,7 +1068,7 @@ export class ContractService {
                       .calculateStakingInterest(
                         sessionId,
                         this.account.address,
-                        oneSession.shares
+                        session.shares
                       )
                       .call()
                       .then((res) => {
@@ -1073,21 +1077,33 @@ export class ContractService {
                           .call({ from: this.account.address })
                           .then((resultInterest) => {
                             const interest = res;
-                            const endMs = oneSession.end * 1000;
+                            const endMs = session.end * 1000;
 
-                            return {
-                              start: new Date(oneSession.start * 1000),
+                            const stake: Stake = {
+                              start: new Date(session.start * 1000),
                               end: new Date(endMs),
-                              shares: new BigNumber(oneSession.shares),
-                              amount: new BigNumber(oneSession.amount),
-                              isActive: oneSession.sessionIsActive,
+                              shares: new BigNumber(session.shares),
+                              amount: new BigNumber(session.amount),
+                              isActive: session.sessionIsActive,
                               sessionId,
                               bigPayDay: new BigNumber(result[0]),
-                              interest: new BigNumber(interest),
-                              penalty: new BigNumber(resultInterest[1]),
+                              interest: !session.withdrawn ? new BigNumber(interest) : new BigNumber(session.interest),
+                              penalty: !session.withdrawn ? new BigNumber(resultInterest[1]) : new BigNumber(session.penalty),
                               forWithdraw: new BigNumber(resultInterest[0]),
-                              isMatured: nowMs > endMs
+                              isMatured: nowMs > endMs,
+                              isWithdrawn: session.withdrawn,
+                              total: null
                             };
+
+                            if (stake.isWithdrawn){
+                              if (stake.penalty.isGreaterThan(stake.amount)) {
+                                stake.penalty = stake.amount;
+                              }
+
+                              stake.total = stake.amount.plus(stake.bigPayDay).plus(stake.interest).minus(stake.penalty);
+                            }
+
+                            return stake;
                           });
                       });
                   });
@@ -1095,16 +1111,16 @@ export class ContractService {
           }
         );
         return Promise.all(sessionsPromises).then(
-          (allDeposits: DepositInterface[]) => {
+          (allDeposits: Stake[]) => {
             return {
-              closed: allDeposits.filter((deposit: DepositInterface) => {
-                return new BigNumber(deposit.shares).toNumber() <= 0;
+              closed: allDeposits.filter((deposit: Stake) => {
+                return deposit.isWithdrawn;
               }),
-              opened: allDeposits.filter((deposit: DepositInterface) => {
-                return !deposit.isMatured && new BigNumber(deposit.shares).toNumber() > 0;
+              opened: allDeposits.filter((deposit: Stake) => {
+                return !deposit.isMatured && !deposit.isWithdrawn;
               }),
-              matured: allDeposits.filter((deposit: DepositInterface) => {
-                return deposit.isMatured && new BigNumber(deposit.shares).toNumber() > 0;
+              matured: allDeposits.filter((deposit: Stake) => {
+                return deposit.isMatured && !deposit.isWithdrawn;
               })
             };
           }

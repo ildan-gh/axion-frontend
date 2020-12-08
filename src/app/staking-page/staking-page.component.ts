@@ -6,7 +6,7 @@ import {
   TemplateRef,
   ViewChild,
 } from "@angular/core";
-import { ContractService, stakingMaxDays, DepositInterface } from "../services/contract";
+import { ContractService, stakingMaxDays, Stake } from "../services/contract";
 import BigNumber from "bignumber.js";
 import { AppConfig } from "../appconfig";
 import { MatDialog } from "@angular/material/dialog";
@@ -44,9 +44,9 @@ export class StakingPageComponent implements OnDestroy {
   } = {};
   public depositTokensProgress: boolean;
   public depositsLists: {
-    opened?: DepositInterface[];
-    closed?: DepositInterface[];
-    matured?: DepositInterface[];
+    opened?: Stake[];
+    closed?: Stake[];
+    matured?: Stake[];
   };
 
   public openedDepositTotals: any;
@@ -158,13 +158,13 @@ export class StakingPageComponent implements OnDestroy {
 
   public depositList() {
     this.contractService.getAccountStakes().then((res: {
-      closed: DepositInterface[];
-      opened: DepositInterface[];
-      matured: DepositInterface[];
+      closed: Stake[];
+      opened: Stake[];
+      matured: Stake[];
     }) => {
       this.depositsLists = res;
 
-      let openedDeposits : DepositInterface[] = res.opened.concat(res.matured);
+      let openedDeposits : Stake[] = res.opened.concat(res.matured);
 
       if (openedDeposits.length) {
         this.openedDepositTotals = { 
