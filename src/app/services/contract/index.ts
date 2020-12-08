@@ -20,6 +20,7 @@ export interface Stake {
   bigPayDay: BigNumber;
   interest: BigNumber;
   penalty: BigNumber;
+  payout: BigNumber;
   withdrawProgress?: boolean;
   forWithdraw: BigNumber;
   isBpdWithdraw: boolean;
@@ -1055,7 +1056,7 @@ export class ContractService {
     const nowMs = Date.now();
     const stakePromises: Stake[] = walletStakeIds.map(
       async (stakeId) => {
-        const stake = await this.StakingContract.methods
+        const stakeSession = await this.StakingContract.methods
           .sessionDataOf(this.account.address, stakeId)
           .call();
 
@@ -1067,37 +1068,53 @@ export class ContractService {
           .stakeSessions(stakeId)
           .call();
 
-        const stakingInterest = await this.StakingContract.methods
-          .calculateStakingInterest(
-            stakeId,
-            this.account.address,
-            stake.shares
-          )
-          .call();
-
-        const payoutAndPenalty = await this.StakingContract.methods
-          .getAmountOutAndPenalty(stakeId, stakingInterest)
-          .call({ from: this.account.address });
-
-        const interest = stakingInterest;
-        const endMs = stake.end * 1000;
+        const endMs = stakeSession.end * 1000;
+        const amount = new BigNumber(stakeSession.amount);
         const bigPayDay = new BigNumber(bigPayDayPayout[0]);
 
-        return {
-          start: new Date(stake.start * 1000),
+        const stake : Stake = {
+          start: new Date(stakeSession.start * 1000),
           end: new Date(endMs),
-          shares: new BigNumber(stake.shares),
-          amount: new BigNumber(stake.amount),
+          shares: new BigNumber(stakeSession.shares),
+          amount: amount,
           sessionId: stakeId,
           bigPayDay: bigPayDay,
-          interest: !stake.withdrawn ? new BigNumber(interest) : new BigNumber(stake.interest),
-          penalty: !stake.withdrawn ? new BigNumber(payoutAndPenalty[1]) : new BigNumber(stake.penalty),
-          forWithdraw: new BigNumber(payoutAndPenalty[0]),
+          interest: null,
+          penalty: null,
+          payout: null,
+          forWithdraw: null,
           isMatured: nowMs > endMs,
-          isWithdrawn: stake.withdrawn,
-          isBpdWithdraw: stake.withdrawn && !bigPayDay.isZero(),
+          isWithdrawn: stakeSession.withdrawn,
+          isBpdWithdraw: stakeSession.withdrawn && !bigPayDay.isZero(),
           isBpdWithdrawn: bigPayDaySession.withdrawn
-        };
+        }
+
+        if (!stakeSession.withdrawn) {
+          const stakingInterest = await this.StakingContract.methods
+            .calculateStakingInterest(
+              stakeId,
+              this.account.address,
+              stakeSession.shares
+            )
+            .call();
+
+          const payoutAndPenalty = await this.StakingContract.methods
+            .getAmountOutAndPenalty(stakeId, stakingInterest)
+            .call({ from: this.account.address });
+
+          stake.interest = new BigNumber(stakingInterest);
+          stake.penalty = new BigNumber(payoutAndPenalty[1]);
+          stake.forWithdraw = new BigNumber(payoutAndPenalty[0]);
+        } else {
+          stake.payout = new BigNumber(stakeSession.interest).plus(bigPayDay);
+          stake.interest = stake.payout.isGreaterThan(amount) 
+            ? stake.payout.minus(amount) 
+            : new BigNumber(0).minus(amount.isLessThan(stakeSession.penalty) 
+              ? amount 
+              : stakeSession.penalty).plus(stake.payout);
+        }
+
+        return stake;
       }
     );
     
