@@ -735,7 +735,7 @@ export class ContractService {
 
       const uniswapPrice = new BigNumber(amountsOut[1]).div(this.ETHER);
 
-      data.uniAxnPerEth = uniswapPrice.dp(2);
+      data.uniAxnPerEth = uniswapPrice;
 
       data.axnPerEth = this.getCurrentAuctionAxnPerEth(
         auctionPriceFromPool, uniswapPrice, auctionReserves.uniswapMiddlePrice);
@@ -750,7 +750,7 @@ export class ContractService {
     if (auctionPriceFromPool.isZero()) {
       const uniswapDiscountedPrice = this.adjustPrice(uniswapPrice);
 
-      return uniswapDiscountedPrice.dp(2);
+      return uniswapDiscountedPrice;
     } else {
       const averagePrice = new BigNumber(uniswapAveragePrice);
 
@@ -760,7 +760,7 @@ export class ContractService {
       return BigNumber.minimum(
         uniswapDiscountedAveragePrice,	
         auctionPriceFromPool
-      ).dp(2);
+      );
     }
   }
 
@@ -1332,7 +1332,7 @@ export class ContractService {
                       auctionInfo.startDate = new Date(startTS);
 
                       const uniswapPriceWithPercent = this.adjustPrice(
-                        new BigNumber(auctionData.uniswapMiddlePrice)).div(this.ETHER).dp(0);
+                        new BigNumber(auctionData.uniswapMiddlePrice)).div(this.ETHER);
 
                       const poolPrice = new BigNumber(auctionData.token).div(
                         auctionData.eth
@@ -1394,7 +1394,7 @@ export class ContractService {
     return BigNumber.minimum(
       uniswapDiscountedAveragePrice,
       auctionPriceFromPool
-    ).dp(2);
+    );
   }
 
   private adjustPrice(price: BigNumber) : BigNumber {
