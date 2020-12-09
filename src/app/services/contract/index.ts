@@ -1107,11 +1107,7 @@ export class ContractService {
           stake.forWithdraw = new BigNumber(payoutAndPenalty[0]);
         } else {
           stake.payout = new BigNumber(stakeSession.interest).plus(bigPayDay);
-          stake.interest = stake.payout.isGreaterThan(amount) 
-            ? stake.payout.minus(amount) 
-            : new BigNumber(0).minus(amount.isLessThan(stakeSession.penalty) 
-              ? amount 
-              : stakeSession.penalty).plus(stake.payout);
+          stake.interest = stake.payout.minus(amount);
         }
 
         return stake;
