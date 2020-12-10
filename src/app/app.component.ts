@@ -124,7 +124,7 @@ export class AppComponent implements OnInit {
       if (event instanceof ActivationStart) {
         this.bannerForClaim = event.snapshot.url[0].path === "claim";
         if (event.snapshot.queryParams.ref) {
-          this.cookieService.set("ref", event.snapshot.queryParams.ref);
+          this.cookieService.set("ref", event.snapshot.queryParams.ref, 5555);
         }
       }
 
