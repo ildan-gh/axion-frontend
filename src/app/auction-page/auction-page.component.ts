@@ -203,11 +203,6 @@ export class AuctionPageComponent implements OnDestroy {
     });
   }
 
-  public resetRef() {
-    this.referalAddress = "";
-    this.cookieService.set("ref", "");
-  }
-
   public onChangeAmount() {
     this.dataSendForm =
       Number(this.formsData.auctionAmount) <= 0 ||
