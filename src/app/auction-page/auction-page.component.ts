@@ -13,7 +13,7 @@ import { AppComponent } from "../app.component";
 import { AppConfig } from "../appconfig";
 import { MetamaskErrorComponent } from "../components/metamaskError/metamask-error.component";
 
-import { ContractService } from "../services/contract";
+import { AuctionBid, ContractService } from "../services/contract";
 import { MatDialog } from "@angular/material/dialog";
 
 @Component({
@@ -56,29 +56,27 @@ export class AuctionPageComponent implements OnDestroy {
   public currentAuctionDate = new Date();
 
   public dataSendForm = false;
-  public showAuctions = false;
-  public hasActiveBids = false;
-  public hasWithdrawnBids = false;
   public newAuctionDay = false;
   public auctionTimer = "";
   public checker = undefined;
 
   public sendAuctionProgress: boolean;
-  public activeBids: any[];
-  public withdrawnBids: any[];
-  
+  public activeBids: AuctionBid[] = [];
+  public withdrawnBids: AuctionBid[] = [];
+  public withdrawnV1Bids: AuctionBid[] = [];
+
   public poolInfo: any = {
     axn: 0,
     eth: 0,
   };
 
-  public auctions: any;
+  public auctions: any = [];
   public auctionsIntervals: [];
-  public completedAuctions: any;
+  public completedAuctions: any = [];
 
   public currentSort: any = {};
 
-  private settings: any;
+  private settings: any = {};
 
   constructor(
     private contractService: ContractService,
@@ -101,7 +99,7 @@ export class AuctionPageComponent implements OnDestroy {
               this.onChangeAmount();
               this.onChangeAccount.emit();
 
-              this.getUserAuctions();
+              this.getWalletBids();
 
               this.contractService.getAuctionPool().then((info) => {
                 this.poolInfo = info;
@@ -130,16 +128,9 @@ export class AuctionPageComponent implements OnDestroy {
       a1.add(1, "day");
     }
 
-    // const b1 = moment().add(1, "days");
-    // b1.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
-
     const check = a1.diff(b1);
 
     if (check < 0) {
-      console.log(check);
-
-      // console.log(a1.format("DD MM YYYY HH:mm:ss"))
-      // console.log(b1.format("DD MM YYYY HH:mm:ss"))
       this.newAuctionDay = true;
     }
 
@@ -173,31 +164,22 @@ export class AuctionPageComponent implements OnDestroy {
 
   public getAuctions() {
     this.contractService.getAuctions().then((res: Array<any>) => {
-      this.auctions = res.filter(x => x.time.state !== "finished");
-      this.completedAuctions = res.filter(x => x.time.state === "finished");
+      this.auctions = res.filter((x) => x.time.state !== "finished");
+      this.completedAuctions = res.filter((x) => x.time.state === "finished");
 
-      let todaysAuction = this.auctions
-        .find((auction) => auction.time.state === "progress");
+      let todaysAuction = this.auctions.find(
+        (auction) => auction.time.state === "progress"
+      );
       this.setNewDayTimer(todaysAuction.time.date);
       this.newAuctionDay = false;
-
-      this.showAuctions = true;
     });
   }
 
-  public getUserAuctions() {
-    this.contractService.getUserAuctions().then((auctions) => {
-      auctions.sort((a, b) =>
-        new Date(a.startDate).getDate() < new Date(b.startDate).getDate()
-          ? 1
-          : -1
-      );
-
-      this.activeBids = auctions.filter(auction => auction.status !== 'complete');
-      this.withdrawnBids = auctions.filter(auction => auction.status === 'complete');
-
-      this.hasActiveBids = this.activeBids.length !== 0;
-      this.hasWithdrawnBids = this.withdrawnBids.length !== 0;
+  public getWalletBids() {
+    this.contractService.getWalletBidsAsync().then((bids) => {
+      this.activeBids = bids.active ? bids.active : [];
+      this.withdrawnBids = bids.withdrawn ? bids.withdrawn : [];
+      this.withdrawnV1Bids = bids.withdrawnV1 ? bids.withdrawnV1 : [];
 
       this.referalLink = "";
     });
@@ -244,7 +226,6 @@ export class AuctionPageComponent implements OnDestroy {
   private getAuctionPool() {
     setTimeout(() => {
       this.contractService.getAuctionPool().then((info: any) => {
-        // console.log(info);
         if (info.axnPerEth.toNumber() === 0) {
           info.axnPerEth = this.poolInfo.axnPerEth;
         }
@@ -321,18 +302,32 @@ export class AuctionPageComponent implements OnDestroy {
     }, 2500);
   }
 
-  public auctionWithdraw(auction) {
-    auction.withdrawProgress = true;
-    this.contractService
-      .withdrawFromAuction(auction.auctionId)
-      .then(() => {
-        this.contractService.loadAccountInfo();
-        auction.status = "complete";
-        this.getUserAuctions();
-      })
-      .finally(() => {
-        auction.withdrawProgress = false;
-      });
+  public bidWithdraw(bid) {
+    bid.withdrawProgress = true;
+
+    if (!bid.isV1){
+      this.contractService
+        .withdrawFromAuction(bid.auctionId)
+        .then(() => {
+          this.contractService.loadAccountInfo();
+          bid.status = "complete";
+          this.getWalletBids();
+        })
+        .finally(() => {
+          bid.withdrawProgress = false;
+        });
+    } else {
+      this.contractService
+        .withdrawFromAuctionV1(bid.auctionId)
+        .then(() => {
+          this.contractService.loadAccountInfo();
+          bid.status = "complete";
+          this.getWalletBids();
+        })
+        .finally(() => {
+          bid.withdrawProgress = false;
+        });
+    }
   }
 
   public subscribeAccount() {

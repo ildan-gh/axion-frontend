@@ -30,28 +30,34 @@ export class StakingPageComponent implements OnDestroy {
   public account;
   public tableInfo;
   public tokensDecimals;
-  public depositMaxDays = 5555;
+  public stakeMaxDays = 5555;
   private accountSubscribe;
   public shareRate = 0;
   public hasBigPayDay = false;
-  public depositEndDate: any;
+  public stakeEndDate: any;
   public startDay = new Date();
   public share: any = {};
   public onChangeAccount: EventEmitter<any> = new EventEmitter();
   public formsData: {
-    depositAmount?: string;
-    depositDays?: number;
+    stakeAmount?: string;
+    stakeDays?: number;
   } = {};
-  public depositTokensProgress: boolean;
-  public depositsLists: {
-    opened?: Stake[];
+  public stakeTokensProgress: boolean;
+  public stakes: {
+    active?: Stake[];
     closed?: Stake[];
     matured?: Stake[];
+    closedV1?: Stake[];
+  } = {
+    active: [],
+    closed: [],
+    matured: [],
+    closedV1: [],
   };
 
-  public openedDepositTotals: any;
+  public activeStakeTotals: any;
 
-  @ViewChild("depositForm", { static: false }) depositForm;
+  @ViewChild("stakeForm", { static: false }) stakeForm;
 
   @ViewChild("warningModal", {
     static: true,
@@ -69,13 +75,15 @@ export class StakingPageComponent implements OnDestroy {
   private bpdInfoChecker = false;
 
   public currentSort: {
-    opened: any;
+    active: any;
     closed: any;
+    closedV1: any;
     matured: any;
   } = {
-    opened: {},
+    active: {},
     closed: {},
-    matured: {}
+    closedV1: {},
+    matured: {},
   };
 
   public bpd: any = [];
@@ -98,7 +106,7 @@ export class StakingPageComponent implements OnDestroy {
             window.dispatchEvent(new Event("resize"));
             if (account) {
               this.onChangeAccount.emit();
-              this.depositList();
+              this.stakeList();
               this.contractService
                 .getStakingContractInfo()
                 .then((data: StakingInfoInterface) => {
@@ -121,7 +129,7 @@ export class StakingPageComponent implements OnDestroy {
     this.tokensDecimals = this.contractService.getCoinsDecimals();
     this.settingsData = this.config.getConfig();
     this.dayEndSubscriber = this.contractService.onDayEnd().subscribe(() => {
-      this.depositList();
+      this.stakeList();
     });
   }
 
@@ -131,7 +139,6 @@ export class StakingPageComponent implements OnDestroy {
         .getStakingContractInfo()
         .then((data: StakingInfoInterface) => {
           this.stakingContractInfo = data;
-          // console.log("staking contract info", this.stakingContractInfo);
           if (this.stakingInfoChecker && this.account) {
             this.getStakingInfo();
           }
@@ -152,76 +159,93 @@ export class StakingPageComponent implements OnDestroy {
   }
 
   public shouldCheckBoxForBPD(index) {
-    return this.formsData.depositDays > 349 &&
-           this.depositEndDate > this.bpd[index].dateEnd
+    return (
+      this.formsData.stakeDays > 349 &&
+      this.stakeEndDate > this.bpd[index].dateEnd
+    );
   }
 
-  public depositList() {
-    this.contractService.getWalletStakesAsync().then((res: {
-      closed: Stake[];
-      opened: Stake[];
-      matured: Stake[];
-    }) => {
-      this.depositsLists = res;
-
-      let openedDeposits : Stake[] = res.opened.concat(res.matured);
-
-      if (openedDeposits.length) {
-        this.openedDepositTotals = { 
-          principal: openedDeposits.map(x => x.amount).reduce((total, x) => total.plus(x)),
-          interest: openedDeposits.map(x => x.interest).reduce((total, x) => total.plus(x)),
-          shares: openedDeposits.map(x => x.shares).reduce((total, x) => total.plus(x)),
-          bigPayDay: openedDeposits.map(x => x.bigPayDay).reduce((total, x) => total.plus(x))
-        };
-  
-        this.openedDepositTotals.total = this.openedDepositTotals.principal
-          .plus(this.openedDepositTotals.interest)
-          .plus(this.openedDepositTotals.bigPayDay);
-      }
-
-      this.applySort("opened");
-      this.applySort("closed");
-      this.applySort("matured");
-      window.dispatchEvent(new Event("resize"));
-      this.getStakingInfo();
-      this.stakingInfoChecker = true;
-    });
-  }
-
-  public openDeposit() {
-    this.depositTokensProgress = true;
+  public stakeList() {
     this.contractService
-      .depositHEX2X(this.formsData.depositAmount, this.formsData.depositDays)
+      .getWalletStakesAsync()
+      .then(
+        (res: {
+          closed: Stake[];
+          active: Stake[];
+          matured: Stake[];
+          closedV1: Stake[];
+        }) => {
+          this.stakes = res;
+
+          let activeStakes: Stake[] = res.active.concat(res.matured);
+
+          if (activeStakes.length) {
+            this.activeStakeTotals = {
+              principal: activeStakes
+                .map((x) => x.principal)
+                .reduce((total, x) => total.plus(x)),
+              interest: activeStakes
+                .map((x) => x.interest)
+                .reduce((total, x) => total.plus(x)),
+              shares: activeStakes
+                .map((x) => x.shares)
+                .reduce((total, x) => total.plus(x)),
+              bigPayDay: activeStakes
+                .map((x) => x.bigPayDay)
+                .reduce((total, x) => total.plus(x)),
+            };
+
+            this.activeStakeTotals.total = this.activeStakeTotals.principal
+              .plus(this.activeStakeTotals.interest)
+              .plus(this.activeStakeTotals.bigPayDay);
+          }
+
+          this.applySort("active");
+          this.applySort("closed");
+          this.applySort("matured");
+          this.applySort("closedV1");
+          window.dispatchEvent(new Event("resize"));
+          this.getStakingInfo();
+          this.stakingInfoChecker = true;
+        }
+      )
+      .catch(console.log);
+  }
+
+  public openStake() {
+    this.stakeTokensProgress = true;
+    this.contractService
+      .depositHEX2X(this.formsData.stakeAmount, this.formsData.stakeDays)
       .then((r) => {
         this.contractService.updateHEX2XBalance(true).then(() => {
-          this.depositTokensProgress = false;
+          this.stakeTokensProgress = false;
           this.shareRate = 0;
         });
         this.formsData = {};
       })
       .catch(() => {
-        this.depositTokensProgress = false;
+        this.stakeTokensProgress = false;
       });
   }
 
   get bonusLongerPays() {
-    const currentValue = new BigNumber(this.formsData.depositAmount || 0);
+    const currentValue = new BigNumber(this.formsData.stakeAmount || 0);
     return currentValue
-      .times((this.formsData.depositDays || 1) - 1)
+      .times((this.formsData.stakeDays || 1) - 1)
       .div(stakingMaxDays);
   }
 
   get userShares() {
     const divDecimals = Math.pow(10, this.tokensDecimals.HEX2X);
-    return new BigNumber(this.formsData.depositAmount || 0)
+    return new BigNumber(this.formsData.stakeAmount || 0)
       .div(divDecimals)
       .times(this.bonusLongerPays.div(divDecimals).plus(1))
       .div(this.stakingContractInfo.ShareRate || 1)
       .times(divDecimals);
   }
 
-  get depositDaysInvalid() {
-    return (this.formsData.depositDays || 0) > this.depositMaxDays;
+  get stakeDaysInvalid() {
+    return (this.formsData.stakeDays || 0) > this.stakeMaxDays;
   }
 
   public onChangeAmount() {
@@ -231,28 +255,25 @@ export class StakingPageComponent implements OnDestroy {
       .div(divDecimals)
       .toString();
 
-    const amount = new BigNumber(this.formsData.depositAmount || 0)
+    const amount = new BigNumber(this.formsData.stakeAmount || 0)
       .div(divDecimals)
       .toString();
 
     const rate =
-      (Number(amount) *
-        (1 + (this.formsData.depositDays - 1) / stakingMaxDays)) /
+      (Number(amount) * (1 + (this.formsData.stakeDays - 1) / stakingMaxDays)) /
       Number(stareRate);
 
     const shareRate = new BigNumber(rate);
 
-    if (this.formsData.depositDays) {
+    if (this.formsData.stakeDays) {
       this.shareRate = isNaN(shareRate.toNumber())
         ? (new BigNumber(0) as any)
         : (new BigNumber(rate) as any);
     }
 
-    this.depositEndDate =
+    this.stakeEndDate =
       Date.now() +
-      this.formsData.depositDays *
-        this.settingsData.settings.time.seconds *	
-        1000;
+      this.formsData.stakeDays * this.settingsData.settings.time.seconds * 1000;
 
     const sharefull = new BigNumber(amount).div(
       new BigNumber(this.stakingContractInfo.ShareRate).div(
@@ -265,21 +286,21 @@ export class StakingPageComponent implements OnDestroy {
     this.share.full = !isNaN(sharefull.toNumber()) ? sharefull : 0;
   }
 
-  public getProgress(deposit) {
-    if (deposit.oldUpdate && new Date().getTime() - deposit.oldUpdate < 5000) {
-      return deposit.progress;
+  public getProgress(stake) {
+    if (stake.oldUpdate && new Date().getTime() - stake.oldUpdate < 5000) {
+      return stake.progress;
     }
-    deposit.oldUpdate = new Date().getTime();
-    const fullAge = deposit.end.getTime() - deposit.start.getTime();
-    const backAge = new Date().getTime() - deposit.start.getTime();
-    deposit.progress = Math.min(Math.floor(backAge / (fullAge / 100)), 100);
-    return deposit.progress;
+    stake.oldUpdate = new Date().getTime();
+    const fullAge = stake.end.getTime() - stake.start.getTime();
+    const backAge = new Date().getTime() - stake.start.getTime();
+    stake.progress = Math.min(Math.floor(backAge / (fullAge / 100)), 100);
+    return stake.progress;
   }
 
   private applySort(table) {
     const currentTableState = this.currentSort[table];
     if (currentTableState.field) {
-      this.depositsLists[table].sort((a, b) => {
+      this.stakes[table].sort((a, b) => {
         let aValue = a[currentTableState.field];
         let bValue = b[currentTableState.field];
 
@@ -307,82 +328,79 @@ export class StakingPageComponent implements OnDestroy {
           : 1;
       });
     } else {
-      this.depositsLists[table].sort((a, b) => {
+      this.stakes[table].sort((a, b) => {
         return Number(a.sessionId) < Number(b.sessionId) ? 1 : -1;
       });
     }
   }
 
-  public sortDeposits(table, field) {
-    const currentTableState = this.currentSort[table];
-    const currentUseField = currentTableState.field;
-
-    if (currentUseField !== field) {
-      currentTableState.field = field;
-      currentTableState.ask = false;
-    } else {
-      if (!currentTableState.ask) {
-        currentTableState.ask = true;
-      } else {
-        currentTableState.field = undefined;
-      }
-    }
-    this.applySort(table);
-  }
-
   public successWithPenalty() {
     this.confirmWithdrawData.openedWarning.close();
-    this.depositWithdraw(this.confirmWithdrawData.deposit, true);
+    this.stakeWithdraw(this.confirmWithdrawData.stake, true);
   }
 
   public confirmWithdrawData;
 
-  public depositWithdraw(deposit: Stake, withoutConfirm?) {
+  public stakeWithdraw(stake: Stake, withoutConfirm?) {
     if (!withoutConfirm) {
-      if (!deposit.penalty.isZero()) {
+      if (!stake.penalty.isZero()) {
         const openedWarning = this.dialog.open(this.warningModal, {});
         const oneDayInSeconds = this.contractService.getMSecondsInDay();
         const nowTS = Date.now();
-        const endTS = deposit.end.getTime();
+        const endTS = stake.end.getTime();
         const endTwoWeeks = endTS + oneDayInSeconds * AVAILABLE_DAYS_AFTER_END;
-        const late = nowTS < endTS ? "Early" : nowTS > endTwoWeeks ? "Late" : "Normal";
+        const late =
+          nowTS < endTS ? "Early" : nowTS > endTwoWeeks ? "Late" : "Normal";
         this.confirmWithdrawData = {
-          deposit,
+          stake,
           openedWarning,
-          penalty: deposit.penalty,
+          penalty: stake.penalty,
           late,
-          payOutAmount: deposit.forWithdraw,
+          payOutAmount: stake.forWithdraw,
         };
         return;
       }
     }
-    
-    deposit.withdrawProgress = true;
 
-    this.contractService
-      .unstake(deposit.sessionId)
-      .then(() => {
-        this.depositList();
-        this.contractService.updateHEX2XBalance(true);
-        deposit.withdrawProgress = false;
-      })
-      .catch(() => {
-        deposit.withdrawProgress = false;
-      });
+    stake.withdrawProgress = true;
+
+    if (!stake.isV1) {
+      this.contractService
+        .unstake(stake.sessionId)
+        .then(() => {
+          this.stakeList();
+          this.contractService.updateHEX2XBalance(true);
+          stake.withdrawProgress = false;
+        })
+        .catch(() => {
+          stake.withdrawProgress = false;
+        });
+    } else {
+      this.contractService
+        .unstakeV1(stake.sessionId)
+        .then(() => {
+          this.stakeList();
+          this.contractService.updateHEX2XBalance(true);
+          stake.withdrawProgress = false;
+        })
+        .catch(() => {
+          stake.withdrawProgress = false;
+        });
+    }
   }
 
-  public bpdWithdraw(deposit) {
-    deposit.withdrawProgress = true;
+  public bpdWithdraw(stake) {
+    stake.withdrawProgress = true;
 
     this.contractService
-      .stakingWithdraw(deposit.sessionId)
+      .bpdWithdraw(stake.sessionId)
       .then(() => {
-        this.depositList();
+        this.stakeList();
         this.contractService.updateHEX2XBalance(true);
-        deposit.withdrawProgress = false;
+        stake.withdrawProgress = false;
       })
       .catch(() => {
-        deposit.withdrawProgress = false;
+        stake.withdrawProgress = false;
       });
   }
 

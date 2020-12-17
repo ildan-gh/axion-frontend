@@ -4,7 +4,7 @@ import BigNumber from "bignumber.js";
 import * as moment from "moment";
 import { Observable, Subscriber } from "rxjs";
 import { Contract } from "web3-eth-contract";
-import { environment } from '../../../environments/environment';
+import { environment } from "../../../environments/environment";
 import { AppConfig } from "../../appconfig";
 import { MetamaskService } from "../web3";
 
@@ -13,9 +13,12 @@ export const stakingMaxDays = 1820;
 
 export interface Stake {
   start: Date;
+  startSeconds: string;
   end: Date;
+  endSeconds: string;
+  targetEnd: Date;
   shares: BigNumber;
-  amount: BigNumber;
+  principal: BigNumber;
   sessionId: string;
   bigPayDay: BigNumber;
   interest: BigNumber;
@@ -23,10 +26,26 @@ export interface Stake {
   payout: BigNumber;
   withdrawProgress?: boolean;
   forWithdraw: BigNumber;
+  firstPayout: string;
+  lastPayout: number;
   isBpdWithdraw: boolean;
   isBpdWithdrawn: boolean;
   isMatured: boolean;
   isWithdrawn: boolean;
+  isV1: boolean;
+}
+
+export interface AuctionBid {
+  auctionId: string;
+  startDate: Date;
+  axnInPool: BigNumber;
+  ethInPool: BigNumber;
+  ethBid: BigNumber;
+  winnings: BigNumber;
+  hasWinnings: boolean;
+  status: string;
+  axnPerEth: BigNumber;
+  isV1: boolean;
 }
 
 @Injectable({
@@ -41,12 +60,15 @@ export class ContractService {
   private NativeSwapContract: Contract;
 
   private StakingContract: Contract;
+  private StakingV1Contract: Contract;
   private UniswapV2Router02: Contract;
-  private Auction: Contract;
+  private AuctionContract: Contract;
+  private AuctionV1Contract: Contract;
 
   private ForeignSwapContract: Contract;
   private BPDContract: Contract;
   private SubBalanceContract: Contract;
+  private SubBalanceV1Contract: Contract;
 
   private isActive: boolean;
 
@@ -226,13 +248,12 @@ export class ContractService {
       this.web3Service.getAccounts().subscribe(async (account: any) => {
         if (account) {
           this.initializeContracts();
-          this.discountPercent = +await this.Auction.methods
-            .discountPercent()
-            .call();
+          const options = await this.AuctionContract.methods
+            .options().call();
 
-          this.premiumPercent = +await this.Auction.methods
-            .premiumPercent()
-            .call();
+          this.discountPercent = +options.discountPercent;
+          this.premiumPercent = +options.premiumPercent;
+
           const promises = [this.getTokensInfo(false)];
           return Promise.all(promises);
         }
@@ -407,7 +428,7 @@ export class ContractService {
               .div(new BigNumber(10).pow(this.tokensDecimals.H2T))
               .toFormat(4),
           };
-          resolve();
+          resolve(null);
           if (callEmitter) {
             this.callAllAccountsSubscribers();
           }
@@ -436,7 +457,7 @@ export class ContractService {
               .div(new BigNumber(10).pow(this.tokensDecimals.H2T))
               .toFormat(4),
           };
-          resolve();
+          resolve(null);
           if (callEmitter) {
             this.callAllAccountsSubscribers();
           }
@@ -465,7 +486,7 @@ export class ContractService {
               .div(new BigNumber(10).pow(this.tokensDecimals.HEX))
               .toFormat(4),
           };
-          resolve();
+          resolve(null);
           if (callEmitter) {
             this.callAllAccountsSubscribers();
           }
@@ -489,7 +510,7 @@ export class ContractService {
             shortBigNumber: bigBalance.div(new BigNumber(10).pow(18)),
             display: bigBalance.div(new BigNumber(10).pow(18)).toFormat(4),
           };
-          resolve();
+          resolve(null);
           if (callEmitter) {
             this.callAllAccountsSubscribers();
           }
@@ -542,7 +563,7 @@ export class ContractService {
         .then((allowance: string) => {
           const allow = new BigNumber(allowance);
           const allowed = allow.minus(amount);
-          allowed.isNegative() ? reject() : resolve();
+          allowed.isNegative() ? reject() : resolve(null);
         });
     });
   }
@@ -555,7 +576,7 @@ export class ContractService {
         .then((allowance: string) => {
           const allow = new BigNumber(allowance);
           const allowed = allow.minus(amount);
-          allowed.isNegative() ? reject() : resolve();
+          allowed.isNegative() ? reject() : resolve(null);
         });
     });
   }
@@ -643,11 +664,11 @@ export class ContractService {
 
   public getContractsInfo() {
     const promises = [
-      this.Auction.methods
+      this.AuctionContract.methods
         .calculateStepsFromStart()
         .call()
         .then((auctionId) => {
-          return this.Auction.methods
+          return this.AuctionContract.methods
             .reservesOf(auctionId)
             .call()
             .then((res) => {
@@ -706,11 +727,11 @@ export class ContractService {
 
   public getAuctionPool() {
     return new Promise(async (resolve) => {
-      const currentAuctionId = await this.Auction.methods
+      const currentAuctionId = await this.AuctionContract.methods
         .calculateStepsFromStart()
         .call();
 
-      const auctionReserves = await this.Auction.methods
+      const auctionReserves = await this.AuctionContract.methods
         .reservesOf(currentAuctionId)
         .call();
 
@@ -730,7 +751,9 @@ export class ContractService {
       if (auctionReserves.eth === "0" || auctionReserves.token === "0") {
         auctionPriceFromPool = new BigNumber(0);
       } else {
-        auctionPriceFromPool = new BigNumber(auctionReserves.token).div(auctionReserves.eth);
+        auctionPriceFromPool = new BigNumber(auctionReserves.token).div(
+          auctionReserves.eth
+        );
       }
 
       const amountsOut = await this.getAmountsOutAsync(this.ETHER.toString());
@@ -740,15 +763,20 @@ export class ContractService {
       data.uniAxnPerEth = uniswapPrice;
 
       data.axnPerEth = this.getCurrentAuctionAxnPerEth(
-        auctionPriceFromPool, uniswapPrice, auctionReserves.uniswapMiddlePrice);
+        auctionPriceFromPool,
+        uniswapPrice,
+        auctionReserves.uniswapMiddlePrice
+      );
 
       resolve(data);
     });
   }
 
   private getCurrentAuctionAxnPerEth(
-    auctionPriceFromPool: BigNumber, uniswapPrice: BigNumber, uniswapAveragePrice: string) 
-      : BigNumber {
+    auctionPriceFromPool: BigNumber,
+    uniswapPrice: BigNumber,
+    uniswapAveragePrice: string
+  ): BigNumber {
     if (auctionPriceFromPool.isZero()) {
       const uniswapDiscountedPrice = this.adjustPrice(uniswapPrice);
 
@@ -756,11 +784,12 @@ export class ContractService {
     } else {
       const averagePrice = new BigNumber(uniswapAveragePrice);
 
-      const uniswapDiscountedAveragePrice =
-        this.adjustPrice(averagePrice.div(this.ETHER));
+      const uniswapDiscountedAveragePrice = this.adjustPrice(
+        averagePrice.div(this.ETHER)
+      );
 
       return BigNumber.minimum(
-        uniswapDiscountedAveragePrice,	
+        uniswapDiscountedAveragePrice,
         auctionPriceFromPool
       );
     }
@@ -790,7 +819,9 @@ export class ContractService {
                 const a = new Date(endDateTime).getTime();
                 const b = Date.now();
 
-                const leftDays = Math.floor((a - b) / (this.secondsInDay * 1000));
+                const leftDays = Math.floor(
+                  (a - b) / (this.secondsInDay * 1000)
+                );
 
                 const dateEnd = leftDays;
                 const showTime = leftDays;
@@ -1046,87 +1077,203 @@ export class ContractService {
 
   public async getWalletStakesAsync(): Promise<{
     closed: Stake[];
-    opened: Stake[];
+    active: Stake[];
     matured: Stake[];
+    closedV1: Stake[];
   }> {
-    const walletStakeIds = await this.StakingContract.methods
+    const stakeIds = await this.StakingContract.methods
       .sessionsOf_(this.account.address)
       .call();
 
+    const lastStakeV1Id: number = +await this.StakingContract.methods
+      .lastSessionIdV1()
+      .call();
+
+    const stakeV1Ids: string[] = (
+      await this.StakingV1Contract.methods
+        .sessionsOf_(this.account.address)
+        .call()
+    ).filter((x) => !stakeIds.includes(x) && x <= lastStakeV1Id);
+
     const nowMs = Date.now();
-    const stakePromises: Stake[] = walletStakeIds.map(
-      async (stakeId) => {
-        const stakeSession = await this.StakingContract.methods
-          .sessionDataOf(this.account.address, stakeId)
-          .call();
 
-        const bigPayDayPayout = await this.SubBalanceContract.methods
-          .calculateSessionPayout(stakeId)
-          .call();
-
-        const bigPayDaySession = await this.SubBalanceContract.methods
-          .stakeSessions(stakeId)
-          .call();
-
-        const endMs = stakeSession.end * 1000;
-        const amount = new BigNumber(stakeSession.amount);
-        const bigPayDay = new BigNumber(bigPayDayPayout[0]);
-
-        const stake : Stake = {
-          start: new Date(stakeSession.start * 1000),
-          end: new Date(endMs),
-          shares: new BigNumber(stakeSession.shares),
-          amount: amount,
-          sessionId: stakeId,
-          bigPayDay: bigPayDay,
-          interest: null,
-          penalty: null,
-          payout: null,
-          forWithdraw: null,
-          isMatured: nowMs > endMs,
-          isWithdrawn: stakeSession.withdrawn,
-          isBpdWithdraw: stakeSession.withdrawn && !bigPayDay.isZero(),
-          isBpdWithdrawn: bigPayDaySession.withdrawn
-        }
-
-        if (!stakeSession.withdrawn) {
-          const stakingInterest = await this.StakingContract.methods
-            .calculateStakingInterest(
-              stakeId,
-              this.account.address,
-              stakeSession.shares
-            )
-            .call();
-
-          const payoutAndPenalty = await this.StakingContract.methods
-            .getAmountOutAndPenalty(stakeId, stakingInterest)
-            .call({ from: this.account.address });
-
-          stake.interest = new BigNumber(stakingInterest);
-          stake.penalty = new BigNumber(payoutAndPenalty[1]);
-          stake.forWithdraw = new BigNumber(payoutAndPenalty[0]);
-        } else {
-          stake.payout = new BigNumber(stakeSession.interest).plus(bigPayDay);
-          stake.interest = stake.payout.minus(amount);
-        }
-
-        return stake;
-      }
+    const stakePromises: Promise<Stake>[] = this.getStakePromises(
+      stakeIds,
+      nowMs
     );
-    
-    const walletStakes = await Promise.all(stakePromises);
+    const stakeV1Promises: Promise<Stake>[] = this.getV1StakePromises(
+      stakeV1Ids,
+      nowMs
+    );
+
+    const stakes = await Promise.all(stakePromises.concat(stakeV1Promises));
+
+    for (const stake of stakes) {
+      if (!stake.isWithdrawn) {
+        const stakingInterest = await this.StakingContract.methods
+          .calculateStakingInterest(
+            stake.firstPayout,
+            stake.lastPayout,
+            stake.shares
+          )
+          .call();
+
+        const payoutAndPenalty = await this.StakingContract.methods
+          .getAmountOutAndPenalty(
+            stake.principal,
+            stake.startSeconds,
+            stake.endSeconds,
+            stakingInterest
+          )
+          .call();
+
+        stake.interest = new BigNumber(stakingInterest);
+        stake.penalty = new BigNumber(payoutAndPenalty[1]);
+        stake.forWithdraw = new BigNumber(payoutAndPenalty[0]);
+      } else if (stake.isWithdrawn && !stake.isV1) {
+        stake.payout = new BigNumber(stake.payout).plus(stake.bigPayDay);
+        stake.interest = stake.payout.minus(stake.principal);
+        stake.targetEnd = new Date(new BigNumber(stake.lastPayout)
+          .minus(stake.firstPayout)
+          .times(this.secondsInDay * 1000)
+          .plus(stake.start.getTime())
+          .toNumber());
+      }
+    }
 
     return {
-      closed: walletStakes.filter((stake: Stake) => {
-        return stake.isWithdrawn && !stake.isBpdWithdraw || stake.isBpdWithdrawn;
+      closed: stakes.filter((stake: Stake) => {
+        return (
+          !stake.isV1 && stake.isWithdrawn && (!stake.isBpdWithdraw ||
+          stake.isBpdWithdrawn)
+        );
       }),
-      opened: walletStakes.filter((stake: Stake) => {
-        return !stake.isMatured && !stake.isWithdrawn || stake.isBpdWithdraw && !stake.isBpdWithdrawn;
+      active: stakes.filter((stake: Stake) => {
+        return (
+          !stake.isMatured && (!stake.isWithdrawn ||
+          stake.isBpdWithdraw && !stake.isBpdWithdrawn)
+        );
       }),
-      matured: walletStakes.filter((stake: Stake) => {
-        return stake.isMatured && !stake.isWithdrawn || stake.isBpdWithdraw && !stake.isBpdWithdrawn;
-      })
+      matured: stakes.filter((stake: Stake) => {
+        return (
+          stake.isMatured && (!stake.isWithdrawn ||
+          stake.isBpdWithdraw && !stake.isBpdWithdrawn)
+        );
+      }),
+      closedV1: stakes.filter((stake: Stake) => {
+        return (
+          stake.isV1 && stake.isWithdrawn && (!stake.isBpdWithdraw ||
+          stake.isBpdWithdrawn)
+        );
+      }),
     };
+  }
+
+  private getV1StakePromises(stakeV1Ids: any, nowMs: number): Promise<Stake>[] {
+    return stakeV1Ids.map(async (stakeId) => {
+      const stakeSession = await this.StakingV1Contract.methods
+        .sessionDataOf(this.account.address, stakeId)
+        .call();
+
+      const bpdSession = await this.SubBalanceV1Contract.methods
+        .getSessionStats(stakeId)
+        .call();
+
+      const bpdPayDayEligible = await this.SubBalanceV1Contract.methods
+        .getSessionEligibility(stakeId)
+        .call();
+
+      const bigPayDayPayout = await this.SubBalanceContract.methods
+        .calculateSessionPayout(
+          bpdSession.start,
+          bpdSession.sessionEnd,
+          0,
+          bpdSession.shares,
+          bpdPayDayEligible 
+        ).call();
+
+      const endMs = stakeSession.end * 1000;
+      const amount = new BigNumber(stakeSession.amount);
+      const bigPayDay = new BigNumber(bigPayDayPayout[0]);
+
+      const stake: Stake = {
+        start: new Date(stakeSession.start * 1000),
+        startSeconds: stakeSession.start,
+        end: new Date(endMs),
+        endSeconds: stakeSession.end,
+        targetEnd: null,
+        shares: new BigNumber(stakeSession.shares),
+        principal: amount,
+        sessionId: stakeId,
+        bigPayDay: bigPayDay,
+        interest: null,
+        penalty: null,
+        payout: null,
+        forWithdraw: null,
+        firstPayout: stakeSession.nextPayout,
+        lastPayout:
+          (stakeSession.end - stakeSession.start) /
+            this.settingsApp.settings.time.seconds +
+          +stakeSession.nextPayout,
+        isMatured: nowMs > endMs,
+        isWithdrawn: stakeSession.shares === "0",
+        isBpdWithdraw: stakeSession.withdrawn && !bigPayDay.isZero(),
+        isBpdWithdrawn: bpdSession.withdrawn,
+        isV1: true,
+      };
+
+      return stake;
+    });
+  }
+
+  private getStakePromises(stakeIds: any, nowMs: number): Promise<Stake>[] {
+    return stakeIds.map(async (stakeId) => {
+      const stakeSession = await this.StakingContract.methods
+        .sessionDataOf(this.account.address, stakeId)
+        .call();
+
+      const bpdSession = await this.SubBalanceContract.methods
+        .getStakeSession(stakeId)
+        .call();
+
+      const bigPayDayPayout = await this.SubBalanceContract.methods
+        .calculateSessionPayout(
+          bpdSession.start, 
+          bpdSession.end, 
+          bpdSession.finishTime, 
+          bpdSession.shares, 
+          bpdSession.payDayEligible
+        ).call();
+
+      const endMs = stakeSession.end * 1000;
+      const amount = new BigNumber(stakeSession.amount);
+      const bigPayDay = new BigNumber(bigPayDayPayout[0]);
+
+      const stake: Stake = {
+        start: new Date(stakeSession.start * 1000),
+        startSeconds: stakeSession.start,
+        end: new Date(endMs),
+        endSeconds: stakeSession.end,
+        targetEnd: null,
+        shares: new BigNumber(stakeSession.shares),
+        principal: amount,
+        sessionId: stakeId,
+        bigPayDay: bigPayDay,
+        interest: null,
+        penalty: null,
+        payout: stakeSession.payout,
+        forWithdraw: null,
+        firstPayout: stakeSession.firstPayout,
+        lastPayout: stakeSession.lastPayout,
+        isMatured: nowMs > endMs,
+        isWithdrawn: stakeSession.withdrawn,
+        isBpdWithdraw: stakeSession.withdrawn && !bigPayDay.isZero(),
+        isBpdWithdrawn: bpdSession.withdrawn,
+        isV1: false,
+      };
+
+      return stake;
+    });
   }
 
   public unstake(sessionId) {
@@ -1140,21 +1287,22 @@ export class ContractService {
       });
   }
 
-  public getSessionStats(sessionId) {
-    return this.SubBalanceContract.methods
-      .getSessionStats(sessionId)
-      .call()
+  public unstakeV1(sessionId) {
+    return this.StakingContract.methods
+      .unstakeV1(sessionId)
+      .send({
+        from: this.account.address,
+      })
       .then((res) => {
-        return res;
+        return this.checkTransaction(res);
       });
   }
 
-  public stakingWithdraw(sessionId) {
-    return this.SubBalanceContract.methods
+  public async bpdWithdraw(sessionId) {
+    await this.SubBalanceContract.methods
       .withdrawPayout(sessionId)
-      .call()
-      .then((res) => {
-        return res;
+      .send({
+        from: this.account.address
       });
   }
 
@@ -1168,18 +1316,23 @@ export class ContractService {
 
     const gasLimit = this.account.balances.ETH.wei;
     const gasPrice = await this.web3Service.gasPrice();
-    const estimatedGas = await this.Auction.methods.bet(0, date, refLink)
-      .estimateGas({from: this.account.address, gas:gasLimit, value: amount});
+    const estimatedGas = await this.AuctionContract.methods
+      .bid(0, date, refLink)
+      .estimateGas({
+        from: this.account.address,
+        gas: gasLimit,
+        value: amount,
+      });
 
     const newAmount = new BigNumber(amount).minus(estimatedGas * gasPrice);
     if (newAmount.isNegative()) {
-      throw new Error("Not enough gas")
+      throw new Error("Not enough gas");
     }
 
     const amountOutMin = await this.getAmountOutMinAsync(newAmount.toString());
 
-    return this.Auction.methods
-      .bet(amountOutMin, date, refLink)
+    return this.AuctionContract.methods
+      .bid(amountOutMin, date, refLink)
       .send({
         from: this.account.address,
         value: newAmount,
@@ -1187,7 +1340,7 @@ export class ContractService {
         gasLimit: estimatedGas,
       })
       .then((res) => {
-        return this.checkTransaction(res)
+        return this.checkTransaction(res);
       });
   }
 
@@ -1201,8 +1354,8 @@ export class ContractService {
 
     const amountOutMin = await this.getAmountOutMinAsync(amount);
 
-    return this.Auction.methods
-      .bet(amountOutMin, date, refLink)
+    return this.AuctionContract.methods
+      .bid(amountOutMin, date, refLink)
       .send({
         from: this.account.address,
         value: amount,
@@ -1212,18 +1365,24 @@ export class ContractService {
       });
   }
 
-  private async getAmountOutMinAsync(amount: string) : Promise<string> {
+  private async getAmountOutMinAsync(amount: string): Promise<string> {
     const amountOut = new BigNumber((await this.getAmountsOutAsync(amount))[1]);
-    return amountOut.times(
-      (100 - environment.slippageTolerancePercent - environment.auctionRecipientPercent) / 100)
-        .dp(0).toString(10);
+    return amountOut
+      .times(
+        (100 -
+          environment.slippageTolerancePercent -
+          environment.auctionRecipientPercent) /
+          100
+      )
+      .dp(0)
+      .toString(10);
   }
 
-  private getAmountsOutAsync(amount: string) : Promise<string[]> {
+  private getAmountsOutAsync(amount: string): Promise<string[]> {
     return this.UniswapV2Router02.methods
       .getAmountsOut(amount, [
         this.CONTRACTS_PARAMS.WETH.ADDRESS,
-        this.CONTRACTS_PARAMS.HEX2X.ADDRESS
+        this.CONTRACTS_PARAMS.HEX2X.ADDRESS,
       ])
       .call();
   }
@@ -1234,27 +1393,31 @@ export class ContractService {
     const oneDayInMS = this.secondsInDay * 1000;
 
     const tomorrowsAuctionId = todaysAuctionId + 1;
-    const nextWeeklyAuctionId = 7 * Math.ceil(todaysAuctionId === 0 ? 1 : todaysAuctionId / 7);
+    const nextWeeklyAuctionId =
+      7 * Math.ceil(todaysAuctionId === 0 ? 1 : todaysAuctionId / 7);
 
     const auctionIds = [todaysAuctionId, tomorrowsAuctionId];
 
     for (let i = 1; i <= 7; i++) {
       const previousAuctionId = todaysAuctionId - i;
 
-      if (previousAuctionId >= 0){
+      if (previousAuctionId >= 0) {
         auctionIds.unshift(previousAuctionId);
       } else {
         break;
       }
     }
 
-    if (nextWeeklyAuctionId !== todaysAuctionId && nextWeeklyAuctionId !== tomorrowsAuctionId) {
+    if (
+      nextWeeklyAuctionId !== todaysAuctionId &&
+      nextWeeklyAuctionId !== tomorrowsAuctionId
+    ) {
       auctionIds.push(nextWeeklyAuctionId);
     }
 
     const nowDateTS = new Date().getTime();
     const auctionsPromises = auctionIds.map((id) => {
-      return this.Auction.methods
+      return this.AuctionContract.methods
         .reservesOf(id)
         .call()
         .then((auctionData) => {
@@ -1268,18 +1431,26 @@ export class ContractService {
             isWeekly: id % 7 === 0,
             time: {
               date: moment(startDateTS),
-              state: (nowDateTS > startDateTS && nowDateTS < endDateTS) ?
-                'progress' : (nowDateTS > endDateTS) ? 'finished' : 'feature',
+              state:
+                nowDateTS > startDateTS && nowDateTS < endDateTS
+                  ? "progress"
+                  : nowDateTS > endDateTS
+                  ? "finished"
+                  : "feature",
             },
             data: {
               axnInPool: axnInPool,
-              ethInPool: ethInPool
+              ethInPool: ethInPool,
             },
-            axnPerEth: null
+            axnPerEth: null,
           };
 
-          if (auction.time.state === 'finished') {
-            auction.axnPerEth = this.getAuctionAxnPerEth(axnInPool, ethInPool, auctionData.uniswapMiddlePrice);
+          if (auction.time.state === "finished") {
+            auction.axnPerEth = this.getAuctionAxnPerEth(
+              axnInPool,
+              ethInPool,
+              auctionData.uniswapMiddlePrice
+            );
           }
 
           return auction;
@@ -1288,18 +1459,21 @@ export class ContractService {
 
     return Promise.all(auctionsPromises).then((results) => {
       return results.sort((auction1, auction2) => {
-        return auction1.id < auction2.id ? 1 : auction1.id > auction2.id ? -1 : 0;
+        return auction1.id < auction2.id
+          ? 1
+          : auction1.id > auction2.id
+          ? -1
+          : 0;
       });
     });
   }
 
   public getAuctions() {
     return new Promise(async (resolve) => {
-      const startMs = await this.Auction.methods
-        .start()
-        .call() * 1000;
+      const startMs =
+        (await this.AuctionContract.methods.start().call()) * 1000;
 
-      const auctionId = await this.Auction.methods
+      const auctionId = await this.AuctionContract.methods
         .calculateStepsFromStart()
         .call();
 
@@ -1307,102 +1481,209 @@ export class ContractService {
     });
   }
 
-  public getUserAuctions() {
-    return this.Auction.methods
-      .start()
-      .call()
-      .then((start) => {
-        return this.Auction.methods
-          .auctionsOf_(this.account.address)
-          .call()
-          .then((result) => {
-            const auctionsPromises = result.map((id) => {
-              return this.Auction.methods
-                .reservesOf(id)
-                .call()
-                .then((auctionData) => {
-                  const auctionInfo = {
-                    auctionId: id,
-                    startDate: null,
-                    axnInPool: new BigNumber(auctionData.token),
-                    ethInPool: new BigNumber(auctionData.eth),
-                    ethBid: null,
-                    winnings: null,
-                    hasWinnings: null,
-                    status: null,
-                    axnPerEth: null
-                  };
-                  return this.Auction.methods
-                    .auctionBetOf(id, this.account.address)
-                    .call()
-                    .then(async (accountBalance) => {
+  public async getWalletBidsAsync(): Promise<{
+    active: AuctionBid[];
+    withdrawn: AuctionBid[];
+    withdrawnV1: AuctionBid[];
+  }> {
+    const start = await this.AuctionContract.methods.start().call();
 
-                      auctionInfo.ethBid = new BigNumber(accountBalance.eth);
+    const auctionIds: string[] = await this.AuctionContract.methods
+      .auctionsOf_(this.account.address)
+      .call();
 
-                      const startTS = (+start + this.secondsInDay * id) * 1000;
-                      const endTS = moment(startTS + this.secondsInDay * 1000);
+    const lastAuctionV1Id: number = +await this.AuctionContract.methods
+      .lastAuctionEventIdV1()
+      .call();
 
-                      auctionInfo.startDate = new Date(startTS);
+    const auctionV1Ids: string[] = (
+      await this.AuctionV1Contract.methods
+        .auctionsOf_(this.account.address)
+        .call()
+    ).filter((x) => !auctionIds.includes(x) && x <= lastAuctionV1Id);
 
-                      const uniswapPriceWithPercent = this.adjustPrice(
-                        new BigNumber(auctionData.uniswapMiddlePrice)).div(this.ETHER);
+    const bidPromises: Promise<AuctionBid>[] = this.getBidPromises(
+      auctionIds,
+      start
+    );
+    const bidV1Promises: Promise<AuctionBid>[] = this.getV1BidPromises(
+      auctionV1Ids,
+      start
+    );
 
-                      const poolPrice = new BigNumber(auctionData.token).div(
-                        auctionData.eth
-                      );
+    const bids = (
+      await Promise.all(bidPromises.concat(bidV1Promises))
+    ).sort((a, b) => (a.startDate < b.startDate ? 1 : -1));
 
-                      const axnWithoutBorder = poolPrice.times(
-                        accountBalance.eth
-                      );
-                      const axnAmountWithDiscount = new BigNumber(
-                        accountBalance.eth
-                      ).times(uniswapPriceWithPercent);
-
-                      const userWinnings = BigNumber.minimum(
-                        axnAmountWithDiscount,
-                        axnWithoutBorder
-                      );
-
-                      auctionInfo.winnings = userWinnings.div(this.ETHER);
-                      auctionInfo.hasWinnings = auctionInfo.winnings.isPositive();
-
-                      if (
-                        accountBalance.ref !==
-                        "0x0000000000000000000000000000000000000000"
-                      ) {
-                        auctionInfo.winnings = auctionInfo.winnings.times(1.1);
-                      }
-
-                      const b = moment(new Date());
-                      const check = endTS.diff(b);
-
-                      auctionInfo.axnPerEth = this.getAuctionAxnPerEth(
-                        auctionInfo.axnInPool, auctionInfo.ethInPool, auctionData.uniswapMiddlePrice);
-
-                      if (check > 0) {
-                        auctionInfo.status = "progress";
-                      } else {
-                        if (!accountBalance.withdrawn) {
-                          auctionInfo.status = "withdraw";
-                        } else {
-                          auctionInfo.status = "complete";
-                        }
-                      }
-                      return auctionInfo;
-                    });
-                });
-            });
-
-            return Promise.all(auctionsPromises);
-          });
-      });
+    return {
+      active: bids.filter((bid: AuctionBid) => {
+        return bid.status !== "complete";
+      }),
+      withdrawn: bids.filter((bid: AuctionBid) => {
+        return !bid.isV1 && bid.status === "complete";
+      }),
+      withdrawnV1: bids.filter((bid: AuctionBid) => {
+        return bid.isV1 && bid.status === "complete";
+      }),
+    };
   }
 
-  private getAuctionAxnPerEth(axnInPool: BigNumber, ethInPool: BigNumber, uniswapMiddlePrice: string) {
-    const auctionPriceFromPool = axnInPool.div(!ethInPool.isZero() ? ethInPool : 1);
+  private getBidPromises(auctionIds: any[], start: any): Promise<AuctionBid>[] {
+    return auctionIds.map(async (id) => {
+      const auctionData = await this.AuctionContract.methods
+        .reservesOf(id)
+        .call();
+
+      const accountBalance = await this.AuctionContract.methods
+        .auctionBidOf(id, this.account.address)
+        .call();
+
+      const startTS = (+start + this.secondsInDay * id) * 1000;
+      const endTS = moment(startTS + this.secondsInDay * 1000);
+
+      const auctionBid: AuctionBid = this.getAuctionBid(
+        id,
+        auctionData,
+        accountBalance,
+        startTS,
+        false
+      );
+
+      auctionBid.axnPerEth = this.getAuctionAxnPerEth(
+        auctionBid.axnInPool,
+        auctionBid.ethInPool,
+        auctionData.uniswapMiddlePrice
+      );
+
+      const b = moment(new Date());
+      const check = endTS.diff(b);
+
+      if (check > 0) {
+        auctionBid.status = "progress";
+      } else {
+        if (!accountBalance.withdrawn) {
+          auctionBid.status = "withdraw";
+        } else {
+          auctionBid.status = "complete";
+        }
+      }
+
+      return auctionBid;
+    });
+  }
+
+  private getV1BidPromises(
+    auctionIds: any[],
+    start: any
+  ): Promise<AuctionBid>[] {
+    return auctionIds.map(async (id) => {
+      const auctionData = await this.AuctionV1Contract.methods
+        .reservesOf(id)
+        .call();
+
+      const accountBalance = await this.AuctionV1Contract.methods
+        .auctionBetOf(id, this.account.address)
+        .call();
+
+      const startTS = (+start + this.secondsInDay * id) * 1000;
+      const endTS = moment(startTS + this.secondsInDay * 1000);
+
+      const auctionBid: AuctionBid = this.getAuctionBid(
+        id,
+        auctionData,
+        accountBalance,
+        startTS,
+        true
+      );
+
+      const b = moment(new Date());
+      const check = endTS.diff(b);
+
+      if (check > 0) {
+        auctionBid.status = "progress";
+      } else {
+        if (!auctionBid.ethBid.isZero()) {
+          auctionBid.status = "withdraw";
+        } else {
+          auctionBid.status = "complete";
+        }
+      }
+
+      if (auctionBid.status !== "complete") {
+        auctionBid.axnPerEth = this.getAuctionAxnPerEth(
+          auctionBid.axnInPool,
+          auctionBid.ethInPool,
+          auctionData.uniswapMiddlePrice
+        );
+      }
+
+      return auctionBid;
+    });
+  }
+
+  private getAuctionBid(
+    id: any,
+    auctionData: any,
+    accountBalance: any,
+    start: number,
+    isV1: boolean
+  ): AuctionBid {
+    const auctionBid: AuctionBid = {
+      auctionId: id,
+      startDate: null,
+      axnInPool: new BigNumber(auctionData.token),
+      ethInPool: new BigNumber(auctionData.eth),
+      ethBid: null,
+      winnings: null,
+      hasWinnings: null,
+      status: null,
+      axnPerEth: null,
+      isV1: isV1,
+    };
+
+    auctionBid.ethBid = new BigNumber(accountBalance.eth);
+
+    auctionBid.startDate = new Date(start);
+
+    const uniswapPriceWithPercent = this.adjustPrice(
+      new BigNumber(auctionData.uniswapMiddlePrice)
+    ).div(this.ETHER);
+
+    const poolPrice = new BigNumber(auctionData.token).div(auctionData.eth);
+
+    const axnWithoutBorder = poolPrice.times(auctionBid.ethBid);
+    const axnAmountWithDiscount = new BigNumber(auctionBid.ethBid).times(
+      uniswapPriceWithPercent
+    );
+
+    const userWinnings = BigNumber.minimum(
+      axnAmountWithDiscount,
+      axnWithoutBorder
+    );
+
+    auctionBid.winnings = userWinnings.div(this.ETHER);
+    auctionBid.hasWinnings = auctionBid.winnings.isPositive();
+
+    if (accountBalance.ref !== "0x0000000000000000000000000000000000000000") {
+      auctionBid.winnings = auctionBid.winnings.times(1.1);
+    }
+
+    return auctionBid;
+  }
+
+  private getAuctionAxnPerEth(
+    axnInPool: BigNumber,
+    ethInPool: BigNumber,
+    uniswapMiddlePrice: string
+  ) {
+    const auctionPriceFromPool = axnInPool.div(
+      !ethInPool.isZero() ? ethInPool : 1
+    );
     const averagePrice = new BigNumber(uniswapMiddlePrice);
 
-    const uniswapDiscountedAveragePrice = this.adjustPrice(averagePrice.div(this.ETHER));
+    const uniswapDiscountedAveragePrice = this.adjustPrice(
+      averagePrice.div(this.ETHER)
+    );
 
     return BigNumber.minimum(
       uniswapDiscountedAveragePrice,
@@ -1410,13 +1691,24 @@ export class ContractService {
     );
   }
 
-  private adjustPrice(price: BigNumber) : BigNumber {
+  private adjustPrice(price: BigNumber): BigNumber {
     return price.times(1 + (this.discountPercent - this.premiumPercent) / 100);
   }
 
   public withdrawFromAuction(auctionId) {
-    return this.Auction.methods
+    return this.AuctionContract.methods
       .withdraw(auctionId)
+      .send({
+        from: this.account.address,
+      })
+      .then((res) => {
+        return this.checkTransaction(res);
+      });
+  }
+
+  public withdrawFromAuctionV1(auctionId) {
+    return this.AuctionContract.methods
+      .withdrawV1(auctionId)
       .send({
         from: this.account.address,
       })
@@ -1481,7 +1773,7 @@ export class ContractService {
           }
         )
         .finally(() => {
-          resolve();
+          resolve(null);
         });
     });
   }
@@ -1516,14 +1808,24 @@ export class ContractService {
       this.CONTRACTS_PARAMS.NativeSwap.ADDRESS
     );
 
-    this.Auction = this.web3Service.getContract(
+    this.AuctionContract = this.web3Service.getContract(
       this.CONTRACTS_PARAMS.Auction.ABI,
       this.CONTRACTS_PARAMS.Auction.ADDRESS
+    );
+
+    this.AuctionV1Contract = this.web3Service.getContract(
+      this.CONTRACTS_PARAMS.AuctionV1.ABI,
+      this.CONTRACTS_PARAMS.AuctionV1.ADDRESS
     );
 
     this.StakingContract = this.web3Service.getContract(
       this.CONTRACTS_PARAMS.Staking.ABI,
       this.CONTRACTS_PARAMS.Staking.ADDRESS
+    );
+
+    this.StakingV1Contract = this.web3Service.getContract(
+      this.CONTRACTS_PARAMS.StakingV1.ABI,
+      this.CONTRACTS_PARAMS.StakingV1.ADDRESS
     );
 
     this.HEXContract = this.web3Service.getContract(
@@ -1544,6 +1846,11 @@ export class ContractService {
     this.SubBalanceContract = this.web3Service.getContract(
       this.CONTRACTS_PARAMS.SubBalance.ABI,
       this.CONTRACTS_PARAMS.SubBalance.ADDRESS
+    );
+
+    this.SubBalanceV1Contract = this.web3Service.getContract(
+      this.CONTRACTS_PARAMS.SubBalanceV1.ABI,
+      this.CONTRACTS_PARAMS.SubBalanceV1.ADDRESS
     );
 
     this.UniswapV2Router02 = this.web3Service.getContract(

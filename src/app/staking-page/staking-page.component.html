@@ -1,28 +1,28 @@
 <section class="axn-section" *ngIf="account">
   <div class="axn-title-block">
-    <span class="axn-title">Create Deposit</span>
+    <span class="axn-title">Create Stake</span>
     <div
       class="question"
       mat-raised-button
       #tooltip="matTooltip"
       (click)="tooltip.toggle()"
       matTooltip="
-        Stake your Axion and get revenue from staking contract. By creating a deposit, the user loses access to his Axion tokens, but receives Shares, indicating the user's share in the distribution of dividends from the daily dividend pool.
+        Stake your Axion and get revenue from staking contract. By creating a stake, the user loses access to his Axion tokens, but receives Shares, indicating the user's share in the distribution of dividends from the daily dividend pool.
 
         The formula for calculating daily dividends is as follows:
         dailyInterest = dailyPool * userShares / totalSupplyShares
 
-        Then the formula for receiving dividends from the deposit will be the following:
+        Then the formula for receiving dividends from the stake will be the following:
         stakingInterest =sum(dailyInterest(i) * userShares / totalSupplyShares(i))
         for each staking day.
         "
       matTooltipClass="question__tooltip"
     ></div>
   </div>
-  <form #depositForm="ngForm" class="axn-form axn-form-3-1">
+  <form #stakeForm="ngForm" class="axn-form axn-form-3-1">
     <div class="axn-form-block axn-form-staking">
       <div class="axn-form-block-one">
-        <span class="axn-form-block-one-title">Deposit</span>
+        <span class="axn-form-block-one-title">Stake</span>
         <input
           *ngIf="account"
           type="text"
@@ -34,13 +34,13 @@
             min: 1,
             max: account?.balances.HEX2X.wei
           }"
-          name="deposit-amount"
+          name="stake-amount"
           placeholder="0.0"
           onfocus="this.placeholder = ''"
           onblur="this.placeholder = '0.0'"
           (ngModelChange)="onChangeAmount()"
           [maxValueChange]="onChangeAccount"
-          [(ngModel)]="formsData.depositAmount"
+          [(ngModel)]="formsData.stakeAmount"
           autocomplete="off"
         />
         <span class="axn-cheap icon icon_axn cl-blue-bg">AXN</span>
@@ -49,7 +49,7 @@
           <span
             class="axn-btn axn-btn-max"
             (click)="
-              formsData.depositAmount = account?.balances.HEX2X.wei;
+              formsData.stakeAmount = account?.balances.HEX2X.wei;
               onChangeAmount()
             "
             >Send max</span
@@ -66,7 +66,7 @@
 
     <div class="axn-form-block axn-form-arrow axn-form-staking">
       <div class="axn-form-block-one">
-        <span class="axn-form-block-one-title">Set deposit period</span>
+        <span class="axn-form-block-one-title">Set stake period</span>
         <input
           class="axn-input axn-input-mid"
           type="number"
@@ -74,24 +74,24 @@
           autocomplete="off"
           [appMinMaxNumber]="{
             min: 1,
-            max: depositMaxDays
+            max: stakeMaxDays
           }"
           min="1"
           (ngModelChange)="onChangeAmount()"
-          [max]="depositMaxDays"
+          [max]="stakeMaxDays"
           placeholder="0"
           onfocus="this.placeholder = ''"
           onblur="this.placeholder = '0'"
           required="required"
-          name="deposit-days"
-          [(ngModel)]="formsData.depositDays"
+          name="stake-days"
+          [(ngModel)]="formsData.stakeDays"
           autocomplete="off"
         />
         <span class="axn-cheap cl-blue-bg">Day</span>
         <div class="axn-form-block-sendmax axn-form-bottom-mid">
           <span
             class="axn-btn axn-btn-max"
-            (click)="formsData.depositDays = depositMaxDays; onChangeAmount()"
+            (click)="formsData.stakeDays = stakeMaxDays; onChangeAmount()"
             >Send max</span
           >
         </div>
@@ -179,7 +179,7 @@
           </div>
           <div class="axn-form-block-shares">
             <span class="axn-form-block-shares-value cl-blue">{{
-              depositEndDate | date: "shortDate"
+              stakeEndDate | date: "shortDate"
             }}</span
             ><br />
             <span class="axn-form-block-shares-text-min">Ends</span>
@@ -204,16 +204,16 @@
         </div>
         <button
           class="axn-btn axn-btn-gray axn-btn-form axn-btn-max-width m-t-15"
-          (click)="openDeposit()"
-          [disabled]="!depositForm.valid"
-          [ngClass]="{ progress: depositTokensProgress }"
+          (click)="openStake()"
+          [disabled]="!stakeForm.valid"
+          [ngClass]="{ progress: stakeTokensProgress }"
         >
-          <span class="lds-ellipsis" *ngIf="depositTokensProgress">
+          <span class="lds-ellipsis" *ngIf="stakeTokensProgress">
             <span class="lds-ellipsis-container">
               <span></span><span></span><span></span><span></span>
             </span>
           </span>
-          <span>Deposit</span>
+          <span>Stake</span>
         </button>
       </div>
     </div>
@@ -272,13 +272,10 @@
   </div>
 </section>
 
-<section
-  class="axn-section"
-  *ngIf="openedDepositTotals && tokensDecimals"
->
+<section class="axn-section" *ngIf="activeStakeTotals && tokensDecimals">
   <div class="axn-form-block table-container p-20">
     <div class="axn-title-block p-20">
-      <span class="axn-title">Opened Deposit Totals</span>
+      <span class="axn-title">Active Stake Totals</span>
     </div>
     <table class="standard-table" cellpadding="0" cellspacing="0" border="0">
       <thead>
@@ -297,12 +294,12 @@
               matTooltipClass="table__tooltip"
               mat-raised-button
               matTooltip="{{
-                openedDepositTotals.principal
+                activeStakeTotals.principal
                   | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
               }}"
             >
               {{
-                openedDepositTotals.principal
+                activeStakeTotals.principal
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
               }}</span
             >
@@ -312,12 +309,12 @@
               matTooltipClass="table__tooltip"
               mat-raised-button
               matTooltip="{{
-                openedDepositTotals.shares
+                activeStakeTotals.shares
                   | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
               }}"
             >
               {{
-                openedDepositTotals.shares
+                activeStakeTotals.shares
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
               }}</span
             >
@@ -327,12 +324,12 @@
               matTooltipClass="table__tooltip"
               mat-raised-button
               matTooltip="{{
-                openedDepositTotals.bigPayDay
+                activeStakeTotals.bigPayDay
                   | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
               }}"
             >
               {{
-                openedDepositTotals.bigPayDay
+                activeStakeTotals.bigPayDay
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
               }}</span
             >
@@ -342,12 +339,12 @@
               matTooltipClass="table__tooltip"
               mat-raised-button
               matTooltip="{{
-                openedDepositTotals.interest
+                activeStakeTotals.interest
                   | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
               }}"
             >
               {{
-                openedDepositTotals.interest
+                activeStakeTotals.interest
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
               }}</span
             >
@@ -357,12 +354,12 @@
               matTooltipClass="table__tooltip"
               mat-raised-button
               matTooltip="{{
-                openedDepositTotals.total
+                activeStakeTotals.total
                   | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
               }}"
             >
               {{
-                openedDepositTotals.total
+                activeStakeTotals.total
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
               }}</span
             >
@@ -373,13 +370,10 @@
   </div>
 </section>
 
-<section
-  class="axn-section"
-  *ngIf="depositsLists?.matured.length && tokensDecimals"
->
+<section class="axn-section" *ngIf="stakes?.matured?.length && tokensDecimals">
   <div class="axn-form-block table-container p-20">
     <div class="axn-title-block p-20">
-      <span class="axn-title">Matured Deposits</span>
+      <span class="axn-title">Matured Stakes</span>
     </div>
     <table class="standard-table" cellpadding="0" cellspacing="0" border="0">
       <thead>
@@ -395,37 +389,37 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let deposit of depositsLists.matured">
+        <tr *ngFor="let stake of stakes.matured">
           <td>
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{ deposit.start | date: 'long' }}"
+              matTooltip="{{ stake.start | date: 'long' }}"
             >
-              {{ deposit.start | date: "shortDate" }}</span
+              {{ stake.start | date: "shortDate" }}</span
             >
           </td>
           <td>
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{ deposit.end | date: 'long' }}"
+              matTooltip="{{ stake.end | date: 'long' }}"
             >
-              {{ deposit.end | date: "shortDate" }}</span
+              {{ stake.end | date: "shortDate" }}</span
             >
           </td>
-          <td>{{ getProgress(deposit) }}%</td>
+          <td>{{ getProgress(stake) }}%</td>
           <td>
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
               matTooltip="{{
-                deposit.amount
+                stake.principal
                   | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
               }}"
             >
               {{
-                deposit.amount
+                stake.principal
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
               }}</span
             >
@@ -435,12 +429,12 @@
               matTooltipClass="table__tooltip"
               mat-raised-button
               matTooltip="{{
-                deposit.shares
+                stake.shares
                   | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
               }}"
             >
               {{
-                deposit.shares
+                stake.shares
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
               }}</span
             >
@@ -450,12 +444,12 @@
               matTooltipClass="table__tooltip"
               mat-raised-button
               matTooltip="{{
-                deposit.bigPayDay
+                stake.bigPayDay
                   | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
               }}"
             >
               {{
-                deposit.bigPayDay
+                stake.bigPayDay
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
               }}</span
             >
@@ -465,12 +459,12 @@
               matTooltipClass="table__tooltip"
               mat-raised-button
               matTooltip="{{
-                deposit.interest
+                stake.interest
                   | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
               }}"
             >
               {{
-                deposit.interest
+                stake.interest
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
               }}</span
             >
@@ -478,16 +472,37 @@
           <td class="action-button">
             <button
               class="axn-btn axn-btn-gray"
-              (click)="depositWithdraw(deposit)"
-              [ngClass]="{ progress: deposit.withdrawProgress }"
-              [disabled]="deposit.withdrawProgress"
+              (click)="stakeWithdraw(stake)"
+              [ngClass]="{ progress: stake.withdrawProgress }"
+              [disabled]="stake.withdrawProgress"
+              *ngIf="!stake.isWithdrawn"
             >
-              <span class="lds-ellipsis" *ngIf="deposit.withdrawProgress">
+              <span class="lds-ellipsis" *ngIf="stake.withdrawProgress">
                 <span class="lds-ellipsis-container">
                   <span></span><span></span><span></span><span></span>
                 </span>
               </span>
               <span class="t-fw-light">&nbsp;&nbsp;Withdraw&nbsp;&nbsp;</span>
+            </button>
+            <button
+              class="axn-btn axn-btn-gray"
+              (click)="bpdWithdraw(stake)"
+              [ngClass]="{ progress: stake.withdrawProgress }"
+              [disabled]="stake.withdrawProgress"
+              *ngIf="
+                stake.isWithdrawn &&
+                stake.isBpdWithdraw &&
+                !stake.isBpdWithdrawn
+              "
+            >
+              <span class="lds-ellipsis" *ngIf="stake.withdrawProgress">
+                <span class="lds-ellipsis-container">
+                  <span></span><span></span><span></span><span></span>
+                </span>
+              </span>
+              <span class="t-fw-light"
+                >&nbsp;&nbsp;Withdraw BPD&nbsp;&nbsp;</span
+              >
             </button>
           </td>
         </tr>
@@ -496,13 +511,10 @@
   </div>
 </section>
 
-<section
-  class="axn-section"
-  *ngIf="depositsLists?.opened.length && tokensDecimals"
->
+<section class="axn-section" *ngIf="stakes?.active?.length && tokensDecimals">
   <div class="axn-form-block table-container p-20">
     <div class="axn-title-block p-20">
-      <span class="axn-title">Opened Deposits</span>
+      <span class="axn-title">Active Stakes</span>
     </div>
     <table class="standard-table" cellpadding="0" cellspacing="0" border="0">
       <thead>
@@ -518,37 +530,37 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let deposit of depositsLists.opened">
+        <tr *ngFor="let stake of stakes.active">
           <td>
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{ deposit.start | date: 'long' }}"
+              matTooltip="{{ stake.start | date: 'long' }}"
             >
-              {{ deposit.start | date: "shortDate" }}</span
+              {{ stake.start | date: "shortDate" }}</span
             >
           </td>
           <td>
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{ deposit.end | date: 'long' }}"
+              matTooltip="{{ stake.end | date: 'long' }}"
             >
-              {{ deposit.end | date: "shortDate" }}</span
+              {{ stake.end | date: "shortDate" }}</span
             >
           </td>
-          <td>{{ getProgress(deposit) }}%</td>
+          <td>{{ getProgress(stake) }}%</td>
           <td>
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
               matTooltip="{{
-                deposit.amount
+                stake.principal
                   | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
               }}"
             >
               {{
-                deposit.amount
+                stake.principal
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
               }}</span
             >
@@ -558,12 +570,12 @@
               matTooltipClass="table__tooltip"
               mat-raised-button
               matTooltip="{{
-                deposit.shares
+                stake.shares
                   | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
               }}"
             >
               {{
-                deposit.shares
+                stake.shares
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
               }}</span
             >
@@ -573,12 +585,12 @@
               matTooltipClass="table__tooltip"
               mat-raised-button
               matTooltip="{{
-                deposit.bigPayDay
+                stake.bigPayDay
                   | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
               }}"
             >
               {{
-                deposit.bigPayDay
+                stake.bigPayDay
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
               }}</span
             >
@@ -588,12 +600,12 @@
               matTooltipClass="table__tooltip"
               mat-raised-button
               matTooltip="{{
-                deposit.interest
+                stake.interest
                   | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
               }}"
             >
               {{
-                deposit.interest
+                stake.interest
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
               }}</span
             >
@@ -601,12 +613,12 @@
           <td class="action-button">
             <button
               class="axn-btn axn-btn-gray"
-              (click)="depositWithdraw(deposit)"
-              [ngClass]="{ progress: deposit.withdrawProgress }"
-              [disabled]="deposit.withdrawProgress"
-              *ngIf="!deposit.isWithdrawn"
+              (click)="stakeWithdraw(stake)"
+              [ngClass]="{ progress: stake.withdrawProgress }"
+              [disabled]="stake.withdrawProgress"
+              *ngIf="!stake.isWithdrawn"
             >
-              <span class="lds-ellipsis" *ngIf="deposit.withdrawProgress">
+              <span class="lds-ellipsis" *ngIf="stake.withdrawProgress">
                 <span class="lds-ellipsis-container">
                   <span></span><span></span><span></span><span></span>
                 </span>
@@ -615,17 +627,23 @@
             </button>
             <button
               class="axn-btn axn-btn-gray"
-              (click)="bpdWithdraw(deposit)"
-              [ngClass]="{ progress: deposit.withdrawProgress }"
-              [disabled]="deposit.withdrawProgress"
-              *ngIf="deposit.isWithdrawn && deposit.isBpdWithdraw && !deposit.isBpdWithdrawn"
+              (click)="bpdWithdraw(stake)"
+              [ngClass]="{ progress: stake.withdrawProgress }"
+              [disabled]="stake.withdrawProgress"
+              *ngIf="
+                stake.isWithdrawn &&
+                stake.isBpdWithdraw &&
+                !stake.isBpdWithdrawn
+              "
             >
-              <span class="lds-ellipsis" *ngIf="deposit.withdrawProgress">
+              <span class="lds-ellipsis" *ngIf="stake.withdrawProgress">
                 <span class="lds-ellipsis-container">
                   <span></span><span></span><span></span><span></span>
                 </span>
               </span>
-              <span class="t-fw-light">&nbsp;&nbsp;Withdraw BPD&nbsp;&nbsp;</span>
+              <span class="t-fw-light"
+                >&nbsp;&nbsp;Withdraw BPD&nbsp;&nbsp;</span
+              >
             </button>
           </td>
         </tr>
@@ -634,19 +652,17 @@
   </div>
 </section>
 
-<section
-  class="axn-section"
-  *ngIf="depositsLists?.closed.length && tokensDecimals"
->
+<section class="axn-section" *ngIf="stakes?.closed?.length && tokensDecimals">
   <div class="axn-form-block table-container p-20">
     <div class="axn-title-block p-20">
-      <span class="axn-title">Deposit History</span>
+      <span class="axn-title">Stake History</span>
     </div>
     <table class="standard-table" cellpadding="0" cellspacing="0" border="0">
       <thead>
         <tr>
           <th>Start</th>
-          <th>End</th>
+          <th>Target End</th>
+          <th>Actual End</th>
           <th>Principal</th>
           <th>BigPayDay</th>
           <th>Interest/Penalty</th>
@@ -654,20 +670,45 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let deposit of depositsLists.closed">
-          <td>{{ deposit.start | date: "shortDate" }}</td>
-          <td>{{ deposit.end | date: "shortDate" }}</td>
+        <tr *ngFor="let stake of stakes.closed">
+          <td>
+            <span
+              matTooltipClass="table__tooltip"
+              mat-raised-button
+              matTooltip="{{ stake.start | date: 'long' }}"
+            >
+              {{ stake.start | date: "shortDate" }}</span
+            >
+          </td>
+          <td>
+            <span
+              matTooltipClass="table__tooltip"
+              mat-raised-button
+              matTooltip="{{ stake.targetEnd | date: 'long' }}"
+            >
+              {{ stake.targetEnd | date: "shortDate" }}</span
+            >
+          </td>
+          <td>
+            <span
+              matTooltipClass="table__tooltip"
+              mat-raised-button
+              matTooltip="{{ stake.end | date: 'long' }}"
+            >
+              {{ stake.end | date: "shortDate" }}</span
+            >
+          </td>
           <td>
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
               matTooltip="{{
-                deposit.amount
+                stake.principal
                   | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
               }}"
             >
               {{
-                deposit.amount
+                stake.principal
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
               }}</span
             >
@@ -677,12 +718,12 @@
               matTooltipClass="table__tooltip"
               mat-raised-button
               matTooltip="{{
-                deposit.bigPayDay
+                stake.bigPayDay
                   | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
               }}"
             >
               {{
-                deposit.bigPayDay
+                stake.bigPayDay
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
               }}</span
             >
@@ -692,12 +733,12 @@
               matTooltipClass="table__tooltip"
               mat-raised-button
               matTooltip="{{
-                deposit.interest
+                stake.interest
                   | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
               }}"
             >
               {{
-                deposit.interest
+                stake.interest
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
               }}</span
             >
@@ -707,12 +748,82 @@
               matTooltipClass="table__tooltip"
               mat-raised-button
               matTooltip="{{
-                deposit.payout
+                stake.payout
                   | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
               }}"
             >
               {{
-                deposit.payout
+                stake.payout
+                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+              }}</span
+            >
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="axn-section" *ngIf="stakes?.closedV1?.length && tokensDecimals">
+  <div class="axn-form-block table-container p-20">
+    <div class="axn-title-block p-20">
+      <span class="axn-title">v1 Stake History</span>
+    </div>
+    <table class="standard-table" cellpadding="0" cellspacing="0" border="0">
+      <thead>
+        <tr>
+          <th>Start</th>
+          <th>Target End</th>
+          <th>Principal</th>
+          <th>BigPayDay</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let stake of stakes.closedV1">
+          <td>
+            <span
+              matTooltipClass="table__tooltip"
+              mat-raised-button
+              matTooltip="{{ stake.start | date: 'long' }}"
+            >
+              {{ stake.start | date: "shortDate" }}</span
+            >
+          </td>
+          <td>
+            <span
+              matTooltipClass="table__tooltip"
+              mat-raised-button
+              matTooltip="{{ stake.end | date: 'long' }}"
+            >
+              {{ stake.end | date: "shortDate" }}</span
+            >
+          </td>
+          <td>
+            <span
+              matTooltipClass="table__tooltip"
+              mat-raised-button
+              matTooltip="{{
+                stake.principal
+                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+              }}"
+            >
+              {{
+                stake.principal
+                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+              }}</span
+            >
+          </td>
+          <td>
+            <span
+              matTooltipClass="table__tooltip"
+              mat-raised-button
+              matTooltip="{{
+                stake.bigPayDay
+                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+              }}"
+            >
+              {{
+                stake.bigPayDay
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
               }}</span
             >
