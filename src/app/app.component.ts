@@ -150,7 +150,7 @@ export class AppComponent implements OnInit {
     body.className += themeName;
     this.theme = themeName;
 
-    this.cookieService.set("theme", themeName);
+    this.cookieService.set("theme", themeName, 5555);
   }
 
   public checkDays() {
