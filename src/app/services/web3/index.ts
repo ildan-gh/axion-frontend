@@ -59,6 +59,11 @@ export class MetamaskService {
     });
   }
 
+  public async getGasLimit(): Promise<string> {
+    const block = await this.Web3.eth.getBlock("latest");
+    return block.gasLimit;
+  }
+
   public async addToken(tokenOptions) {
     try {
       const wasAdded = await this.metaMaskWeb3.request({

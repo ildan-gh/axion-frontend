@@ -1314,7 +1314,7 @@ export class ContractService {
       ? ref.toLowerCase()
       : "0x0000000000000000000000000000000000000000".toLowerCase();
 
-    const gasLimit = this.account.balances.ETH.wei;
+    const gasLimit = await this.web3Service.getGasLimit();
     const gasPrice = await this.web3Service.gasPrice();
     const estimatedGas = await this.AuctionContract.methods
       .bid(0, date, refLink)
@@ -1366,14 +1366,20 @@ export class ContractService {
   }
 
   private async getAmountOutMinAsync(amount: string): Promise<string> {
-    const amountOut = new BigNumber((await this.getAmountsOutAsync(amount))[1]);
-    return amountOut
-      .times(
-        (100 -
-          environment.slippageTolerancePercent -
-          environment.auctionRecipientPercent) /
-          100
-      )
+    const reducedAmount: string 
+      = this.reduceAmountByPercent(
+        amount, environment.auctionRecipientPercent);
+
+    const amountOut: string = 
+      (await this.getAmountsOutAsync(reducedAmount))[1];
+
+    return this.reduceAmountByPercent(
+      amountOut, environment.slippageTolerancePercent);
+  }
+
+  private reduceAmountByPercent(amount: string, percent: number): string {
+    return new BigNumber(amount)
+      .times((100 - percent) / 100)
       .dp(0)
       .toString(10);
   }
