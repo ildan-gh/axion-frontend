@@ -341,9 +341,13 @@ export class StakingPageComponent implements OnDestroy {
 
   public confirmWithdrawData;
 
-  public stakeWithdraw(stake: Stake, withoutConfirm?) {
+  public async stakeWithdraw(stake: Stake, withoutConfirm?) {
     if (!withoutConfirm) {
-      if (!stake.penalty.isZero()) {
+      const result = await this.contractService.getStakePayoutAndPenalty(stake, stake.interest);
+      const payout = new BigNumber(result[0]);
+      const penalty = new BigNumber(result[1]);
+
+      if (!penalty.isZero()) {
         const openedWarning = this.dialog.open(this.warningModal, {});
         const oneDayInSeconds = this.contractService.getMSecondsInDay();
         const nowTS = Date.now();
@@ -351,12 +355,13 @@ export class StakingPageComponent implements OnDestroy {
         const endTwoWeeks = endTS + oneDayInSeconds * AVAILABLE_DAYS_AFTER_END;
         const late =
           nowTS < endTS ? "Early" : nowTS > endTwoWeeks ? "Late" : "Normal";
+          
         this.confirmWithdrawData = {
           stake,
           openedWarning,
-          penalty: stake.penalty,
+          penalty,
           late,
-          payOutAmount: stake.forWithdraw,
+          payout,
         };
         return;
       }

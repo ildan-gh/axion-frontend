@@ -841,12 +841,12 @@
     <div class="dialog-description">
       {{ confirmWithdrawData.late ? confirmWithdrawData.late : "" }} unstake!
       You will get
-      {{
-        confirmWithdrawData.payOutAmount
+      ~{{
+        confirmWithdrawData.payout
           | bigNumberFormat: tokensDecimals.HEX2X:true:false:2
       }}
       Axion,
-      {{
+      ~{{
         confirmWithdrawData.penalty
           | bigNumberFormat: tokensDecimals.HEX2X:true:false:2
       }}

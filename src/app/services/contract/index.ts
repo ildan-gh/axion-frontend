@@ -22,10 +22,8 @@ export interface Stake {
   sessionId: string;
   bigPayDay: BigNumber;
   interest: BigNumber;
-  penalty: BigNumber;
   payout: BigNumber;
   withdrawProgress?: boolean;
-  forWithdraw: BigNumber;
   firstPayout: string;
   lastPayout: number;
   isBpdWithdraw: boolean;
@@ -1118,18 +1116,7 @@ export class ContractService {
           )
           .call();
 
-        const payoutAndPenalty = await this.StakingContract.methods
-          .getAmountOutAndPenalty(
-            stake.principal,
-            stake.startSeconds,
-            stake.endSeconds,
-            stakingInterest
-          )
-          .call();
-
         stake.interest = new BigNumber(stakingInterest);
-        stake.penalty = new BigNumber(payoutAndPenalty[1]);
-        stake.forWithdraw = new BigNumber(payoutAndPenalty[0]);
       } else if (stake.isWithdrawn && !stake.isV1) {
         stake.payout = new BigNumber(stake.payout).plus(stake.bigPayDay);
         stake.interest = stake.payout.minus(stake.principal);
@@ -1167,6 +1154,17 @@ export class ContractService {
         );
       }),
     };
+  }
+
+  public async getStakePayoutAndPenalty(stake: Stake, stakingInterest: any) {
+    return await this.StakingContract.methods
+      .getAmountOutAndPenalty(
+        stake.principal,
+        stake.startSeconds,
+        stake.endSeconds,
+        stakingInterest
+      )
+      .call();
   }
 
   private getV1StakePromises(stakeV1Ids: any, nowMs: number): Promise<Stake>[] {
@@ -1207,9 +1205,7 @@ export class ContractService {
         sessionId: stakeId,
         bigPayDay: bigPayDay,
         interest: null,
-        penalty: null,
         payout: null,
-        forWithdraw: null,
         firstPayout: stakeSession.nextPayout,
         lastPayout:
           (stakeSession.end - stakeSession.start) /
@@ -1260,9 +1256,7 @@ export class ContractService {
         sessionId: stakeId,
         bigPayDay: bigPayDay,
         interest: null,
-        penalty: null,
         payout: stakeSession.payout,
-        forWithdraw: null,
         firstPayout: stakeSession.firstPayout,
         lastPayout: stakeSession.lastPayout,
         isMatured: nowMs > endMs,
