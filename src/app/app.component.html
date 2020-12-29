@@ -177,21 +177,32 @@
       <span class="repeat-content" *ngFor="let item of runLineCountArray">
         <ng-container *ngIf="chainNetwork === 'rinkeby'">
           <b
-            >{{ leftDaysInfo.showTime.h }}h {{ leftDaysInfo.showTime.m }}m
-            {{ leftDaysInfo.showTime.s }}s</b
+            >{{ leftDaysInfoHex.showTime.h }}h {{ leftDaysInfoHex.showTime.m }}m
+            {{ leftDaysInfoHex.showTime.s }}s</b
           >
         </ng-container>
-        <ng-container *ngIf="chainNetwork === 'ropsten'">
-          <b>{{ leftDaysInfo?.dateEnd }}</b
-          >&nbsp;<b>Days</b>
+        <ng-container *ngIf="chainNetwork === 'ropsten' && hexFreeclaimInfoShow">
+          <b>{{ leftDaysInfoHex?.axnLeftToClaim.toLocaleString() }}</b>&nbsp;<b>AXN</b>&nbsp;or
+          <b>{{ leftDaysInfoHex?.dateEnd }}</b>&nbsp;<b>Days</b>
         </ng-container>
+
+        <ng-container *ngIf="chainNetwork === 'mainnet' && hexFreeclaimInfoShow">
+          <b>{{ leftDaysInfoHex?.axnLeftToClaim.toLocaleString() }}</b>&nbsp;<b>AXN</b>&nbsp;or
+          <b>{{ leftDaysInfoHex?.dateEnd }}</b>&nbsp;<b>Days</b>
+        </ng-container>
+
+        <span *ngIf="bannerForClaim && hexFreeclaimInfoShow">left for HEX freeclaims.</span>
 
         <ng-container *ngIf="chainNetwork === 'mainnet'">
-          <b>{{ leftDaysInfo?.dateEnd }}</b
-          >&nbsp;<b>Days</b>
+          <b>{{ leftDaysInfoHex3t.leftDays }}</b>&nbsp;<b>Days</b>
         </ng-container>
 
-        <span *ngIf="bannerForClaim">left for Claiming AXN</span>
+        <ng-container *ngIf="chainNetwork === 'ropsten'">
+          <b>{{ leftDaysInfoHex3t.leftDays }}</b>&nbsp;<b>Days</b>
+        </ng-container>
+
+        <span *ngIf="bannerForClaim">left for HEX3T conversions!</span>
+
       </span>
     </ng-container>
     <ng-container *ngIf="!leftDaysInfoShow || !account || !bannerForClaim">

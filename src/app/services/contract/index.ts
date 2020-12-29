@@ -85,7 +85,8 @@ export class ContractService {
       checkerAuctionPool: 5000,
       checkerStakingInfo: 3600000,
       checkerBPD: 3600000,
-
+      freeclaimEndTime: 1611859352000, // Jan-28-2021 06:42:32 PM UTC
+      
       production: false,
       network: "ropsten",
       chainsForButtonAddToMetamask: [1, 3, 4],
@@ -108,7 +109,6 @@ export class ContractService {
     },
   };
 
-  private swapDaysPeriod: any;
   private secondsInDay: any;
   private startDate: any;
   private leftDays: any;
@@ -129,8 +129,7 @@ export class ContractService {
       }
       const oldLeftDays = this.leftDays;
 
-      const finishDate =
-        this.startDate * 1000 + this.swapDaysPeriod * this.secondsInDay * 1000;
+      const finishDate = this.settingsApp.settings.freeclaimEndTime;
       this.leftDays = Math.floor(
         (finishDate - new Date().getTime()) / (this.secondsInDay * 1000)
       );
@@ -793,7 +792,7 @@ export class ContractService {
     }
   }
 
-  public getEndDateTime() {
+  public getEndDateTimeHex3t() {
     return this.ForeignSwapContract.methods
       .stepTimestamp()
       .call()
@@ -810,7 +809,6 @@ export class ContractService {
                 const fullStartDate = startDate * 1000;
                 const endDateTime = fullStartDate + allDaysSeconds;
 
-                this.swapDaysPeriod = swapDaysPeriod;
                 this.secondsInDay = secondsInDay;
                 this.startDate = startDate;
 
@@ -836,25 +834,29 @@ export class ContractService {
       });
   }
 
-  public getEndDateTimeCurrent() {
+  public getEndDateTimeHex() {
     return new Promise((resolve) => {
-      const allDaysSeconds = this.swapDaysPeriod * this.secondsInDay * 1000;
-      const fullStartDate = this.startDate * 1000;
-      const endDateTime = fullStartDate + allDaysSeconds;
+      this.ForeignSwapContract.methods.finalClaimedAmount().call().then(amount => {
+        const axnLeftToClaim = Math.round(new BigNumber("10000000000000000000000000000").minus(amount).div(new BigNumber(10).pow(18)).toNumber());
 
-      const a = new Date(endDateTime).getTime();
-      const b = Date.now();
+        const fullStartDate = this.startDate * 1000;
+        const endDateTime = this.settingsApp.settings.freeclaimEndTime;
 
-      const leftDays = Math.floor((a - b) / (this.secondsInDay * 1000));
-      const dateEnd = leftDays;
-      const showTime = leftDays;
+        const a = new Date(endDateTime).getTime();
+        const b = Date.now();
 
-      resolve({
-        startDate: fullStartDate,
-        endDate: endDateTime,
-        dateEnd,
-        leftDays,
-        showTime,
+        const leftDays = Math.floor((a - b) / (this.secondsInDay * 1000));
+        const dateEnd = leftDays;
+        const showTime = leftDays;
+
+        resolve({
+          startDate: fullStartDate,
+          endDate: endDateTime,
+          axnLeftToClaim,
+          dateEnd,
+          leftDays,
+          showTime,
+        });
       });
     });
   }
@@ -1004,7 +1006,7 @@ export class ContractService {
             value: getStartTimes,
           };
         }),
-      this.getEndDateTime().then((dateInfo) => {
+      this.getEndDateTimeHex3t().then((dateInfo) => {
         return {
           key: "dateInfo",
           value: dateInfo,
@@ -1860,6 +1862,6 @@ export class ContractService {
 
     this.AxnTokenAddress = this.CONTRACTS_PARAMS.HEX.ADDRESS;
 
-    this.getEndDateTime();
+    this.getEndDateTimeHex3t();
   }
 }

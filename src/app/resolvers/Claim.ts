@@ -18,10 +18,9 @@ export class ClaimResolver implements Resolve<any> {
   resolve() {
     return new Observable((observer) => {
       this.contractService
-        .getEndDateTime()
+        .getEndDateTimeHex3t()
         .then((result: { leftDays: number }) => {
           const leftDaysInfoShow = result.leftDays > 0;
-          // const leftDaysInfoShow = true;
           if (leftDaysInfoShow) {
             this.continue(observer);
           } else {

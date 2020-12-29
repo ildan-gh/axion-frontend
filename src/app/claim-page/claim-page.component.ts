@@ -67,7 +67,7 @@ export class ClaimPageComponent implements OnInit, OnDestroy {
     if (this.leftDaysInfoChecker) {
       setTimeout(() => {
         this.contractService
-          .getEndDateTimeCurrent()
+          .getEndDateTimeHex3t()
           .then((result: { leftDaysInfo: number }) => {
             if (result.leftDaysInfo < 0) {
               this.leftDaysInfoChecker = false;
@@ -89,7 +89,7 @@ export class ClaimPageComponent implements OnInit, OnDestroy {
             this.account = account;
             if (account) {
               this.contractService
-                .getEndDateTimeCurrent()
+                .getEndDateTimeHex3t()
                 .then((result: { leftDaysInfo: number }) => {
                   if (result.leftDaysInfo < 0) {
                     this.leftDaysInfoChecker = false;

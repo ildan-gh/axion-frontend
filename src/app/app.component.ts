@@ -17,8 +17,10 @@ export class AppComponent implements OnInit {
   public isHeaderActive;
   public account;
   private accountSubscribe;
-  public leftDaysInfo;
+  public leftDaysInfoHex;
+  public leftDaysInfoHex3t;
   public leftDaysInfoShow = false;
+  public hexFreeclaimInfoShow = false;
   public leftDaysInfoChecker = false;
   public addToMetamask = false;
   public theme = "white";
@@ -88,16 +90,18 @@ export class AppComponent implements OnInit {
           this.accountSubscribe.unsubscribe();
           this.subscribeAccount();
 
-          this.contractService.getEndDateTime().then((result) => {
-            this.leftDaysInfo = result;
-            this.leftDaysInfoShow = this.leftDaysInfo.leftDays > 0;
-
-            if (this.leftDaysInfoShow) {
-              this.leftDaysInfoChecker = true;
-              // if (this.account) {
-              this.checkDays();
-              // }
-            }
+          this.contractService.getEndDateTimeHex().then((hexEndInfo) => {
+            this.contractService.getEndDateTimeHex3t().then((hex3tEndInfo) => {
+              this.leftDaysInfoHex = hexEndInfo;
+              this.leftDaysInfoHex3t = hex3tEndInfo;
+              
+              this.hexFreeclaimInfoShow = this.leftDaysInfoHex.leftDays > 0;
+              this.leftDaysInfoShow = this.leftDaysInfoHex3t.leftDays > 0;
+              if (this.leftDaysInfoShow) {
+                this.leftDaysInfoChecker = true;
+                this.checkDays();
+              }
+            })
           });
         }
       });
@@ -156,16 +160,20 @@ export class AppComponent implements OnInit {
   public checkDays() {
     if (this.leftDaysInfoChecker) {
       setTimeout(() => {
-        this.contractService.getEndDateTimeCurrent().then((result) => {
-          this.leftDaysInfo = result;
-          this.leftDaysInfoShow = this.leftDaysInfo.leftDays > 0;
-          if (!this.leftDaysInfoShow) {
-            this.leftDaysInfoChecker = false;
-          } else {
-            this.checkDays();
-            // console.log("app days checker", result);
-          }
-        });
+        this.contractService.getEndDateTimeHex().then((hexDaysLeftInfo) => {
+          this.contractService.getEndDateTimeHex3t().then((hex3tDaysLeftInfo) => {
+            this.leftDaysInfoHex = hexDaysLeftInfo;
+            this.leftDaysInfoHex3t = hex3tDaysLeftInfo;
+
+            this.hexFreeclaimInfoShow = this.leftDaysInfoHex.leftDays > 0;
+            this.leftDaysInfoShow = this.leftDaysInfoHex3t.leftDays > 0;
+            if (!this.leftDaysInfoShow) {
+              this.leftDaysInfoChecker = false;
+            } else {
+              this.checkDays();
+            }
+          });
+        })
       }, 1000);
     }
   }
