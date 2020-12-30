@@ -47,13 +47,17 @@ export class AuctionPageComponent implements OnDestroy {
 
   public formsData: {
     auctionAmount?: string;
+    autostakeDays?: number;
   } = {};
 
   public referalLink = "";
+  public stakeMaxDays = 5555;
   public referalAddress = "";
   public addressCopy = false;
   public auctionPoolChecker = false;
   public currentAuctionDate = new Date();
+
+  public today = new Date().getTime();
 
   public dataSendForm = false;
   public newAuctionDay = false;
@@ -79,7 +83,7 @@ export class AuctionPageComponent implements OnDestroy {
   private settings: any = {};
 
   constructor(
-    private contractService: ContractService,
+    public contractService: ContractService,
     private cookieService: CookieService,
     private ngZone: NgZone,
     private appComponent: AppComponent,
@@ -256,21 +260,36 @@ export class AuctionPageComponent implements OnDestroy {
       }
     }
 
+    // Make sure number of days is between 14 and 5555
+    // This check is also made in the contract, may not be needed here too.
+    // this.contractService.autoStakeDays <-- Min auto stake days
+    const minimumAutoStake = this.contractService.autoStakeDays;
+    const autoStakeDays = this.formsData.autostakeDays;
+
+    const actualDays =
+      autoStakeDays < minimumAutoStake
+        ? minimumAutoStake
+        : autoStakeDays > this.stakeMaxDays
+        ? this.stakeMaxDays
+        : autoStakeDays;
+
     this.sendAuctionProgress = true;
 
     const callMethod =
       this.formsData.auctionAmount === this.account.balances.ETH.wei
-        ? "sendMaxETHToAuction"
-        : "sendETHToAuction";
+        ? "sendMaxETHToAuctionV2"
+        : "sendETHToAuctionV2";
 
     this.contractService[callMethod](
       this.formsData.auctionAmount,
+      actualDays,
       this.cookieService.get("ref")
     )
       .then(
         ({ transactionHash }) => {
           this.contractService.updateETHBalance(true).then(() => {
             this.formsData.auctionAmount = undefined;
+            this.formsData.autostakeDays = undefined;
           });
         },
         (err) => {
@@ -305,7 +324,7 @@ export class AuctionPageComponent implements OnDestroy {
   public bidWithdraw(bid) {
     bid.withdrawProgress = true;
 
-    if (!bid.isV1){
+    if (!bid.isV1) {
       this.contractService
         .withdrawFromAuction(bid.auctionId)
         .then(() => {

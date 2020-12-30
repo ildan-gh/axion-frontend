@@ -86,7 +86,7 @@ export class ContractService {
       checkerStakingInfo: 3600000,
       checkerBPD: 3600000,
       freeclaimEndTime: 1611859352000, // Jan-28-2021 06:42:32 PM UTC
-      
+
       production: false,
       network: "ropsten",
       chainsForButtonAddToMetamask: [1, 3, 4],
@@ -119,6 +119,7 @@ export class ContractService {
 
   private dayEndSubscribers: Subscriber<any>[] = [];
 
+  public autoStakeDays: number;
   private discountPercent: number;
   private premiumPercent: number;
 
@@ -245,9 +246,9 @@ export class ContractService {
       this.web3Service.getAccounts().subscribe(async (account: any) => {
         if (account) {
           this.initializeContracts();
-          const options = await this.AuctionContract.methods
-            .options().call();
+          const options = await this.AuctionContract.methods.options().call();
 
+          this.autoStakeDays = +options.autoStakeDays;
           this.discountPercent = +options.discountPercent;
           this.premiumPercent = +options.premiumPercent;
 
@@ -836,28 +837,36 @@ export class ContractService {
 
   public getEndDateTimeHex() {
     return new Promise((resolve) => {
-      this.ForeignSwapContract.methods.finalClaimedAmount().call().then(amount => {
-        const axnLeftToClaim = Math.round(new BigNumber("10000000000000000000000000000").minus(amount).div(new BigNumber(10).pow(18)).toNumber());
+      this.ForeignSwapContract.methods
+        .finalClaimedAmount()
+        .call()
+        .then((amount) => {
+          const axnLeftToClaim = Math.round(
+            new BigNumber("10000000000000000000000000000")
+              .minus(amount)
+              .div(new BigNumber(10).pow(18))
+              .toNumber()
+          );
 
-        const fullStartDate = this.startDate * 1000;
-        const endDateTime = this.settingsApp.settings.freeclaimEndTime;
+          const fullStartDate = this.startDate * 1000;
+          const endDateTime = this.settingsApp.settings.freeclaimEndTime;
 
-        const a = new Date(endDateTime).getTime();
-        const b = Date.now();
+          const a = new Date(endDateTime).getTime();
+          const b = Date.now();
 
-        const leftDays = Math.floor((a - b) / (this.secondsInDay * 1000));
-        const dateEnd = leftDays;
-        const showTime = leftDays;
+          const leftDays = Math.floor((a - b) / (this.secondsInDay * 1000));
+          const dateEnd = leftDays;
+          const showTime = leftDays;
 
-        resolve({
-          startDate: fullStartDate,
-          endDate: endDateTime,
-          axnLeftToClaim,
-          dateEnd,
-          leftDays,
-          showTime,
+          resolve({
+            startDate: fullStartDate,
+            endDate: endDateTime,
+            axnLeftToClaim,
+            dateEnd,
+            leftDays,
+            showTime,
+          });
         });
-      });
     });
   }
 
@@ -1085,9 +1094,9 @@ export class ContractService {
       .sessionsOf_(this.account.address)
       .call();
 
-    const lastStakeV1Id: number = +await this.StakingContract.methods
+    const lastStakeV1Id: number = +(await this.StakingContract.methods
       .lastSessionIdV1()
-      .call();
+      .call());
 
     const stakeV1Ids: string[] = (
       await this.StakingV1Contract.methods
@@ -1122,37 +1131,41 @@ export class ContractService {
       } else if (stake.isWithdrawn && !stake.isV1) {
         stake.payout = new BigNumber(stake.payout).plus(stake.bigPayDay);
         stake.interest = stake.payout.minus(stake.principal);
-        stake.targetEnd = new Date(new BigNumber(stake.lastPayout)
-          .minus(stake.firstPayout)
-          .times(this.secondsInDay * 1000)
-          .plus(stake.start.getTime())
-          .toNumber());
+        stake.targetEnd = new Date(
+          new BigNumber(stake.lastPayout)
+            .minus(stake.firstPayout)
+            .times(this.secondsInDay * 1000)
+            .plus(stake.start.getTime())
+            .toNumber()
+        );
       }
     }
 
     return {
       closed: stakes.filter((stake: Stake) => {
         return (
-          !stake.isV1 && stake.isWithdrawn && (!stake.isBpdWithdraw ||
-          stake.isBpdWithdrawn)
+          !stake.isV1 &&
+          stake.isWithdrawn &&
+          (!stake.isBpdWithdraw || stake.isBpdWithdrawn)
         );
       }),
       active: stakes.filter((stake: Stake) => {
         return (
-          !stake.isMatured && (!stake.isWithdrawn ||
-          stake.isBpdWithdraw && !stake.isBpdWithdrawn)
+          !stake.isMatured &&
+          (!stake.isWithdrawn || (stake.isBpdWithdraw && !stake.isBpdWithdrawn))
         );
       }),
       matured: stakes.filter((stake: Stake) => {
         return (
-          stake.isMatured && (!stake.isWithdrawn ||
-          stake.isBpdWithdraw && !stake.isBpdWithdrawn)
+          stake.isMatured &&
+          (!stake.isWithdrawn || (stake.isBpdWithdraw && !stake.isBpdWithdrawn))
         );
       }),
       closedV1: stakes.filter((stake: Stake) => {
         return (
-          stake.isV1 && stake.isWithdrawn && (!stake.isBpdWithdraw ||
-          stake.isBpdWithdrawn)
+          stake.isV1 &&
+          stake.isWithdrawn &&
+          (!stake.isBpdWithdraw || stake.isBpdWithdrawn)
         );
       }),
     };
@@ -1189,8 +1202,9 @@ export class ContractService {
           bpdSession.sessionEnd,
           0,
           bpdSession.shares,
-          bpdPayDayEligible 
-        ).call();
+          bpdPayDayEligible
+        )
+        .call();
 
       const endMs = stakeSession.end * 1000;
       const amount = new BigNumber(stakeSession.amount);
@@ -1236,12 +1250,13 @@ export class ContractService {
 
       const bigPayDayPayout = await this.SubBalanceContract.methods
         .calculateSessionPayout(
-          bpdSession.start, 
-          bpdSession.end, 
-          bpdSession.finishTime, 
-          bpdSession.shares, 
+          bpdSession.start,
+          bpdSession.end,
+          bpdSession.finishTime,
+          bpdSession.shares,
           bpdSession.payDayEligible
-        ).call();
+        )
+        .call();
 
       const endMs = stakeSession.end * 1000;
       const amount = new BigNumber(stakeSession.amount);
@@ -1295,11 +1310,9 @@ export class ContractService {
   }
 
   public async bpdWithdraw(sessionId) {
-    await this.SubBalanceContract.methods
-      .withdrawPayout(sessionId)
-      .send({
-        from: this.account.address
-      });
+    await this.SubBalanceContract.methods.withdrawPayout(sessionId).send({
+      from: this.account.address,
+    });
   }
 
   public async sendMaxETHToAuction(amount, ref?) {
@@ -1361,16 +1374,78 @@ export class ContractService {
       });
   }
 
-  private async getAmountOutMinAsync(amount: string): Promise<string> {
-    const reducedAmount: string 
-      = this.reduceAmountByPercent(
-        amount, environment.auctionRecipientPercent);
+  public async sendETHToAuctionV2(amount, days, ref?) {
+    const date = Math.round(
+      (new Date().getTime() + 24 * 60 * 60 * 1000) / 1000
+    );
+    const refLink = ref
+      ? ref.toLowerCase()
+      : "0x0000000000000000000000000000000000000000".toLowerCase();
 
-    const amountOut: string = 
-      (await this.getAmountsOutAsync(reducedAmount))[1];
+    const amountOutMin = await this.getAmountOutMinAsync(amount);
+
+    return this.AuctionContract.methods
+      .bid(amountOutMin, date, refLink, days)
+      .send({
+        from: this.account.address,
+        value: amount,
+      })
+      .then((res) => {
+        return this.checkTransaction(res);
+      });
+  }
+
+  public async sendMaxETHToAuctionV2(amount, days, ref?) {
+    const date = Math.round(
+      (new Date().getTime() + 24 * 60 * 60 * 1000) / 1000
+    );
+    const refLink = ref
+      ? ref.toLowerCase()
+      : "0x0000000000000000000000000000000000000000".toLowerCase();
+
+    const gasLimit = await this.web3Service.getGasLimit();
+    const gasPrice = await this.web3Service.gasPrice();
+    const estimatedGas = await this.AuctionContract.methods
+      .bid(0, date, refLink, days)
+      .estimateGas({
+        from: this.account.address,
+        gas: gasLimit,
+        value: amount,
+      });
+
+    const newAmount = new BigNumber(amount).minus(estimatedGas * gasPrice);
+
+    if (newAmount.isNegative()) {
+      throw new Error("Not enough gas");
+    }
+
+    const amountOutMin = await this.getAmountOutMinAsync(newAmount.toString());
+
+    return this.AuctionContract.methods
+      .bid(amountOutMin, date, refLink, days)
+      .send({
+        from: this.account.address,
+        value: newAmount,
+        gasPrice,
+        gasLimit: estimatedGas,
+      })
+      .then((res) => {
+        return this.checkTransaction(res);
+      });
+  }
+
+  private async getAmountOutMinAsync(amount: string): Promise<string> {
+    const reducedAmount: string = this.reduceAmountByPercent(
+      amount,
+      environment.auctionRecipientPercent
+    );
+
+    const amountOut: string = (await this.getAmountsOutAsync(reducedAmount))[1];
 
     return this.reduceAmountByPercent(
-      amountOut, environment.slippageTolerancePercent);
+      amountOut,
+      environment.slippageTolerancePercent
+    );
   }
 
   private reduceAmountByPercent(amount: string, percent: number): string {
@@ -1494,9 +1569,9 @@ export class ContractService {
       .auctionsOf_(this.account.address)
       .call();
 
-    const lastAuctionV1Id: number = +await this.AuctionContract.methods
+    const lastAuctionV1Id: number = +(await this.AuctionContract.methods
       .lastAuctionEventIdV1()
-      .call();
+      .call());
 
     const auctionV1Ids: string[] = (
       await this.AuctionV1Contract.methods

@@ -84,7 +84,7 @@
   &__axion-small {
     @include before-img(block, 18px, 16px, r) {
       background-size: cover;
-      background-image: url("assets/images/icons/axion-icon.svg");
+      background-image: url("assets/images/icons/axion-icon.png");
     }
   }
 
@@ -105,7 +105,7 @@
 
   &__axion {
     @include before-img(block, 28px, 24px, r) {
-      background-image: url("assets/images/icons/axion-icon.svg");
+      background-image: url("assets/images/icons/axion-icon.png");
     }
   }
 
