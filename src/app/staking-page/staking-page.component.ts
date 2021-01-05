@@ -269,9 +269,13 @@ export class StakingPageComponent implements OnDestroy {
   }
 
   public onRestakeDaysChanged() {
-    this.actionsModalData.shares = this.userSharesRestake;
-    this.actionsModalData.lpb = this.bonusLongerPaysBetterRestake;
-    this.actionsModalData.totalShares = this.userSharesRestake.plus(this.bonusLongerPaysBetterRestake)
+    const shares = this.userSharesRestake;
+    this.actionsModalData.shares = shares;
+
+    const LPB = this.bonusLongerPaysBetterRestake;
+    this.actionsModalData.lpb = LPB;
+
+    this.actionsModalData.totalShares = shares.plus(LPB)
   }
 
   public onChangeAmount() {
