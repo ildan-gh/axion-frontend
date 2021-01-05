@@ -36,6 +36,7 @@ export class StakingPageComponent implements OnDestroy {
   public hasBigPayDay = false;
   public stakeEndDate: any;
   public startDay = new Date();
+  public today = new Date().getTime();
   public share: any = {};
   public onChangeAccount: EventEmitter<any> = new EventEmitter();
   public formsData: {
@@ -63,6 +64,11 @@ export class StakingPageComponent implements OnDestroy {
     static: true,
   })
   warningModal: TemplateRef<any>;
+
+  @ViewChild("actionsModal", {
+    static: true,
+  })
+  actionsModal: TemplateRef<any>;
 
   public stakingContractInfo: StakingInfoInterface = {
     ShareRate: 0,
@@ -332,6 +338,31 @@ export class StakingPageComponent implements OnDestroy {
         return Number(a.sessionId) < Number(b.sessionId) ? 1 : -1;
       });
     }
+  }
+
+  public actionsModalData;
+
+  public openStakeActions(stake: Stake) {
+    this.actionsModalData = {
+      opened: this.dialog.open(this.actionsModal, {}),
+      stake,
+      stakeDays: 0
+    }
+  }
+
+  public successWithPenaltyActions(stake: Stake) {
+    this.actionsModalData.opened.close();
+    this.stakeWithdraw(stake, true);
+  }
+
+  public reStake(stake: Stake, stakingDays: number) {    
+    this.contractService.restake(stake, stakingDays).then(() => {
+      this.stakeList();
+      this.contractService.updateHEX2XBalance(true);
+    }).finally(() => {
+      stake.withdrawProgress = false;
+      this.actionsModalData.opened.close();
+    })
   }
 
   public successWithPenalty() {

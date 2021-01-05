@@ -1319,6 +1319,17 @@ export class ContractService {
       });
   }
 
+  public restake(stake: Stake, stakeDays) {
+    const restakeMethod = stake.isV1 ? 'reStakeV1' : 'reStake';
+
+    return this.StakingContract.methods[restakeMethod](stake.sessionId, stakeDays).send({
+        from: this.account.address,
+      })
+      .then((res) => {
+        return this.checkTransaction(res);
+      });
+  }
+
   public async bpdWithdraw(sessionId) {
     await this.SubBalanceContract.methods.withdrawPayout(sessionId).send({
       from: this.account.address,

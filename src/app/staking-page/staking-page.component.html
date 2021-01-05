@@ -472,7 +472,7 @@
           <td class="action-button">
             <button
               class="axn-btn axn-btn-gray"
-              (click)="stakeWithdraw(stake)"
+              (click)="openStakeActions(stake)"
               [ngClass]="{ progress: stake.withdrawProgress }"
               [disabled]="stake.withdrawProgress"
               *ngIf="!stake.isWithdrawn"
@@ -482,7 +482,7 @@
                   <span></span><span></span><span></span><span></span>
                 </span>
               </span>
-              <span class="t-fw-light">&nbsp;&nbsp;Withdraw&nbsp;&nbsp;</span>
+              <span class="t-fw-light">&nbsp;&nbsp;Actions&nbsp;&nbsp;</span>
             </button>
             <button
               class="axn-btn axn-btn-gray"
@@ -834,6 +834,7 @@
   </div>
 </section>
 
+<!-- Early/Late Unstake Warning Modal -->
 <ng-template #warningModal class="dialog-block" mat-dialog-content>
   <div class="dialog-block__content">
     <div class="dialog-title">Attention!</div>
@@ -863,6 +864,67 @@
         (click)="successWithPenalty()"
       >
         <span>Ok</span>
+      </button>
+    </div>
+  </div>
+</ng-template>
+
+
+<!-- Unstake Modal -->
+<ng-template #actionsModal class="dialog-block" mat-dialog-content>
+  <div class="dialog-block__content">
+    <div class="dialog-title">Stake Actions</div>
+
+    <div class="dialog-description">
+      <div>
+        <p>
+          <span style="font-weight: bold;">Withdraw</span><br/>
+          Receive liquid AXN from this completed stake.
+        </p>
+        <p>
+          <span style="font-weight: bold;">Restake</span><br />
+          Put your AXN (principal + interest) from this completed stake into a new stake in one transaction.<br/>
+          Just enter the length of the new stake below, and then click "Restake".
+        </p>
+
+        <div class="axn-form-block-one">
+          <span class="axn-form-block-one-title">Set Restake Period</span>
+          <input 
+            class="axn-input" 
+            style="width: auto;font-size: 1.5rem;"
+            type="number" 
+            step="1" 
+            min="1" 
+            [max]="stakeMaxDays" 
+            placeholder="0"
+            required="required" 
+            name="stake-days"
+            autocomplete="off" 
+            onblur="this.placeholder = '0'" 
+            onfocus="this.placeholder = ''" 
+            [(ngModel)]="actionsModalData.stakingDays" 
+            [appMinMaxNumber]="{
+              min: 1,
+              max: stakeMaxDays
+            }" 
+          />
+          <span class="axn-cheap cl-blue-bg" style="text-transform: none;">{{today + (actionsModalData.stakingDays * 24 * 60 * 60 * 1000) | date: "MMM d, y"}}</span>
+          <div class="axn-form-block-sendmax axn-form-bottom-mid">
+            <span class="axn-btn axn-btn-max" (click)="actionsModalData.stakingDays = stakeMaxDays;">Max Days</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dialog-bottom">
+      <button class="axn-btn axn-btn-gray" type="button" mat-dialog-close>
+        <span>Close</span>
+      </button>
+      <button class="axn-btn axn-btn-gray" [disabled]="!actionsModalData.stakingDays" type="button" (click)="reStake(actionsModalData.stake, actionsModalData.stakingDays)">
+        <span>Restake</span>
+      </button>
+      <button class="axn-btn axn-btn-gray" type="button" (click)="successWithPenaltyActions(actionsModalData.stake)">
+        <span>Withdraw</span>
       </button>
     </div>
   </div>
