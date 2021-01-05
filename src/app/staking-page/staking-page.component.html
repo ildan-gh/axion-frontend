@@ -888,7 +888,16 @@
         </p>
 
         <div class="axn-form-block-one">
-          <span class="axn-form-block-one-title">Set Restake Period</span>
+          <div>
+            <p *ngIf="actionsModalData.stake.principal && actionsModalData.stake.interest" style="text-transform: none;">
+              Stake Amount: {{actionsModalData.amount | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}} AXN<br/>
+              Given Shares: {{actionsModalData.shares | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}}<br />
+              Longer Pays Better: {{actionsModalData.lpb | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}}<br />
+              Total Shares: {{actionsModalData.totalShares | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}}
+            </p>
+          </div>
+          
+          <span class="axn-form-block-one-title" style="text-transform: none; font-size: 1rem;">Restake Period</span>
           <input 
             class="axn-input" 
             style="width: auto;font-size: 1.5rem;"
@@ -902,6 +911,7 @@
             autocomplete="off" 
             onblur="this.placeholder = '0'" 
             onfocus="this.placeholder = ''" 
+            (ngModelChange)="onRestakeDaysChanged()"
             [(ngModel)]="actionsModalData.stakingDays" 
             [appMinMaxNumber]="{
               min: 1,
@@ -918,12 +928,12 @@
 
     <div class="dialog-bottom">
       <button class="axn-btn axn-btn-gray" type="button" mat-dialog-close>
-        <span>Close</span>
+        <span>Cancel</span>
       </button>
-      <button class="axn-btn axn-btn-gray" [disabled]="!actionsModalData.stakingDays" type="button" (click)="reStake(actionsModalData.stake, actionsModalData.stakingDays)">
+      <button class="axn-btn axn-btn-gray" style="background-color: #353c56;" [disabled]="!actionsModalData.stakingDays" type="button" (click)="reStake(actionsModalData.stake, actionsModalData.stakingDays)">
         <span>Restake</span>
       </button>
-      <button class="axn-btn axn-btn-gray" type="button" (click)="successWithPenaltyActions(actionsModalData.stake)">
+      <button class="axn-btn axn-btn-gray" style="background-color: #353c56;" type="button" (click)="successWithPenaltyActions(actionsModalData.stake)">
         <span>Withdraw</span>
       </button>
     </div>

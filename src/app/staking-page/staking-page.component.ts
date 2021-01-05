@@ -241,6 +241,13 @@ export class StakingPageComponent implements OnDestroy {
       .div(stakingMaxDays);
   }
 
+  get bonusLongerPaysBetterRestake() {
+    const currentValue = new BigNumber(this.actionsModalData.amount || 0);
+    return currentValue
+      .times((this.actionsModalData.stakingDays || 1) - 1)
+      .div(stakingMaxDays);
+  }
+
   get userShares() {
     const divDecimals = Math.pow(10, this.tokensDecimals.HEX2X);
     return new BigNumber(this.formsData.stakeAmount || 0)
@@ -250,8 +257,21 @@ export class StakingPageComponent implements OnDestroy {
       .times(divDecimals);
   }
 
+  get userSharesRestake() {
+    const divDecimals = Math.pow(10, this.tokensDecimals.HEX2X);
+    const shareRate = new BigNumber(this.stakingContractInfo.ShareRate || 0).div(divDecimals);
+    const amount = new BigNumber(this.actionsModalData.amount || 0).div(divDecimals);
+    return amount.div(shareRate).times(divDecimals);
+  }
+
   get stakeDaysInvalid() {
     return (this.formsData.stakeDays || 0) > this.stakeMaxDays;
+  }
+
+  public onRestakeDaysChanged() {
+    this.actionsModalData.shares = this.userSharesRestake;
+    this.actionsModalData.lpb = this.bonusLongerPaysBetterRestake;
+    this.actionsModalData.totalShares = this.userSharesRestake.plus(this.bonusLongerPaysBetterRestake)
   }
 
   public onChangeAmount() {
@@ -346,7 +366,8 @@ export class StakingPageComponent implements OnDestroy {
     this.actionsModalData = {
       opened: this.dialog.open(this.actionsModal, {}),
       stake,
-      stakeDays: 0
+      stakeDays: 0,
+      amount: stake.principal.plus(stake.interest)
     }
   }
 
