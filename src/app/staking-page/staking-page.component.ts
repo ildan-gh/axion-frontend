@@ -377,7 +377,7 @@ export class StakingPageComponent implements OnDestroy {
 
   public successWithPenaltyActions(stake: Stake) {
     this.actionsModalData.opened.close();
-    this.stakeWithdraw(stake, true);
+    this.stakeWithdraw(stake);
   }
 
   public reStake(stake: Stake, stakingDays: number) {    
