@@ -883,8 +883,10 @@
         </p>
         <p>
           <span style="font-weight: bold;">Restake</span><br />
-          Put your AXN (principal + interest) from this completed stake into a new stake in one transaction.<br/>
-          Just enter the length of the new stake below, and then click "Restake".
+          Put your completed stake earnings (principal + interest) into a new stake in one transaction.<br/>
+          Enter the length of the restake, then click the "Restake" button.
+          <br/><br />
+          <b>Note:</b> Your restake would have a new share rate of <b>{{stakingContractInfo.ShareRate | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}}</b>
         </p>
 
         <div class="axn-form-block-one">
@@ -921,12 +923,10 @@
 
             <!-- RIGHT COL -->
             <div class="axn-form-block-one" style="text-transform: none;display: block;" >
-              <span class="axn-form-block-one-title" style="text-transform: none; font-size: 1rem;margin-bottom: 5%;">New Stake Settings</span>
-              <div style="height: 10px;"></div> 
-              <p *ngIf="actionsModalData.amount">Stake Amount: <b>{{actionsModalData.amount | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}} AXN</b></p>
-              <p *ngIf="actionsModalData.shares">Shares: <b>{{actionsModalData.shares | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}}</b></p>
-              <p *ngIf="actionsModalData.lpb">Longer Pays Better: <b>{{actionsModalData.lpb | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}}</b></p>
-              <p *ngIf="actionsModalData.totalShares">Total Shares: <b>{{actionsModalData.totalShares | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}}</b></p>
+              <p *ngIf="actionsModalData.amount">Amount<br/><b>{{actionsModalData.amount | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}} AXN</b></p>
+              <p *ngIf="actionsModalData.shares">Shares<br /><b>{{actionsModalData.shares | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}}</b></p>
+              <p *ngIf="actionsModalData.lpb">Longer Pays Better<br /><b>{{actionsModalData.lpb | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}}</b></p>
+              <p *ngIf="actionsModalData.totalShares">Total Shares<br /><b>{{actionsModalData.totalShares | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}}</b></p>
             </div>
           </div> 
         </div>
