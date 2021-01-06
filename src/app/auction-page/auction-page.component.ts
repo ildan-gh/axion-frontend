@@ -98,11 +98,12 @@ export class AuctionPageComponent implements OnDestroy {
           this.ngZone.run(() => {
             this.account = account;
             window.dispatchEvent(new Event("resize"));
+            this.formsData.autostakeDays = this.contractService.autoStakeDays;
+
             if (account) {
               this.getAuctions();
               this.onChangeAmount();
               this.onChangeAccount.emit();
-
               this.getWalletBids();
 
               this.contractService.getAuctionPool().then((info) => {
