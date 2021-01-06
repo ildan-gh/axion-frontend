@@ -890,7 +890,7 @@
         </p>
 
         <div class="axn-form-block-one">
-          <div class="axn-form-base-2">
+          <div class="axn-form axn-form-base-2">
             
             <!-- LEFT COL -->
             <div class="axn-form-block-one axn-form-border-dashed-right">
@@ -899,21 +899,16 @@
                 class="axn-input" 
                 type="number" 
                 step="1" 
-                min="1" 
-                style="width: auto;"
                 [max]="stakeMaxDays" 
                 placeholder="0"
-                required="required" 
-                name="stake-days"
+                name="restake-days"
                 autocomplete="off" 
                 onblur="this.placeholder = '0'" 
                 onfocus="this.placeholder = ''" 
+                style="width: auto;font-size: 1.5rem;"
                 (ngModelChange)="onRestakeDaysChanged()"
                 [(ngModel)]="actionsModalData.stakingDays" 
-                [appMinMaxNumber]="{
-                  min: 1,
-                  max: stakeMaxDays
-                }" 
+                [appMinMaxNumber]="{max: stakeMaxDays}" 
               />
               <span class="axn-cheap cl-blue-bg" style="text-transform: none;">{{today + (actionsModalData.stakingDays * 24 * 60 * 60 * 1000) | date: "MMM d, y"}}</span>
               <div class="axn-form-block-sendmax axn-form-bottom-mid">
@@ -934,13 +929,13 @@
     </div>
 
     <div class="dialog-bottom">
-      <button class="axn-btn axn-btn-gray" type="button" mat-dialog-close>
+      <button class="axn-btn axn-btn-cancel" type="button" mat-dialog-close>
         <span>Cancel</span>
       </button>
-      <button class="axn-btn axn-btn-gray" style="background-color: #404b77;" [disabled]="!actionsModalData.stakingDays" type="button" (click)="reStake(actionsModalData.stake, actionsModalData.stakingDays)">
+      <button class="axn-btn axn-btn-gray" [disabled]="!actionsModalData.stakingDays" type="button" (click)="reStake(actionsModalData.stake, actionsModalData.stakingDays)">
         <span>Restake</span>
       </button>
-      <button class="axn-btn axn-btn-gray" style="background-color: #404b77;" type="button" (click)="successWithPenaltyActions(actionsModalData.stake)">
+      <button class="axn-btn axn-btn-gray" type="button" (click)="successWithPenaltyActions(actionsModalData.stake)">
         <span>Withdraw</span>
       </button>
     </div>
