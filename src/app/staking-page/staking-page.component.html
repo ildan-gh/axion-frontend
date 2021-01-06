@@ -888,40 +888,47 @@
         </p>
 
         <div class="axn-form-block-one">
-          <div>
-            <p *ngIf="actionsModalData.stake.principal && actionsModalData.stake.interest" style="text-transform: none;">
-              Stake Amount: {{actionsModalData.amount | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}} AXN<br/>
-              Given Shares: {{actionsModalData.shares | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}}<br />
-              Longer Pays Better: {{actionsModalData.lpb | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}}<br />
-              Total Shares: {{actionsModalData.totalShares | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}}
-            </p>
-          </div>
-          
-          <span class="axn-form-block-one-title" style="text-transform: none; font-size: 1rem;">Restake Period</span>
-          <input 
-            class="axn-input" 
-            style="width: auto;font-size: 1.5rem;"
-            type="number" 
-            step="1" 
-            min="1" 
-            [max]="stakeMaxDays" 
-            placeholder="0"
-            required="required" 
-            name="stake-days"
-            autocomplete="off" 
-            onblur="this.placeholder = '0'" 
-            onfocus="this.placeholder = ''" 
-            (ngModelChange)="onRestakeDaysChanged()"
-            [(ngModel)]="actionsModalData.stakingDays" 
-            [appMinMaxNumber]="{
-              min: 1,
-              max: stakeMaxDays
-            }" 
-          />
-          <span class="axn-cheap cl-blue-bg" style="text-transform: none;">{{today + (actionsModalData.stakingDays * 24 * 60 * 60 * 1000) | date: "MMM d, y"}}</span>
-          <div class="axn-form-block-sendmax axn-form-bottom-mid">
-            <span class="axn-btn axn-btn-max" (click)="actionsModalData.stakingDays = stakeMaxDays;">Max Days</span>
-          </div>
+          <div class="axn-form-base-2">
+            
+            <!-- LEFT COL -->
+            <div class="axn-form-block-one axn-form-border-dashed-right">
+              <span class="axn-form-block-one-title" style="text-transform: none; font-size: 1rem;">Restake Period</span>
+              <input 
+                class="axn-input" 
+                type="number" 
+                step="1" 
+                min="1" 
+                style="width: auto;"
+                [max]="stakeMaxDays" 
+                placeholder="0"
+                required="required" 
+                name="stake-days"
+                autocomplete="off" 
+                onblur="this.placeholder = '0'" 
+                onfocus="this.placeholder = ''" 
+                (ngModelChange)="onRestakeDaysChanged()"
+                [(ngModel)]="actionsModalData.stakingDays" 
+                [appMinMaxNumber]="{
+                  min: 1,
+                  max: stakeMaxDays
+                }" 
+              />
+              <span class="axn-cheap cl-blue-bg" style="text-transform: none;">{{today + (actionsModalData.stakingDays * 24 * 60 * 60 * 1000) | date: "MMM d, y"}}</span>
+              <div class="axn-form-block-sendmax axn-form-bottom-mid">
+                <span class="axn-btn axn-btn-max" (click)="actionsModalData.stakingDays = stakeMaxDays;">Max Days</span>
+              </div>
+            </div>
+
+            <!-- RIGHT COL -->
+            <div class="axn-form-block-one" style="text-transform: none;display: block;" >
+              <span class="axn-form-block-one-title" style="text-transform: none; font-size: 1rem;margin-bottom: 5%;">New Stake Settings</span>
+              <div style="height: 10px;"></div> 
+              <p *ngIf="actionsModalData.amount">Stake Amount: <b>{{actionsModalData.amount | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}} AXN</b></p>
+              <p *ngIf="actionsModalData.shares">Shares: <b>{{actionsModalData.shares | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}}</b></p>
+              <p *ngIf="actionsModalData.lpb">Longer Pays Better: <b>{{actionsModalData.lpb | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}}</b></p>
+              <p *ngIf="actionsModalData.totalShares">Total Shares: <b>{{actionsModalData.totalShares | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}}</b></p>
+            </div>
+          </div> 
         </div>
       </div>
     </div>
