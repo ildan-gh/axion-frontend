@@ -377,7 +377,11 @@ export class StakingPageComponent implements OnDestroy {
 
   public successWithPenaltyActions(stake: Stake) {
     this.actionsModalData.opened.close();
-    this.stakeWithdraw(stake);
+
+    // Skip late penalty dialog if not past 14 days
+    const endMS = +stake.endSeconds * 1000;
+    const penaltyWindow = endMS + (14 * 86400 * 1000)
+    this.stakeWithdraw(stake, Date.now() < penaltyWindow);
   }
 
   public reStake(stake: Stake, stakingDays: number) {    
