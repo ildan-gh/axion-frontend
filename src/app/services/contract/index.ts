@@ -1320,7 +1320,7 @@ export class ContractService {
   }
 
   public restake(stake: Stake, stakeDays) {
-    const restakeMethod = stake.isV1 ? 'reStakeV1' : 'reStake';
+    const restakeMethod = stake.isV1 ? 'restakeV1' : 'restake';
 
     return this.StakingContract.methods[restakeMethod](stake.sessionId, stakeDays).send({
         from: this.account.address,
