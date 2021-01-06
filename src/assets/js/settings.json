@@ -4,7 +4,7 @@
     "checkerAuctionPool": 15000,
     "checkerStakingInfo": 3600000,
     "checkerBPD": 3600000,
-    "freeclaimEndTime": 1611859352000, // Jan-28-2021 06:42:32 PM UTC
+    "freeclaimEndTime": 1611859352000,
 
     "production": true,
     "chainsForButtonAddToMetamask": [1, 3],
