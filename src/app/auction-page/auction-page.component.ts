@@ -47,7 +47,7 @@ export class AuctionPageComponent implements OnDestroy {
 
   public formsData: {
     auctionAmount?: string;
-    autostakeDays?: number;
+    autoStakeDays?: number;
   } = {};
 
   public referalLink = "";
@@ -98,7 +98,7 @@ export class AuctionPageComponent implements OnDestroy {
           this.ngZone.run(() => {
             this.account = account;
             window.dispatchEvent(new Event("resize"));
-            this.formsData.autostakeDays = this.contractService.autoStakeDays;
+            this.formsData.autoStakeDays = this.contractService.autoStakeDays;
 
             if (account) {
               this.getAuctions();
@@ -265,7 +265,7 @@ export class AuctionPageComponent implements OnDestroy {
     // This check is also made in the contract, may not be needed here too.
     // this.contractService.autoStakeDays <-- Min auto stake days
     const minimumAutoStake = this.contractService.autoStakeDays;
-    const autoStakeDays = this.formsData.autostakeDays;
+    const autoStakeDays = this.formsData.autoStakeDays;
 
     const actualDays =
       autoStakeDays < minimumAutoStake
@@ -290,7 +290,7 @@ export class AuctionPageComponent implements OnDestroy {
         ({ transactionHash }) => {
           this.contractService.updateETHBalance(true).then(() => {
             this.formsData.auctionAmount = undefined;
-            this.formsData.autostakeDays = undefined;
+            this.formsData.autoStakeDays = undefined;
           });
         },
         (err) => {
