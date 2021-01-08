@@ -32,6 +32,11 @@ export class AuctionPageComponent implements OnDestroy {
   })
   warningModal: TemplateRef<any>;
 
+  @ViewChild("withdrawModal", {
+    static: true,
+  })
+  withdrawModal: TemplateRef<any>;
+
   private warningDialog;
 
   public changeSort = true;
@@ -47,6 +52,11 @@ export class AuctionPageComponent implements OnDestroy {
 
   public formsData: {
     auctionAmount?: string;
+  } = {};
+
+  public withdrawData: {
+    dialog?: any;
+    bid?: AuctionBid;
     autoStakeDays?: number;
   } = {};
 
@@ -98,7 +108,6 @@ export class AuctionPageComponent implements OnDestroy {
           this.ngZone.run(() => {
             this.account = account;
             window.dispatchEvent(new Event("resize"));
-            this.formsData.autoStakeDays = this.contractService.autoStakeDays;
 
             if (account) {
               this.getAuctions();
@@ -261,19 +270,6 @@ export class AuctionPageComponent implements OnDestroy {
       }
     }
 
-    // Make sure number of days is between 14 and 5555
-    // This check is also made in the contract, may not be needed here too.
-    // this.contractService.autoStakeDays <-- Min auto stake days
-    const minimumAutoStake = this.contractService.autoStakeDays;
-    const autoStakeDays = this.formsData.autoStakeDays;
-
-    const actualDays =
-      autoStakeDays < minimumAutoStake
-        ? minimumAutoStake
-        : autoStakeDays > this.stakeMaxDays
-        ? this.stakeMaxDays
-        : autoStakeDays;
-
     this.sendAuctionProgress = true;
 
     const callMethod =
@@ -283,14 +279,12 @@ export class AuctionPageComponent implements OnDestroy {
 
     this.contractService[callMethod](
       this.formsData.auctionAmount,
-      actualDays,
       this.cookieService.get("ref")
     )
       .then(
         ({ transactionHash }) => {
           this.contractService.updateETHBalance(true).then(() => {
             this.formsData.auctionAmount = undefined;
-            this.formsData.autoStakeDays = undefined;
           });
         },
         (err) => {
@@ -322,12 +316,28 @@ export class AuctionPageComponent implements OnDestroy {
     }, 2500);
   }
 
-  public bidWithdraw(bid) {
+  public openWithdrawBid(bid: AuctionBid) {
+    this.withdrawData.bid = bid;
+    this.withdrawData.autoStakeDays = this.contractService.autoStakeDays;
+    this.withdrawData.dialog = this.dialog.open(this.withdrawModal, {});
+  }
+
+  public confirmAutostakeDays() {
+    this.withdrawData.dialog.close();
+
+    this.bidWithdraw(
+      this.withdrawData.bid, 
+      this.withdrawData.autoStakeDays
+    )
+
+  }
+
+  public bidWithdraw(bid, autoStakeDays) {
     bid.withdrawProgress = true;
 
     if (!bid.isV1) {
       this.contractService
-        .withdrawFromAuction(bid.auctionId)
+        .withdrawFromAuction(bid.auctionId, autoStakeDays)
         .then(() => {
           this.contractService.loadAccountInfo();
           bid.status = "complete";
@@ -338,7 +348,7 @@ export class AuctionPageComponent implements OnDestroy {
         });
     } else {
       this.contractService
-        .withdrawFromAuctionV1(bid.auctionId)
+        .withdrawFromAuctionV1(bid.auctionId, autoStakeDays)
         .then(() => {
           this.contractService.loadAccountInfo();
           bid.status = "complete";

@@ -10,10 +10,10 @@ const routes: Routes = [
     path: "claim",
     component: ClaimPageComponent,
   },
-  // {
-  //   path: "auction",
-  //   component: AuctionPageComponent,
-  // },
+  {
+    path: "auction",
+    component: AuctionPageComponent,
+  },
   {
     path: "staking",
     component: StakingPageComponent,
