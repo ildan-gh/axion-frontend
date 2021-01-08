@@ -1869,12 +1869,6 @@
               "internalType": "uint256",
               "name": "time",
               "type": "uint256"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "stakeDays",
-              "type": "uint256"
             }
           ],
           "name": "Bid",
@@ -1981,12 +1975,6 @@
               "internalType": "uint256",
               "name": "time",
               "type": "uint256"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "stakeDays",
-              "type": "uint256"
             }
           ],
           "name": "Withdraval",
@@ -2042,30 +2030,6 @@
             }
           ],
           "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "uint256",
-              "name": "daysInFuture",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "amount",
-              "type": "uint256"
-            }
-          ],
-          "name": "addReservesToAuction",
-          "outputs": [
-            {
-              "internalType": "uint256",
-              "name": "",
-              "type": "uint256"
-            }
-          ],
-          "stateMutability": "nonpayable",
           "type": "function"
         },
         {
@@ -2170,129 +2134,6 @@
         {
           "inputs": [
             {
-              "internalType": "address",
-              "name": "account",
-              "type": "address"
-            }
-          ],
-          "name": "auctionsOf_",
-          "outputs": [
-            {
-              "internalType": "uint256[]",
-              "name": "",
-              "type": "uint256[]"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "uint256",
-              "name": "",
-              "type": "uint256"
-            },
-            {
-              "internalType": "address",
-              "name": "",
-              "type": "address"
-            }
-          ],
-          "name": "autoStakeDaysOf",
-          "outputs": [
-            {
-              "internalType": "uint256",
-              "name": "",
-              "type": "uint256"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "uint256",
-              "name": "amountOutMin",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "deadline",
-              "type": "uint256"
-            },
-            {
-              "internalType": "address",
-              "name": "ref",
-              "type": "address"
-            },
-            {
-              "internalType": "uint256",
-              "name": "stakeDays",
-              "type": "uint256"
-            }
-          ],
-          "name": "bid",
-          "outputs": [],
-          "stateMutability": "payable",
-          "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "calculateNearestWeeklyAuction",
-          "outputs": [
-            {
-              "internalType": "uint256",
-              "name": "",
-              "type": "uint256"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "calculateStepsFromStart",
-          "outputs": [
-            {
-              "internalType": "uint256",
-              "name": "",
-              "type": "uint256"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "uint256",
-              "name": "amount",
-              "type": "uint256"
-            }
-          ],
-          "name": "callIncomeDailyTokensTrigger",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "uint256",
-              "name": "amount",
-              "type": "uint256"
-            }
-          ],
-          "name": "callIncomeWeeklyTokensTrigger",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
               "internalType": "uint256",
               "name": "",
               "type": "uint256"
@@ -2377,32 +2218,6 @@
           "type": "function"
         },
         {
-          "inputs": [],
-          "name": "getUniswapLastPrice",
-          "outputs": [
-            {
-              "internalType": "uint256",
-              "name": "",
-              "type": "uint256"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "getUniswapMiddlePriceForSevenDays",
-          "outputs": [
-            {
-              "internalType": "uint256",
-              "name": "",
-              "type": "uint256"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
           "inputs": [
             {
               "internalType": "bytes32",
@@ -2445,59 +2260,6 @@
           "type": "function"
         },
         {
-          "inputs": [
-            {
-              "internalType": "uint256",
-              "name": "_stepTimestamp",
-              "type": "uint256"
-            },
-            {
-              "internalType": "address",
-              "name": "_mainTokenAddress",
-              "type": "address"
-            },
-            {
-              "internalType": "address",
-              "name": "_stakingAddress",
-              "type": "address"
-            },
-            {
-              "internalType": "address payable",
-              "name": "_uniswapAddress",
-              "type": "address"
-            },
-            {
-              "internalType": "address payable",
-              "name": "_recipientAddress",
-              "type": "address"
-            },
-            {
-              "internalType": "address",
-              "name": "_nativeSwapAddress",
-              "type": "address"
-            },
-            {
-              "internalType": "address",
-              "name": "_foreignSwapAddress",
-              "type": "address"
-            },
-            {
-              "internalType": "address",
-              "name": "_subbalancesAddress",
-              "type": "address"
-            },
-            {
-              "internalType": "address",
-              "name": "_auctionV1Address",
-              "type": "address"
-            }
-          ],
-          "name": "init",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
           "inputs": [],
           "name": "init_",
           "outputs": [
@@ -2508,24 +2270,6 @@
             }
           ],
           "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "address",
-              "name": "_manager",
-              "type": "address"
-            },
-            {
-              "internalType": "address",
-              "name": "_migrator",
-              "type": "address"
-            }
-          ],
-          "name": "initialize",
-          "outputs": [],
-          "stateMutability": "nonpayable",
           "type": "function"
         },
         {
@@ -2663,6 +2407,142 @@
           "type": "function"
         },
         {
+          "inputs": [],
+          "name": "start",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "stepTimestamp",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "_manager",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_migrator",
+              "type": "address"
+            }
+          ],
+          "name": "initialize",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "_stepTimestamp",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "_mainTokenAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_stakingAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "address payable",
+              "name": "_uniswapAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "address payable",
+              "name": "_recipientAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_nativeSwapAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_foreignSwapAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_subbalancesAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_auctionV1Address",
+              "type": "address"
+            }
+          ],
+          "name": "init",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "percent",
+              "type": "uint256"
+            }
+          ],
+          "name": "setReferrerPercentage",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "percent",
+              "type": "uint256"
+            }
+          ],
+          "name": "setReferredPercentage",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bool",
+              "name": "_referralsOn",
+              "type": "bool"
+            }
+          ],
+          "name": "setReferralsOn",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
           "inputs": [
             {
               "internalType": "uint256",
@@ -2704,84 +2584,69 @@
         {
           "inputs": [
             {
-              "internalType": "bool",
-              "name": "_referralsOn",
-              "type": "bool"
-            }
-          ],
-          "name": "setReferralsOn",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "uint256",
-              "name": "percent",
-              "type": "uint256"
-            }
-          ],
-          "name": "setReferredPercentage",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "uint256",
-              "name": "percent",
-              "type": "uint256"
-            }
-          ],
-          "name": "setReferrerPercentage",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "bytes32",
-              "name": "role",
-              "type": "bytes32"
-            },
-            {
               "internalType": "address",
               "name": "account",
               "type": "address"
             }
           ],
-          "name": "setupRole",
+          "name": "auctionsOf_",
+          "outputs": [
+            {
+              "internalType": "uint256[]",
+              "name": "",
+              "type": "uint256[]"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "getUniswapLastPrice",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "getUniswapMiddlePriceForSevenDays",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "amountOutMin",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "deadline",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "ref",
+              "type": "address"
+            }
+          ],
+          "name": "bid",
           "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "start",
-          "outputs": [
-            {
-              "internalType": "uint256",
-              "name": "",
-              "type": "uint256"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "stepTimestamp",
-          "outputs": [
-            {
-              "internalType": "uint256",
-              "name": "",
-              "type": "uint256"
-            }
-          ],
-          "stateMutability": "view",
+          "stateMutability": "payable",
           "type": "function"
         },
         {
@@ -2806,6 +2671,100 @@
             }
           ],
           "name": "withdrawV1",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "callIncomeDailyTokensTrigger",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "daysInFuture",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "addReservesToAuction",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "callIncomeWeeklyTokensTrigger",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "calculateNearestWeeklyAuction",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "calculateStepsFromStart",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            }
+          ],
+          "name": "setupRole",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
