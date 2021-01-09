@@ -22,7 +22,7 @@
   <form #stakeForm="ngForm" class="axn-form axn-form-3-1">
     <div class="axn-form-block axn-form-staking">
       <div class="axn-form-block-one">
-        <span class="axn-form-block-one-title">Stake</span>
+        <span class="axn-form-block-one-title">Amount</span>
         <input
           *ngIf="account"
           type="text"
@@ -52,7 +52,7 @@
               formsData.stakeAmount = account?.balances.HEX2X.wei;
               onChangeAmount()
             "
-            >Send max</span
+            >Max</span
           >
           <span class="axn-form-block-sendmax-text">
             Balance
@@ -66,7 +66,7 @@
 
     <div class="axn-form-block axn-form-arrow axn-form-staking">
       <div class="axn-form-block-one">
-        <span class="axn-form-block-one-title">Set stake period</span>
+        <span class="axn-form-block-one-title">Length</span>
         <input
           class="axn-input axn-input-mid"
           type="number"
@@ -87,12 +87,12 @@
           [(ngModel)]="formsData.stakeDays"
           autocomplete="off"
         />
-        <span class="axn-cheap cl-blue-bg">Day</span>
+        <span class="axn-cheap cl-blue-bg">Days</span>
         <div class="axn-form-block-sendmax axn-form-bottom-mid">
           <span
             class="axn-btn axn-btn-max"
             (click)="formsData.stakeDays = stakeMaxDays; onChangeAmount()"
-            >Send max</span
+            >Max</span
           >
         </div>
       </div>
@@ -129,6 +129,7 @@
                     | bigNumberFormat: tokensDecimals.HEX2X:true:false:2
                 }}
               </span>
+              <br />
               <span class="axn-form-block-shares-text">Share rate</span>
             </div>
           </div>
@@ -213,7 +214,7 @@
               <span></span><span></span><span></span><span></span>
             </span>
           </span>
-          <span>Stake</span>
+          <span>STAKE</span>
         </button>
       </div>
     </div>
@@ -482,7 +483,7 @@
                   <span></span><span></span><span></span><span></span>
                 </span>
               </span>
-              <span class="t-fw-light">&nbsp;&nbsp;Actions&nbsp;&nbsp;</span>
+              <span class="t-fw-light">&nbsp;&nbsp;ACTIONS&nbsp;&nbsp;</span>
             </button>
             <button
               class="axn-btn axn-btn-gray"
@@ -501,7 +502,7 @@
                 </span>
               </span>
               <span class="t-fw-light"
-                >&nbsp;&nbsp;Withdraw BPD&nbsp;&nbsp;</span
+                >&nbsp;&nbsp;WITHDRAW BPD&nbsp;&nbsp;</span
               >
             </button>
           </td>
@@ -623,7 +624,7 @@
                   <span></span><span></span><span></span><span></span>
                 </span>
               </span>
-              <span class="t-fw-light">&nbsp;&nbsp;Withdraw&nbsp;&nbsp;</span>
+              <span class="t-fw-light">&nbsp;&nbsp;WITHDRAW&nbsp;&nbsp;</span>
             </button>
             <button
               class="axn-btn axn-btn-gray"
@@ -642,7 +643,7 @@
                 </span>
               </span>
               <span class="t-fw-light"
-                >&nbsp;&nbsp;Withdraw BPD&nbsp;&nbsp;</span
+                >&nbsp;&nbsp;WITHDRAW BPD&nbsp;&nbsp;</span
               >
             </button>
           </td>

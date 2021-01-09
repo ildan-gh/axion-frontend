@@ -9,84 +9,48 @@
       matTooltip="
       This auction raffles accumulated Axion tokens between users, in proportion to the participants' bid in Ethereum. Any leftover Axion from the auction rolls over into the next weekly auction.
 
-      When the user places a bid in ETH: 80% of the received ETH is instantly used to buy back Axion on Uniswap and the received AXN is used to replenish the Staking contract. 19% of the received ETH is the company's profit,  1% goes to The Eden Reforestation Project, with each $0.10 planting a tree.
+      When the user places a bid in ETH: 80% of the received ETH is used to instantly BUYBACK Axion on Uniswap and the received AXN is distributed as DIVIDENDS to stakers. 19% of the received ETH is the company's profit,  1% goes to The Eden Reforestation Project, with each $0.10 planting a tree.
 
-      All Axion received from the Auction including referral bonuses will be autostaked for 60 days upon withdrawal.
+      All Axion received from the Auction including referral bonuses will be staked for a minimum of {{ contractService.autoStakeDays }} days upon withdrawal. The stake length may be increased up to {{stakeMaxDays}} days.
+      
+      When you increase the stake length you get more shares, resulting in better DIVIDENDS received from auction BUYBACK.
 
-      There is a chance the auction gets oversold, and everyone who bids will receive a lower amount of AXN compared to buying on Uniswap.
+      There is a chance the auction gets overbid, and everyone who has bid will receive a lower amount of AXN compared to buying on Uniswap.
 
-      If entering within the last hour or so, please be sure to use a high gas fee. If your transaction does not complete by auction cut off, your ETH will be entered into the next days auction. We cannot be responsible for this and cannot provide any refunds."
+      If entering within the last hour or so, please be sure to use a high gas fee. If your transaction does not complete by auction cut off, your ETH will be entered into the next days auction. We are not responsible for this and cannot provide any refunds.
+      
+      WARNING
+      Last bid of the same auction overwrites previous bid referral and stake length."
       matTooltipClass="question__tooltip question__extrawidth"
     ></div>
   </div>
 
-  <div class="axn-form axn-form-base-2">
-    <div class="axn-form-block axn-form-auction">
-      <div class="axn-form-base-2">
-        <!-- Auction Bid -->
-        <div class="axn-form-block-one axn-form-border-dashed-right">
-          <span class="axn-form-block-one-title">Input</span>
-          <input
-            type="text"
-            *ngIf="account"
-            required="required"
-            class="axn-input"
-            placeholder="0.0"
-            onfocus="this.placeholder = ''"
-            onblur="this.placeholder = '0.0'"
-            [maxValueChange]="onChangeAccount"
-            (ngModelChange)="onChangeAmount()"
-            [(ngModel)]="formsData.auctionAmount"
-            autocomplete="off"
-            [appBigNumber]="{
-              decimals: tokensDecimals['ETH'],
-              min: 1,
-              max: account?.balances.ETH.wei
-            }"
-          />
-          <span class="axn-cheap icon icon_eth cl-purple-bg">ETH</span>
-        </div>
-        <!-- Autostake Days -->
-        <div class="axn-form-block-one">
-          <span class="axn-form-block-one-title">Autostake Length (Days)</span>
-          <input
-            step="1"
-            type="number"
-            class="axn-input"
-            autocomplete="off"
-            required="required"
-            name="stake-days"
-            [max]="stakeMaxDays"
-            placeholder="{{ contractService.autoStakeDays }} minimum"
-            onblur="this.placeholder = '60 minimum'"
-            [(ngModel)]="formsData.autostakeDays"
-            [appMinMaxNumber]="{
-              min: 1,
-              max: stakeMaxDays
-            }"
-          />
-          <span
-            class="axn-cheap cl-blue-bg"
-            style="
-              padding-left: 10px;
-              padding-right: 10px;
-              text-transform: none;
-            "
-            >{{
-              today +
-                ((formsData.autostakeDays ||
-                  this.contractService.autoStakeDays) +
-                  1) *
-                  24 *
-                  60 *
-                  60 *
-                  1000 | date: "MMM d, y"
-            }}</span
-          >
-        </div>
-      </div>
+    <div class="axn-form axn-form-base-2">
 
+    <!-- BID -->
+    <div class="axn-form-block axn-form-auction">
       <div class="axn-form-block-one axn-form-arrow p-b-none">
+        <span class="axn-form-block-one-title">Input</span>
+        <input
+          type="text"
+          *ngIf="account"
+          required="required"
+          class="axn-input"
+          placeholder="0.0"
+          onfocus="this.placeholder = ''"
+          onblur="this.placeholder = '0.0'"
+          [appBigNumber]="{
+            decimals: tokensDecimals['ETH'],
+            min: 1,
+            max: account?.balances.ETH.wei
+          }"
+          [maxValueChange]="onChangeAccount"
+          (ngModelChange)="onChangeAmount()"
+          [(ngModel)]="formsData.auctionAmount"
+          autocomplete="off"
+        />
+        <span class="axn-cheap icon icon_eth cl-purple-bg">ETH</span>
+
         <div class="axn-form-base-2 axn-form-bottom">
           <div class="axn-form-block-sendmax">
             <span
@@ -94,13 +58,12 @@
               (click)="
                 formsData.auctionAmount = account?.balances.ETH.shortBigNumber.toString()
               "
-              >Send max</span
+              >Max</span
             >
             <span class="axn-form-block-sendmax-text">
               Balance
               <span class="axn-form-block-sendmax-value">{{
-                account?.balances?.ETH.shortBigNumber
-                  | bigNumberFormat: 0:true:false:2
+                account?.balances?.ETH.shortBigNumber | bigNumberFormat: 0:true:false:2
               }}</span></span
             >
           </div>
@@ -108,11 +71,7 @@
             <button
               class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-small"
               [ngClass]="{ progress: sendAuctionProgress }"
-              [disabled]="
-                !dataSendForm ||
-                sendAuctionProgress ||
-                formsData.autostakeDays < contractService.autoStakeDays
-              "
+              [disabled]="!dataSendForm || sendAuctionProgress"
               (click)="sendETHToAuction()"
             >
               <span class="lds-ellipsis" *ngIf="sendAuctionProgress">
@@ -120,27 +79,18 @@
                   <span></span><span></span><span></span><span></span>
                 </span>
               </span>
-              <span class="axn-btn-text axn-btn-arrow-right">SEND</span>
+              <span class="axn-btn-text axn-btn-arrow-right">BID</span>
             </button>
           </div>
         </div>
-        <span
-          style="
-            text-transform: none;
-            margin-top: 16px;
-            font-size: 14px;
-            font-weight: 500;
-          "
-          >NOTE: When you increase the auto stake duration<br />you get better
-          dividends with more shares.</span
-        >
       </div>
     </div>
 
+    <!-- AUCTION INFO -->
     <div class="axn-form-block">
       <div class="axn-form-base-2">
         <div class="axn-form-block-one axn-form-border-dashed-right">
-          <span class="axn-form-block-one-title">AXN Pool</span>
+          <span class="axn-form-block-one-title">AXN In Pool</span>
           <span
             class="axn-form-block-one-value-small p-tb-5"
             matTooltipClass="table__tooltip"
@@ -152,7 +102,7 @@
           <span class="axn-cheap icon icon_axn cl-blue-bg">AXN</span>
         </div>
         <div class="axn-form-block-one">
-          <span class="axn-form-block-one-title">ETH Pool</span>
+          <span class="axn-form-block-one-title">ETH In Pool</span>
           <span
             class="axn-form-block-one-value-small p-tb-5"
             matTooltipClass="table__tooltip"
@@ -223,7 +173,7 @@
           (click)="generateRefLink()"
           class="axn-btn axn-btn-gray"
           style="max-width: 200px"
-          >Generate referral link</span
+          >Generate Link</span
         >
 
         <input
@@ -255,7 +205,7 @@
       *ngIf="account && referalAddress"
     >
       <span class="axn-form-block-referal-link-text">
-        Referrer address
+        Referrer Address:
         <span class="cl-purple">{{ referalAddress }}</span></span
       >
     </div>
@@ -272,8 +222,8 @@
       <thead>
         <tr>
           <th>Date</th>
-          <th>AXN in pool</th>
-          <th>ETH in pool</th>
+          <th>AXN in Pool</th>
+          <th>ETH in Pool</th>
           <th>My ETH</th>
           <th>My AXN</th>
           <th>AXN per ETH</th>
@@ -361,7 +311,7 @@
               *ngIf="bid.status === 'withdraw'"
               class="axn-btn axn-btn-gray"
               style="margin: auto"
-              (click)="bidWithdraw(bid)"
+              (click)="openWithdrawBid(bid)"
               [ngClass]="{ progress: bid.withdrawProgress }"
               [disabled]="bid.withdrawProgress"
             >
@@ -370,7 +320,7 @@
                   <span></span><span></span><span></span><span></span>
                 </span>
               </span>
-              <span class="t-fz-14">&nbsp;&nbsp;WITHDRAW&nbsp;&nbsp;</span>
+              <span class="t-fz-14">&nbsp;&nbsp;STAKE&nbsp;&nbsp;</span>
             </button>
             <span
               class="axn-text t-cl-purple t-t-u t-fz-14"
@@ -394,8 +344,8 @@
       <thead>
         <tr>
           <th>Date</th>
-          <th>AXN in pool</th>
-          <th>ETH in pool</th>
+          <th>AXN in Pool</th>
+          <th>ETH in Pool</th>
           <th>My ETH</th>
           <th>My AXN</th>
           <th>AXN per ETH</th>
@@ -503,7 +453,7 @@
       <thead>
         <tr>
           <th>Date</th>
-          <th>AXN in pool</th>
+          <th>AXN in Pool</th>
           <th>Completion</th>
         </tr>
       </thead>
@@ -577,8 +527,8 @@
       <thead>
         <tr>
           <th>Date</th>
-          <th>AXN in pool</th>
-          <th>ETH in pool</th>
+          <th>AXN in Pool</th>
+          <th>ETH in Pool</th>
           <th>AXN per ETH</th>
         </tr>
       </thead>
@@ -657,8 +607,8 @@
       <thead>
         <tr>
           <th>Date</th>
-          <th>AXN in pool</th>
-          <th>ETH in pool</th>
+          <th>AXN in Pool</th>
+          <th>ETH in Pool</th>
         </tr>
       </thead>
       <tbody>
@@ -726,6 +676,71 @@
         (click)="successLowProfit()"
       >
         <span>Ok</span>
+      </button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #withdrawModal class="dialog-block" mat-dialog-content>
+  <div class="dialog-block__content">
+    <div class="dialog-title">Withdraw Auction Bid</div>
+
+  
+    <div class="dialog-description">
+
+    
+      <div class="axn-form axn-form-block-one">
+          <p style="text-transform: none;">
+            It is mandatory for each auction bid to be autostaked.<br/>
+            Please enter the autostake length for this bid
+          </p>
+
+        <span class="axn-form-block-one-title">Stake Length<br>{{ contractService.autoStakeDays }} - {{stakeMaxDays}} Days</span>
+        <input
+          step="1"
+          type="number"
+          class="axn-input axn-input-mid"
+          autocomplete="off"
+          required="required"
+          style="width: auto;"
+          name="stake-days"
+          [max]="stakeMaxDays"
+          [(ngModel)]="withdrawData.autoStakeDays"
+          [appMinMaxNumber]="{
+            max: stakeMaxDays
+          }"
+        />
+        <span
+          class="axn-cheap cl-blue-bg"
+          style="
+            padding-left: 10px;
+            padding-right: 10px;
+            text-transform: none;
+          "
+          >{{
+            today +
+              ((withdrawData.autoStakeDays ||
+                this.contractService.autoStakeDays) +
+                1) *
+                24 *
+                60 *
+                60 *
+                1000 | date: "MMM d, y"
+          }}</span>
+
+          <div class="axn-form-block-sendmax">
+            <span class="axn-btn axn-btn-max" (click)="withdrawData.autoStakeDays = stakeMaxDays">Send max</span>
+          </div>
+          
+      </div>
+    </div>
+
+    <div class="dialog-bottom">
+      <button class="axn-btn axn-btn-gray" type="button" mat-dialog-close>
+        <span>Close</span>
+      </button>
+      <button class="axn-btn axn-btn-gray" [disabled]="withdrawData.autoStakeDays < contractService.autoStakeDays" type="button" (click)="confirmAutostakeDays()">
+        <span>withdraw</span>
       </button>
     </div>
   </div>

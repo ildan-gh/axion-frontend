@@ -1395,7 +1395,7 @@ export class ContractService {
       });
   }
 
-  public async sendETHToAuctionV2(amount, days, ref?) {
+  public async sendETHToAuctionV2(amount, ref?) {
     const date = Math.round(
       (new Date().getTime() + 24 * 60 * 60 * 1000) / 1000
     );
@@ -1406,7 +1406,7 @@ export class ContractService {
     const amountOutMin = await this.getAmountOutMinAsync(amount);
 
     return this.AuctionContract.methods
-      .bid(amountOutMin, date, refLink, days)
+      .bid(amountOutMin, date, refLink)
       .send({
         from: this.account.address,
         value: amount,
@@ -1416,7 +1416,7 @@ export class ContractService {
       });
   }
 
-  public async sendMaxETHToAuctionV2(amount, days, ref?) {
+  public async sendMaxETHToAuctionV2(amount, ref?) {
     const date = Math.round(
       (new Date().getTime() + 24 * 60 * 60 * 1000) / 1000
     );
@@ -1427,7 +1427,7 @@ export class ContractService {
     const gasLimit = await this.web3Service.getGasLimit();
     const gasPrice = await this.web3Service.gasPrice();
     const estimatedGas = await this.AuctionContract.methods
-      .bid(0, date, refLink, days)
+      .bid(0, date, refLink)
       .estimateGas({
         from: this.account.address,
         gas: gasLimit,
@@ -1443,7 +1443,7 @@ export class ContractService {
     const amountOutMin = await this.getAmountOutMinAsync(newAmount.toString());
 
     return this.AuctionContract.methods
-      .bid(amountOutMin, date, refLink, days)
+      .bid(amountOutMin, date, refLink)
       .send({
         from: this.account.address,
         value: newAmount,
@@ -1793,9 +1793,9 @@ export class ContractService {
     return price.times(1 + (this.discountPercent - this.premiumPercent) / 100);
   }
 
-  public withdrawFromAuction(auctionId) {
+  public withdrawFromAuction(auctionId, autoStakeDays) {
     return this.AuctionContract.methods
-      .withdraw(auctionId)
+      .withdraw(auctionId, autoStakeDays)
       .send({
         from: this.account.address,
       })
@@ -1804,9 +1804,9 @@ export class ContractService {
       });
   }
 
-  public withdrawFromAuctionV1(auctionId) {
+  public withdrawFromAuctionV1(auctionId, autoStakeDays) {
     return this.AuctionContract.methods
-      .withdrawV1(auctionId)
+      .withdrawV1(auctionId, autoStakeDays)
       .send({
         from: this.account.address,
       })

@@ -1869,12 +1869,6 @@
               "internalType": "uint256",
               "name": "time",
               "type": "uint256"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "stakeDays",
-              "type": "uint256"
             }
           ],
           "name": "Bid",
@@ -2226,11 +2220,6 @@
               "internalType": "address",
               "name": "ref",
               "type": "address"
-            },
-            {
-              "internalType": "uint256",
-              "name": "stakeDays",
-              "type": "uint256"
             }
           ],
           "name": "bid",
@@ -2391,7 +2380,7 @@
         },
         {
           "inputs": [],
-          "name": "getUniswapMiddlePriceForSevenDays",
+          "name": "getUniswapMiddlePriceForDays",
           "outputs": [
             {
               "internalType": "uint256",
@@ -2556,6 +2545,19 @@
         },
         {
           "inputs": [],
+          "name": "middlePriceDays",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
           "name": "options",
           "outputs": [
             {
@@ -2692,6 +2694,19 @@
           "inputs": [
             {
               "internalType": "uint256",
+              "name": "_middleDays",
+              "type": "uint256"
+            }
+          ],
+          "name": "setMiddlePriceDays",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
               "name": "percent",
               "type": "uint256"
             }
@@ -2790,6 +2805,11 @@
               "internalType": "uint256",
               "name": "auctionId",
               "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "stakeDays",
+              "type": "uint256"
             }
           ],
           "name": "withdraw",
@@ -2802,6 +2822,11 @@
             {
               "internalType": "uint256",
               "name": "auctionId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "stakeDays",
               "type": "uint256"
             }
           ],
