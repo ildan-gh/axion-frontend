@@ -683,7 +683,7 @@
 
 <ng-template #withdrawModal class="dialog-block" mat-dialog-content>
   <div class="dialog-block__content">
-    <div class="dialog-title">Withdraw Auction Bid</div>
+    <div class="dialog-title">Stake Auction Bid</div>
 
   
     <div class="dialog-description">
@@ -740,7 +740,7 @@
         <span>Close</span>
       </button>
       <button class="axn-btn axn-btn-gray" [disabled]="withdrawData.autoStakeDays < contractService.autoStakeDays" type="button" (click)="confirmAutostakeDays()">
-        <span>withdraw</span>
+        <span>Stake</span>
       </button>
     </div>
   </div>
