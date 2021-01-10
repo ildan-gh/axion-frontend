@@ -384,7 +384,7 @@ export class StakingPageComponent implements OnDestroy {
     this.stakeWithdraw(stake, Date.now() < penaltyWindow);
   }
 
-  public reStake(stake: Stake, stakingDays: number) {    
+  public restake(stake: Stake, stakingDays: number) {    
     this.contractService.restake(stake, stakingDays).then(() => {
       this.stakeList();
       this.contractService.updateHEX2XBalance(true);
