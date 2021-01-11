@@ -385,12 +385,13 @@ export class StakingPageComponent implements OnDestroy {
   }
 
   public restake(stake: Stake, stakingDays: number) {    
+    this.actionsModalData.opened.close();
+    stake.withdrawProgress = true;
     this.contractService.restake(stake, stakingDays).then(() => {
       this.stakeList();
       this.contractService.updateHEX2XBalance(true);
     }).finally(() => {
       stake.withdrawProgress = false;
-      this.actionsModalData.opened.close();
     })
   }
 
