@@ -81,6 +81,21 @@
       }
     }
 
+    &-cancel {
+      color: $clButton-Gray-Text;
+      background-color: $clButton-Cancel-Background;
+      box-shadow: $clButton-Gray-Shadow;
+      font-size: 13px;
+      font-weight: 300;
+
+      &:not([disabled]) {
+        &:hover {
+          box-shadow: $clButton-Gray-Hover-Shadow;
+          color: $clButton-Gray-Hover-Text;
+        }
+      }
+    }
+
     &-metamask {
       padding: 0;
       border: none;

@@ -19,6 +19,18 @@
       }
     }
 
+    &-cancel {
+      color: $clButton-Gray-Text-dark;
+      background-color: $clButton-Cancel-Background-dark;
+      box-shadow: $clButton-Gray-Shadow-dark;
+      &:not([disabled]) {
+        &:hover {
+          box-shadow: $clButton-Gray-Hover-Shadow-dark;
+          color: $clButton-Gray-Hover-Text-dark;
+        }
+      }
+    }
+    
     &-metamask {
       &:before {
         background-color: $clButton-Metamask-Before-Background-dark;
@@ -28,7 +40,6 @@
         color: $clButton-Metamask-Text-dark;
       }
     }
-
 
     &-arrow {
       &-left {

@@ -473,7 +473,7 @@
           <td class="action-button">
             <button
               class="axn-btn axn-btn-gray"
-              (click)="stakeWithdraw(stake)"
+              (click)="openStakeActions(stake)"
               [ngClass]="{ progress: stake.withdrawProgress }"
               [disabled]="stake.withdrawProgress"
               *ngIf="!stake.isWithdrawn"
@@ -483,7 +483,7 @@
                   <span></span><span></span><span></span><span></span>
                 </span>
               </span>
-              <span class="t-fw-light">&nbsp;&nbsp;WITHDRAW&nbsp;&nbsp;</span>
+              <span class="t-fw-light">&nbsp;&nbsp;ACTIONS&nbsp;&nbsp;</span>
             </button>
             <button
               class="axn-btn axn-btn-gray"
@@ -835,6 +835,7 @@
   </div>
 </section>
 
+<!-- Early/Late Unstake Warning Modal -->
 <ng-template #warningModal class="dialog-block" mat-dialog-content>
   <div class="dialog-block__content">
     <div class="dialog-title">Attention!</div>
@@ -864,6 +865,80 @@
         (click)="successWithPenalty()"
       >
         <span>Ok</span>
+      </button>
+    </div>
+  </div>
+</ng-template>
+
+
+<!-- Unstake Modal -->
+<ng-template #actionsModal class="dialog-block" mat-dialog-content>
+  <div class="dialog-block__content">
+    <div class="dialog-title">Stake Actions</div>
+
+    <div class="dialog-description">
+      <div>
+        <p>
+          <span style="font-weight: bold;">Withdraw</span><br/>
+          Receive liquid AXN from this completed stake.
+        </p>
+        <p>
+          <span style="font-weight: bold;">Restake</span><br />
+          Put your completed stake earnings (principal + interest) into a new stake in one transaction.<br/>
+          Enter the length of the restake, then click the "Restake" button.
+          <br/><br />
+          <b>Note:</b> Your restake would have a new share rate of <b>{{stakingContractInfo.ShareRate | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}}</b>
+        </p>
+
+        <div class="axn-form-block-one">
+          <div class="axn-form axn-form-base-2">
+            
+            <!-- LEFT COL -->
+            <div class="axn-form-block-one axn-form-border-dashed-right">
+              <span class="axn-form-block-one-title" style="text-transform: none; font-size: 1rem;">Restake Period</span>
+              <input 
+                class="axn-input" 
+                type="number" 
+                step="1" 
+                [max]="stakeMaxDays" 
+                placeholder="0"
+                name="restake-days"
+                autocomplete="off" 
+                onblur="this.placeholder = '0'" 
+                onfocus="this.placeholder = ''" 
+                style="width: auto;font-size: 1.5rem;"
+                (ngModelChange)="onRestakeDaysChanged()"
+                [(ngModel)]="actionsModalData.stakingDays" 
+                [appMinMaxNumber]="{max: stakeMaxDays}" 
+              />
+              <span class="axn-cheap cl-blue-bg" style="text-transform: none;">{{today + (actionsModalData.stakingDays * 24 * 60 * 60 * 1000) | date: "MMM d, y"}}</span>
+              <div class="axn-form-block-sendmax axn-form-bottom-mid">
+                <span class="axn-btn axn-btn-max" (click)="actionsModalData.stakingDays = stakeMaxDays;">Max Days</span>
+              </div>
+            </div>
+
+            <!-- RIGHT COL -->
+            <div class="axn-form-block-one" style="text-transform: none;display: block;" >
+              <p *ngIf="actionsModalData.amount">Amount<br/><b>{{actionsModalData.amount | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}} AXN</b></p>
+              <p *ngIf="actionsModalData.isLate">Late Penalty<br/><b>{{actionsModalData.penalty | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}} AXN</b></p>
+              <p *ngIf="actionsModalData.shares">Shares<br /><b>{{actionsModalData.shares | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}}</b></p>
+              <p *ngIf="actionsModalData.lpb">Longer Pays Better<br /><b>{{actionsModalData.lpb | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}}</b></p>
+              <p *ngIf="actionsModalData.totalShares">Total Shares<br /><b>{{actionsModalData.totalShares | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}}</b></p>
+            </div>
+          </div> 
+        </div>
+      </div>
+    </div>
+
+    <div class="dialog-bottom">
+      <button class="axn-btn axn-btn-cancel" type="button" mat-dialog-close>
+        <span>Cancel</span>
+      </button>
+      <button class="axn-btn axn-btn-gray" [disabled]="!actionsModalData.stakingDays" type="button" (click)="restake(actionsModalData.stake, actionsModalData.stakingDays)">
+        <span>Restake</span>
+      </button>
+      <button class="axn-btn axn-btn-gray" type="button" (click)="successWithPenaltyActions(actionsModalData.stake)">
+        <span>Withdraw</span>
       </button>
     </div>
   </div>
