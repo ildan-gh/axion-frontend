@@ -920,6 +920,7 @@
             <!-- RIGHT COL -->
             <div class="axn-form-block-one" style="text-transform: none;display: block;" >
               <p *ngIf="actionsModalData.amount">Amount<br/><b>{{actionsModalData.amount | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}} AXN</b></p>
+              <p *ngIf="actionsModalData.isLate">Late Penalty<br/><b>{{actionsModalData.penalty | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}} AXN</b></p>
               <p *ngIf="actionsModalData.shares">Shares<br /><b>{{actionsModalData.shares | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}}</b></p>
               <p *ngIf="actionsModalData.lpb">Longer Pays Better<br /><b>{{actionsModalData.lpb | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}}</b></p>
               <p *ngIf="actionsModalData.totalShares">Total Shares<br /><b>{{actionsModalData.totalShares | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}}</b></p>

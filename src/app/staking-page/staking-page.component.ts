@@ -366,12 +366,34 @@ export class StakingPageComponent implements OnDestroy {
 
   public actionsModalData;
 
-  public openStakeActions(stake: Stake) {
-    this.actionsModalData = {
-      opened: this.dialog.open(this.actionsModal, {}),
-      stake,
-      stakeDays: 0,
-      amount: stake.principal.plus(stake.interest)
+  public async openStakeActions(stake: Stake) {
+
+    // Check if this is a late unstake
+    const endMS = +stake.endSeconds * 1000;
+    const penaltyWindow = endMS + (AVAILABLE_DAYS_AFTER_END * 86400 * 1000)
+    const isLate = Date.now() > penaltyWindow
+
+    if (isLate) {
+      const result = await this.contractService.getStakePayoutAndPenalty(stake, stake.interest);
+      const payout = new BigNumber(result[0]);
+      const penalty = new BigNumber(result[1]);
+
+      this.actionsModalData = {
+        opened: this.dialog.open(this.actionsModal, {}),
+        stake,
+        stakeDays: 0,
+        amount: payout,
+        penalty,
+        isLate
+      }
+    } else {
+      this.actionsModalData = {
+        opened: this.dialog.open(this.actionsModal, {}),
+        stake,
+        stakeDays: 0,
+        amount: stake.principal.plus(stake.interest),
+        isLate
+      }
     }
   }
 
