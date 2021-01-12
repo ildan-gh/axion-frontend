@@ -685,10 +685,7 @@
   <div class="dialog-block__content">
     <div class="dialog-title">Stake Auction Bid</div>
 
-  
-    <div class="dialog-description">
-
-    
+    <div class="dialog-description dialog-description-slim">
       <div class="axn-form axn-form-block-one">
           <p style="text-transform: none;">
             It is mandatory for each auction bid to be autostaked.<br/>
@@ -699,10 +696,9 @@
         <input
           step="1"
           type="number"
-          class="axn-input axn-input-mid"
+          class="axn-input"
           autocomplete="off"
           required="required"
-          style="width: auto;"
           name="stake-days"
           [max]="stakeMaxDays"
           [(ngModel)]="withdrawData.autoStakeDays"
