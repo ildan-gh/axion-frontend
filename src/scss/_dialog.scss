@@ -47,11 +47,14 @@
   max-height: 100%;
 }
 .mat-dialog-container {
-  padding: 30px 0 !important;
+  margin: 2% 0 !important;
+  padding: 0 !important;
   overflow: auto !important;
+  overflow-x: hidden !important;
   color: $clDialog-Mat-Container;
   background-color: $clDialog-Mat-Container-Background;
   border-radius: 20px !important;
+  height: auto !important;
 }
 
 .alert-window-title {
