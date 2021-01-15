@@ -208,7 +208,7 @@ export class ContractService {
       address: this.CONTRACTS_PARAMS.HEX2X.ADDRESS,
       decimals: this.tokensDecimals.HEX2X,
       image:
-        "https://axiondev.rocknblock.io/assets/images/icons/axion-icon.svg",
+        "https://stake.axion.network/assets/images/icons/axion-icon.png",
       symbol: "AXN",
     });
   }
