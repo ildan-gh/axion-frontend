@@ -24,6 +24,7 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { HttpClientModule } from "@angular/common/http";
 import { MatDialogModule, MatTooltipModule, MAT_HAMMER_OPTIONS  } from "@angular/material";
 import { AppConfig } from "./appconfig";
+import { MiningPageComponent } from "./mining-page/mining-page.component";
 
 export function initializeApp(injector: Injector) {
   return () =>
@@ -57,6 +58,7 @@ registerLocaleData(localeGB, "en-gb");
     BigNumberMax,
     StakingPageComponent,
     MinMaxDirective,
+    MiningPageComponent
   ],
   imports: [
     BrowserModule,
