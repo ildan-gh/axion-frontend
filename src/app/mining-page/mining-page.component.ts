@@ -13,7 +13,7 @@ import { AppComponent } from "../app.component";
 import { AppConfig } from "../appconfig";
 import { MetamaskErrorComponent } from "../components/metamaskError/metamask-error.component";
 
-import { ContractService } from "../services/contract";
+import { MiningContractService } from "../services/mining-contract";
 import { MatDialog } from "@angular/material/dialog";
 
 @Component({
@@ -53,7 +53,7 @@ export class MiningPageComponent implements OnDestroy {
   private settings: any = {};
 
   constructor(
-    public contractService: ContractService,
+    public contractService: MiningContractService,
     private cookieService: CookieService,
     private ngZone: NgZone,
     private appComponent: AppComponent,
