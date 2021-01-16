@@ -72,9 +72,9 @@ export class MiningContractService {
     contractService
       .accountSubscribe()
       .subscribe((account: any) => {
-        if (!account || account.balances) {
-          this.account = account;
+        if (account) {
           this.isActive = true;
+          this.account = account;
           this.callAllAccountsSubscribers();
         }
       });
