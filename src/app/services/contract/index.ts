@@ -1128,7 +1128,7 @@ export class ContractService {
 
     const stakes = await Promise.all(stakePromises.concat(stakeV1Promises));
 
-    const dayMs = 86400 * 1000;
+    const dayMs = this.secondsInDay * 1000;
 
     for (const stake of stakes) {
       if (!stake.isWithdrawn) {
@@ -1147,7 +1147,7 @@ export class ContractService {
         stake.targetEnd = new Date(
           new BigNumber(stake.lastPayout)
             .minus(stake.firstPayout)
-            .times(this.secondsInDay * 1000)
+            .times(dayMs)
             .plus(stake.start.getTime())
             .toNumber()
         );
