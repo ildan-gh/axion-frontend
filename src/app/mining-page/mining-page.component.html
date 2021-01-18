@@ -40,22 +40,22 @@
           onfocus="this.placeholder = ''"
           onblur="this.placeholder = '0.0'"
           [appBigNumber]="{
-            decimals: tokensDecimals['ETH'],
-            max: account?.balances.ETH.wei
+            decimals: userTokenBalance?.decimals,
+            max: userTokenBalance?.shortBigNumber
           }"
-          [(ngModel)]="formData.amount"
+          [(ngModel)]="depositAmount"
           autocomplete="off"
         />
         <span class="axn-cheap icon icon_uni cl-purple-bg">{{currentPool.base}}-{{currentPool.market}}</span>
 
         <div class="axn-form-bottom axn-form-base-2">
           <div class="axn-form-block-sendmax">
-            <span class="axn-btn axn-btn-max" (click)="formData.amount = account?.balances.ETH.shortBigNumber.toString()">
+            <span class="axn-btn axn-btn-max" (click)="addMax()">
              &nbsp;Max&nbsp;
             </span>
 
             <span class="axn-form-block-sendmax-text">
-              Balance: {{ account?.balances?.ETH.shortBigNumber | bigNumberFormat: 0:true:false:2 }}
+              Balance: {{ userTokenBalance?.weiBigNumber | bigNumberFormat: userTokenBalance?.decimals:true:false:2 || 0}}
               <span class="axn-form-block-sendmax-value"></span>
             </span>
             <br/>
@@ -66,7 +66,7 @@
             <button
               class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid"
               [ngClass]="{ progress: currentPool.depositProgress }"
-              [disabled]="!formData.amount || +formData.amount === 0 || !currentPool.isLive"
+              [disabled]="!depositAmount || +depositAmount === 0 || !currentPool.isLive"
               (click)="depositLPTokens()"
             >
               <!-- Ellipsis Loading Indicator -->
@@ -118,7 +118,7 @@
       <!-- Buttons -->
       <div class="axn-form-base-3">
         <div class="axn-form-block-one axn-form-base-center">
-          <button class="axn-btn axn-btn-gray axn-btn-form axn-form-btn-mid" [ngClass]="{ progress: currentPool.withdrawLPProgress }"
+          <button class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid" [ngClass]="{ progress: currentPool.withdrawLPProgress }"
             [disabled]="currentPool.stakedTokens === 0" (click)="withdraw('LP')">
             <!-- Ellipsis Loading Indicator -->
             <span class="lds-ellipsis" *ngIf="currentPool.withdrawLPProgress">
@@ -133,8 +133,8 @@
         </div>
 
         <div class="axn-form-block-one axn-form-base-center">
-          <button class="axn-btn axn-btn-gray axn-btn-form" [ngClass]="{ progress: currentPool.withdrawAllProgress }"
-            [disabled]="currentPool.rewardsEarned === 0 || currentPool.stakedTokens === 0" (click)="withdraw('BOTH')">
+          <button class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid" [ngClass]="{ progress: currentPool.withdrawAllProgress }"
+            [disabled]="currentPool.rewardsEarned === 0 || currentPool.stakedTokens === 0" (click)="withdraw('ALL')">
             <!-- Ellipsis Loading Indicator -->
             <span class="lds-ellipsis" *ngIf="currentPool.withdrawAllProgress">
               <span class="lds-ellipsis-container">
@@ -143,12 +143,12 @@
             </span>
           
             <!-- Button Text -->
-            <span class="axn-btn-text">Withdraw Both</span>
+            <span class="axn-btn-text">Withdraw All</span>
           </button>
         </div>
         
         <div class="axn-form-block-one axn-form-base-center">
-          <button class="axn-btn axn-btn-gray axn-btn-form" [ngClass]="{ progress: currentPool.withdrawRewardsProgress }"
+          <button class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid" [ngClass]="{ progress: currentPool.withdrawRewardsProgress }"
             [disabled]="currentPool.rewardsEarned === 0" (click)="withdraw('REWARDS')">
             <!-- Ellipsis Loading Indicator -->
             <span class="lds-ellipsis" *ngIf="currentPool.withdrawRewardsProgress">

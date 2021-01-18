@@ -69,6 +69,8 @@ export class MiningContractService {
   public autoStakeDays: number;
 
   constructor(private httpService: HttpClient, private config: AppConfig, private contractService: ContractService) {
+    this.web3Service = new MetamaskService(config);
+
     contractService
       .accountSubscribe()
       .subscribe((account: any) => {
@@ -198,5 +200,26 @@ export class MiningContractService {
     // );
 
     this.AxnTokenAddress = this.CONTRACTS_PARAMS.HEX.ADDRESS;
+  }
+
+  public getTokenInfo(tokenAddress, address): any {
+    const TOKEN = this.web3Service.getContract(this.contractService.CONTRACTS_PARAMS.UniswapPair.ABI, tokenAddress)
+    return new Promise(async (resolve, reject) => {
+      try {
+        const balance = await TOKEN.methods.balanceOf(address).call();
+        const decimals = await TOKEN.methods.decimals().call();
+        
+        const bigBalance = new BigNumber(balance);
+        resolve({
+          decimals: decimals,
+          wei: balance,
+          weiBigNumber: bigBalance,
+          shortBigNumber: bigBalance.div(new BigNumber(10).pow(decimals)),
+          display: bigBalance.div(new BigNumber(10).pow(decimals)).toFormat(2),
+        })
+      } catch (err) {
+        reject(err)
+      }
+    })
   }
 }

@@ -113,7 +113,7 @@ export class ContractService {
   private startDate: any;
   private leftDays: any;
 
-  private CONTRACTS_PARAMS: any;
+  public CONTRACTS_PARAMS: any;
 
   public AxnTokenAddress = "none";
 

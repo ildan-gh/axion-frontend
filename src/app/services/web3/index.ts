@@ -31,7 +31,7 @@ export class MetamaskService {
 
     this.providers = {};
     this.providers.metamask = Web3.givenProvider;
-
+    this.Web3 = new Web3(Web3.givenProvider)
     this.metaMaskWeb3 = window["ethereum"];
   }
 

@@ -27,10 +27,9 @@ export class MiningPageComponent implements OnDestroy {
   public onChangeAccount: EventEmitter<any> = new EventEmitter();
   
   public pools: any[];
+  public userTokenBalance: any = {};
   public currentPool: any = {};
-  public formData: any = {
-    amount: 0
-  };
+  public depositAmount = 0;
 
   private accountSubscribe;
   private settings: any = {};
@@ -55,6 +54,12 @@ export class MiningPageComponent implements OnDestroy {
               this.onChangeAccount.emit();
               this.pools  = this.getPools();
               this.currentPool = this.pools[0];
+
+              // Get token balance of the current pool
+              contractService.getTokenInfo(this.currentPool.address, account.address).then(result => {
+                this.userTokenBalance = result;
+                console.log(result)
+              })
             }
           });
         }
@@ -91,12 +96,12 @@ export class MiningPageComponent implements OnDestroy {
   }
 
   public async depositLPTokens() {
-    if (this.formData.amount > 0) {
+    if (this.depositAmount > 0) {
       const methodName = "deposit";
 
       try {
         this.currentPool.depositProgress = true;
-        await this.contractService[methodName](this.formData.amount);
+        await this.contractService[methodName](this.depositAmount);
         this.contractService.updateETHBalance();
         this.getPools();
       } catch (err) {
@@ -114,7 +119,11 @@ export class MiningPageComponent implements OnDestroy {
     }
   }
 
-  public async withdraw(type) {
+  public addMax() {
+    this.depositAmount = this.userTokenBalance.wei;
+  }
+
+  public async withdraw(type) { 
     let progressIndicatorVariable;
     let methodName;
 
@@ -127,7 +136,7 @@ export class MiningPageComponent implements OnDestroy {
         methodName = "withdrawRewards";
         progressIndicatorVariable = "withdrawRewardsProgress";
         break;
-      case "BOTH":
+      case "ALL":
         methodName = "withdrawAll";
         progressIndicatorVariable = "withdrawAllProgress";
         break;
@@ -137,7 +146,7 @@ export class MiningPageComponent implements OnDestroy {
 
     try {
       this.currentPool[progressIndicatorVariable] = true;
-      await this.contractService[methodName](this.formData.amount);
+      await this.contractService[methodName]();
 
       // Update info after success
       this.contractService.updateETHBalance();
