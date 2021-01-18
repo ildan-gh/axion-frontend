@@ -91,11 +91,17 @@
       }
 
       &-3 {
+        display: grid;
+        padding-top: 2%;
         grid-template-columns: repeat(3, minmax(250px, 400px));
 
         @include b(900) {
           grid-template-columns: 1fr;
         }
+      }
+
+      &-center {
+        justify-items: center;
       }
 
       &-4 {

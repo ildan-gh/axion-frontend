@@ -1,22 +1,22 @@
 <section class="axn-section" *ngIf="account">
   <div class="axn-title-block">
     <span class="axn-title" (hover)="tooltip2.toggle()">Mining</span>
-    <div
-      #tooltip2="matTooltip"
-      (click)="tooltip2.toggle()"
-      class="question"
-      mat-raised-button
-      matTooltip="Yo"
-      matTooltipClass="question__tooltip question__extrawidth"
-    ></div>
+    <div 
+      #tooltip2="matTooltip" 
+      (click)="tooltip2.toggle()" 
+      class="question" 
+      mat-raised-button 
+      matTooltip="Yo, this needs to be changed. @JoeJoe"
+      matTooltipClass="question__tooltip question__extrawidth">
+    </div>
   </div>
 
-    <div class="axn-form axn-form-base-2">
+  <div class="axn-form axn-form-base-2">
 
-    <!-- BID -->
+    <!-- DEPOSIT -->
     <div class="axn-form-block axn-form-auction">
       <div class="axn-form-block-one axn-form-arrow p-b-none">
-        <span class="axn-form-block-one-title">Input</span>
+        <span class="axn-form-block-one-title">Deposit AXN-ETH LP Tokens</span>
         <input
           type="text"
           *ngIf="account"
@@ -32,188 +32,127 @@
           }"
           [maxValueChange]="onChangeAccount"
           (ngModelChange)="onChangeAmount()"
-          [(ngModel)]="formsData.auctionAmount"
+          [(ngModel)]="formsData"
           autocomplete="off"
         />
-        <span class="axn-cheap icon icon_eth cl-purple-bg">ETH</span>
+        <span class="axn-cheap icon icon_uni cl-purple-bg">AXN-ETH</span>
 
-        <div class="axn-form-base-2 axn-form-bottom">
+        <div class="axn-form-bottom axn-form-base-2">
           <div class="axn-form-block-sendmax">
-            <span
-              class="axn-btn axn-btn-max"
-              (click)="
-                formsData.auctionAmount = account?.balances.ETH.shortBigNumber.toString()
-              "
-              >Max</span
-            >
+            <span class="axn-btn axn-btn-max" (click)="formsData.auctionAmount = account?.balances.ETH.shortBigNumber.toString()">
+             &nbsp;Max&nbsp;
+            </span>
+
             <span class="axn-form-block-sendmax-text">
-              Balance
-              <span class="axn-form-block-sendmax-value">{{
-                account?.balances?.ETH.shortBigNumber | bigNumberFormat: 0:true:false:2
-              }}</span></span
-            >
+              Balance: {{ account?.balances?.ETH.shortBigNumber | bigNumberFormat: 0:true:false:2 }}
+              <span class="axn-form-block-sendmax-value"></span>
+            </span>
+            <br/>
           </div>
-          <div class="axn-form-block-button" *ngIf="poolInfo.axn > 0">
+
+          <!-- Deposit Button -->
+          <div class="axn-form-block-button" layout-align="center center">
             <button
-              class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-small"
+              class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid"
               [ngClass]="{ progress: sendAuctionProgress }"
               [disabled]="!dataSendForm || sendAuctionProgress"
               (click)="sendETHToAuction()"
             >
+              <!-- Ellipsis Loading Indicator -->
               <span class="lds-ellipsis" *ngIf="sendAuctionProgress">
                 <span class="lds-ellipsis-container">
                   <span></span><span></span><span></span><span></span>
                 </span>
               </span>
-              <span class="axn-btn-text axn-btn-arrow-right">BID</span>
+
+              <!-- Button Text -->
+              <span class="axn-btn-text axn-btn-arrow-right">DEPOSIT</span>
             </button>
           </div>
         </div>
+
       </div>
     </div>
 
-    <!-- AUCTION INFO -->
-    <div class="axn-form-block">
+    <!-- POOL INFO -->
+    <div class="axn-form-block axn-form-auction">
       <div class="axn-form-base-2">
         <div class="axn-form-block-one axn-form-border-dashed-right">
-          <span class="axn-form-block-one-title">AXN In Pool</span>
+          <span class="axn-form-block-one-title">Your AXN-ETH LP</span>
           <span
             class="axn-form-block-one-value-small p-tb-5"
             matTooltipClass="table__tooltip"
             mat-raised-button
-            matTooltip="{{ poolInfo.axn || 0 }}"
+            matTooltip="{{ 0 | bigNumberFormat: 0:true:false:2 || 0 }}"
           >
-            {{ poolInfo.axn | bigNumberFormat: 0:true:false:2 || 0 }}
+            {{ 0 | bigNumberFormat: 0:true:false:2 || 0 }}
+          </span>
+
+          <span class="axn-cheap icon icon_uni cl-purple-bg">AXN-ETH</span>
+        </div>
+        <div class="axn-form-block-one">
+          <span class="axn-form-block-one-title">AXN Earned</span>
+          <span
+            class="axn-form-block-one-value-small p-tb-5"
+            matTooltipClass="table__tooltip"
+            mat-raised-button
+            matTooltip="{{0 | bigNumberFormat: tokensDecimals['ETH']:true:false:18 }}"
+          >
+            {{ 0 | bigNumberFormat: tokensDecimals["ETH"]:true:false:2 }}
           </span>
           <span class="axn-cheap icon icon_axn cl-blue-bg">AXN</span>
         </div>
-        <div class="axn-form-block-one">
-          <span class="axn-form-block-one-title">ETH In Pool</span>
-          <span
-            class="axn-form-block-one-value-small p-tb-5"
-            matTooltipClass="table__tooltip"
-            mat-raised-button
-            matTooltip="{{
-              poolInfo.eth
-                | bigNumberFormat: tokensDecimals['ETH']:true:false:18
-            }}"
-          >
-            {{
-              poolInfo.eth | bigNumberFormat: tokensDecimals["ETH"]:true:false:2
-            }}
-          </span>
-          <span class="axn-cheap icon icon_eth cl-purple-bg">ETH</span>
-        </div>
       </div>
-      <div class="axn-form-block-pool axn-form-bottom">
-        <span class="axn-form-block-pool-title">Auction price</span>
-        <div class="axn-form-block-pool-axn">
-          <span class="icon icon-flex icon__axion"
-            >{{
-              poolInfo.axnPerEth | bigNumberFormat: 0:true:false:2
-            }}
-            AXN</span
-          >
-          <span class="cl-purple">=</span>
-          <span class="icon icon-flex icon__eth-purple cl-purple">1 ETH</span>
+
+      <!-- Buttons -->
+      <div class="axn-form-base-3">
+        <div class="axn-form-block-one axn-form-base-center">
+          <button class="axn-btn axn-btn-gray axn-btn-form axn-form-btn-mid" [ngClass]="{ progress: sendAuctionProgress }"
+            [disabled]="!dataSendForm || sendAuctionProgress" (click)="sendETHToAuction()">
+            <!-- Ellipsis Loading Indicator -->
+            <span class="lds-ellipsis" *ngIf="sendAuctionProgress">
+              <span class="lds-ellipsis-container">
+                <span></span><span></span><span></span><span></span>
+              </span>
+            </span>
+          
+            <!-- Button Text -->
+            <span class="axn-btn-text">Withdraw Tokens</span>
+          </button>
         </div>
 
-        <span class="axn-form-block-pool-title">Uniswap price</span>
-        <div class="axn-form-block-pool-uni">
-          <span class="icon icon-flex icon__axion-gray cl-gray-dark"
-            >{{
-              poolInfo.uniAxnPerEth | bigNumberFormat: 0:true:false:2 || 0
-            }}
-            AXN</span
-          >
-          <span class="cl-gray-dark">=</span>
-          <span class="cl-gray-dark">1 ETH</span>
+        <div class="axn-form-block-one axn-form-base-center">
+          <button class="axn-btn axn-btn-gray axn-btn-form" [ngClass]="{ progress: sendAuctionProgress }"
+            [disabled]="!dataSendForm || sendAuctionProgress" (click)="sendETHToAuction()">
+            <!-- Ellipsis Loading Indicator -->
+            <span class="lds-ellipsis" *ngIf="sendAuctionProgress">
+              <span class="lds-ellipsis-container">
+                <span></span><span></span><span></span><span></span>
+              </span>
+            </span>
+          
+            <!-- Button Text -->
+            <span class="axn-btn-text">Withdraw All</span>
+          </button>
+        </div>
+        
+        <div class="axn-form-block-one axn-form-base-center">
+          <button class="axn-btn axn-btn-gray axn-btn-form" [ngClass]="{ progress: sendAuctionProgress }"
+            [disabled]="!dataSendForm || sendAuctionProgress" (click)="sendETHToAuction()">
+            <!-- Ellipsis Loading Indicator -->
+            <span class="lds-ellipsis" *ngIf="sendAuctionProgress">
+              <span class="lds-ellipsis-container">
+                <span></span><span></span><span></span><span></span>
+              </span>
+            </span>
+        
+            <!-- Button Text -->
+            <span class="axn-btn-text">Withdraw Rewards</span>
+          </button>
         </div>
       </div>
+
     </div>
+
   </div>
 </section>
-
-<ng-template #warningModal class="dialog-block" mat-dialog-content>
-  <div class="dialog-block__content">
-    <div class="dialog-title">Attention!</div>
-
-    <div class="dialog-description">
-      Your bid too low, you might get nothing from the auction
-    </div>
-
-    <div class="dialog-bottom">
-      <button class="axn-btn axn-btn-gray" type="button" mat-dialog-close>
-        <span>Close</span>
-      </button>
-      <button
-        class="axn-btn axn-btn-gray"
-        type="button"
-        (click)="successLowProfit()"
-      >
-        <span>Ok</span>
-      </button>
-    </div>
-  </div>
-</ng-template>
-
-<ng-template #withdrawModal class="dialog-block" mat-dialog-content>
-  <div class="dialog-block__content">
-    <div class="dialog-title">Stake Auction Bid</div>
-
-    <div class="dialog-description dialog-description-slim">
-      <div class="axn-form axn-form-block-one">
-          <p style="text-transform: none;">
-            It is mandatory for each auction bid to be autostaked.<br/>
-            Please enter the autostake length for this bid
-          </p>
-
-        <span class="axn-form-block-one-title">Stake Length<br>{{ contractService.autoStakeDays }} - {{stakeMaxDays}} Days</span>
-        <input
-          step="1"
-          type="number"
-          class="axn-input"
-          autocomplete="off"
-          required="required"
-          name="stake-days"
-          [max]="stakeMaxDays"
-          [(ngModel)]="withdrawData.autoStakeDays"
-          [appMinMaxNumber]="{
-            max: stakeMaxDays
-          }"
-        />
-        <span
-          class="axn-cheap cl-blue-bg"
-          style="
-            padding-left: 10px;
-            padding-right: 10px;
-            text-transform: none;
-          "
-          >{{
-            today +
-              ((withdrawData.autoStakeDays ||
-                this.contractService.autoStakeDays) +
-                1) *
-                24 *
-                60 *
-                60 *
-                1000 | date: "MMM d, y"
-          }}</span>
-
-          <div class="axn-form-block-sendmax">
-            <span class="axn-btn axn-btn-max" (click)="withdrawData.autoStakeDays = stakeMaxDays">Send max</span>
-          </div>
-          
-      </div>
-    </div>
-
-    <div class="dialog-bottom">
-      <button class="axn-btn axn-btn-gray" type="button" mat-dialog-close>
-        <span>Close</span>
-      </button>
-      <button class="axn-btn axn-btn-gray" [disabled]="withdrawData.autoStakeDays < contractService.autoStakeDays" type="button" (click)="confirmAutostakeDays()">
-        <span>Stake</span>
-      </button>
-    </div>
-  </div>
-</ng-template>
