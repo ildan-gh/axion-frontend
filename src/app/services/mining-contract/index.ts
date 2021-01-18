@@ -202,8 +202,13 @@ export class MiningContractService {
     this.AxnTokenAddress = this.CONTRACTS_PARAMS.HEX.ADDRESS;
   }
 
-  public getTokenInfo(tokenAddress, address): any {
-    const TOKEN = this.web3Service.getContract(this.contractService.CONTRACTS_PARAMS.UniswapPair.ABI, tokenAddress)
+  public getDecimals(lpTokenAddress): any {
+    const TOKEN = this.web3Service.getContract(this.contractService.CONTRACTS_PARAMS.UniswapPair.ABI, lpTokenAddress)
+    return TOKEN.methods.decimals().call();
+  }
+
+  public getTokenBalance(lpTokenAddress, address): any {
+    const TOKEN = this.web3Service.getContract(this.contractService.CONTRACTS_PARAMS.UniswapPair.ABI, lpTokenAddress)
     return new Promise(async (resolve, reject) => {
       try {
         const balance = await TOKEN.methods.balanceOf(address).call();
@@ -222,4 +227,20 @@ export class MiningContractService {
       }
     })
   }
+
+  public async withdraw(type) {
+    return new Promise((resolve, reject) => {
+      let methodName;
+
+      if (type === "LP") methodName = "withdrawLP";
+      else if (type === "REWARDS") methodName = "withdrawRewards";
+      else if (type === "ALL") methodName = "withdrawAll";
+
+      // TODO: implement
+      console.log(methodName)
+      resolve(null)
+    })
+  }
+
+
 }

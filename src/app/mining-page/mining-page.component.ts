@@ -54,18 +54,13 @@ export class MiningPageComponent implements OnDestroy {
               this.onChangeAccount.emit();
               this.pools  = this.getPools();
               this.currentPool = this.pools[0];
-
-              // Get token balance of the current pool
-              contractService.getTokenInfo(this.currentPool.address, account.address).then(result => {
-                this.userTokenBalance = result;
-                console.log(result)
-              })
+              this.contractService.getDecimals(this.currentPool.address).then(decimals => this.tokensDecimals = decimals )
+              this.updatePoolBalances();    
             }
           });
         }
       });
 
-    this.tokensDecimals = this.contractService.getCoinsDecimals();
     this.settings = config.getConfig();
   }
 
@@ -84,8 +79,8 @@ export class MiningPageComponent implements OnDestroy {
       base: "AXN",
       market: "ETH",
 
-      stakedTokens: new BigNumber(5.421234),
-      rewardsEarned: new BigNumber(100000.1128423),
+      stakedTokens: new BigNumber(0),
+      rewardsEarned: new BigNumber(0),
 
       isLive: true,
       depositProgress: false,
@@ -123,33 +118,23 @@ export class MiningPageComponent implements OnDestroy {
     this.depositAmount = this.userTokenBalance.wei;
   }
 
-  public async withdraw(type) { 
-    let progressIndicatorVariable;
-    let methodName;
+  public async updatePoolBalances() {
+    this.userTokenBalance = await this.contractService.getTokenBalance(this.currentPool.address, this.account.address);
+  }
 
-    switch(type) {
-      case "LP":
-        methodName = "withdrawLP";
-        progressIndicatorVariable = "withdrawLPProgress";
-        break;
-      case "REWARDS":
-        methodName = "withdrawRewards";
-        progressIndicatorVariable = "withdrawRewardsProgress";
-        break;
-      case "ALL":
-        methodName = "withdrawAll";
-        progressIndicatorVariable = "withdrawAllProgress";
-        break;
-      default:
-        return;
-    }
+  public async withdraw(type) { 
+    let progressIndicatorVariable: string;
+
+    if (type === "LP") progressIndicatorVariable = "withdrawLPProgress";
+    else if (type === "REWARDS") progressIndicatorVariable = "withdrawRewardsProgress";
+    else if (type === "ALL") progressIndicatorVariable = "withdrawAllProgress";
 
     try {
       this.currentPool[progressIndicatorVariable] = true;
-      await this.contractService[methodName]();
+      await this.contractService.withdraw(type);
 
       // Update info after success
-      this.contractService.updateETHBalance();
+      this.updatePoolBalances();
       this.getPools();
     } catch (err) {
       if (err.message) {
