@@ -119,7 +119,7 @@
       <div class="axn-form-base-3">
         <div class="axn-form-block-one axn-form-base-center">
           <button class="axn-btn axn-btn-gray axn-btn-form axn-form-btn-mid" [ngClass]="{ progress: currentPool.withdrawLPProgress }"
-            [disabled]="currentPool.stakedTokens === 0" (click)="withdrawLP()">
+            [disabled]="currentPool.stakedTokens === 0" (click)="withdraw('LP')">
             <!-- Ellipsis Loading Indicator -->
             <span class="lds-ellipsis" *ngIf="currentPool.withdrawLPProgress">
               <span class="lds-ellipsis-container">
@@ -134,7 +134,7 @@
 
         <div class="axn-form-block-one axn-form-base-center">
           <button class="axn-btn axn-btn-gray axn-btn-form" [ngClass]="{ progress: currentPool.withdrawAllProgress }"
-            [disabled]="currentPool.rewardsEarned === 0 && currentPool.stakedTokens === 0" (click)="withdrawAll()">
+            [disabled]="currentPool.rewardsEarned === 0 || currentPool.stakedTokens === 0" (click)="withdraw('BOTH')">
             <!-- Ellipsis Loading Indicator -->
             <span class="lds-ellipsis" *ngIf="currentPool.withdrawAllProgress">
               <span class="lds-ellipsis-container">
@@ -149,7 +149,7 @@
         
         <div class="axn-form-block-one axn-form-base-center">
           <button class="axn-btn axn-btn-gray axn-btn-form" [ngClass]="{ progress: currentPool.withdrawRewardsProgress }"
-            [disabled]="currentPool.rewardsEarned === 0" (click)="withdrawRewards()">
+            [disabled]="currentPool.rewardsEarned === 0" (click)="withdraw('REWARDS')">
             <!-- Ellipsis Loading Indicator -->
             <span class="lds-ellipsis" *ngIf="currentPool.withdrawRewardsProgress">
               <span class="lds-ellipsis-container">

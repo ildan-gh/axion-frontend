@@ -30,7 +30,7 @@ export class MiningPageComponent implements OnDestroy {
   public currentPool: any = {};
   public formData: any = {
     amount: 0
-  }
+  };
 
   private accountSubscribe;
   private settings: any = {};
@@ -72,15 +72,15 @@ export class MiningPageComponent implements OnDestroy {
     this.appComponent.subscribeAccount();
   }
 
-  // TODO: Get actual pools
+  // TODO: Get actual pools & account's data
   private getPools() {
     return [{
       address: "0xaadb00551312a3c2a8b46597a39ef1105afb2c08",
       base: "AXN",
       market: "ETH",
 
-      stakedTokens: 5.123,
-      rewardsEarned: 100000.1128423,
+      stakedTokens: new BigNumber(5.421234),
+      rewardsEarned: new BigNumber(100000.1128423),
 
       isLive: true,
       depositProgress: false,
@@ -90,37 +90,69 @@ export class MiningPageComponent implements OnDestroy {
     }]
   }
 
-  public depositLPTokens() {
-    console.log(this.formData.amount)
-    console.log(this.currentPool)
+  public async depositLPTokens() {
+    if (this.formData.amount > 0) {
+      const methodName = "deposit";
 
-    this.currentPool.depositProgress = true;
-    setTimeout(() => {
-      this.currentPool.depositProgress = false;
-    }, 2000)
+      try {
+        this.currentPool.depositProgress = true;
+        await this.contractService[methodName](this.formData.amount);
+        this.contractService.updateETHBalance();
+        this.getPools();
+      } catch (err) {
+        if (err.message) {
+          this.dialog.open(MetamaskErrorComponent, {
+            width: "400px",
+            data: {
+              msg: err.message,
+            },
+          });
+        }
+      } finally {
+        this.currentPool.depositProgress = false;
+      }
+    }
   }
 
-  public withdrawLP() {
-    console.log("Withdraw LP")
-    this.currentPool.withdrawLPProgress = true;
-    setTimeout(() => {
-      this.currentPool.withdrawLPProgress = false;
-    }, 2000)
-  }
+  public async withdraw(type) {
+    let progressIndicatorVariable;
+    let methodName;
 
-  public withdrawRewards() {
-    console.log("Withdraw Reward")
-    this.currentPool.withdrawRewardsProgress = true;
-    setTimeout(() => {
-      this.currentPool.withdrawRewardsProgress = false;
-    }, 2000)
-  }
+    switch(type) {
+      case "LP":
+        methodName = "withdrawLP";
+        progressIndicatorVariable = "withdrawLPProgress";
+        break;
+      case "REWARDS":
+        methodName = "withdrawRewards";
+        progressIndicatorVariable = "withdrawRewardsProgress";
+        break;
+      case "BOTH":
+        methodName = "withdrawAll";
+        progressIndicatorVariable = "withdrawAllProgress";
+        break;
+      default:
+        return;
+    }
 
-  public withdrawAll() {
-    console.log("Withdraw All")
-    this.currentPool.withdrawAllProgress = true;
-    setTimeout(() => {
-      this.currentPool.withdrawAllProgress = false;
-    }, 2000)
+    try {
+      this.currentPool[progressIndicatorVariable] = true;
+      await this.contractService[methodName](this.formData.amount);
+
+      // Update info after success
+      this.contractService.updateETHBalance();
+      this.getPools();
+    } catch (err) {
+      if (err.message) {
+        this.dialog.open(MetamaskErrorComponent, {
+          width: "400px",
+          data: {
+            msg: err.message,
+          },
+        });
+      }
+    } finally {
+      this.currentPool[progressIndicatorVariable] = false;
+    }
   }
 }
