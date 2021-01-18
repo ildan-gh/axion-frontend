@@ -22,34 +22,17 @@ import { MatDialog } from "@angular/material/dialog";
   styleUrls: ["./mining-page.component.scss"],
 })
 export class MiningPageComponent implements OnDestroy {
-  @ViewChild("successModal", {
-    static: true,
-  })
-  successModal: TemplateRef<any>;
-
-  @ViewChild("warningModal", {
-    static: true,
-  })
-  warningModal: TemplateRef<any>;
-
-  @ViewChild("withdrawModal", {
-    static: true,
-  })
-  withdrawModal: TemplateRef<any>;
-
-  private warningDialog;
-
-  public changeSort = true;
-
-  public sortData = {
-    id: true,
-  } as any;
-
   public account;
   public tokensDecimals;
-  private accountSubscribe;
   public onChangeAccount: EventEmitter<any> = new EventEmitter();
+  
+  public pools: any[];
+  public currentPool: any = {};
+  public formData: any = {
+    amount: 0
+  }
 
+  private accountSubscribe;
   private settings: any = {};
 
   constructor(
@@ -70,7 +53,8 @@ export class MiningPageComponent implements OnDestroy {
 
             if (account) {
               this.onChangeAccount.emit();
-
+              this.pools  = this.getPools();
+              this.currentPool = this.pools[0];
             }
           });
         }
@@ -86,5 +70,57 @@ export class MiningPageComponent implements OnDestroy {
 
   public subscribeAccount() {
     this.appComponent.subscribeAccount();
+  }
+
+  // TODO: Get actual pools
+  private getPools() {
+    return [{
+      address: "0xaadb00551312a3c2a8b46597a39ef1105afb2c08",
+      base: "AXN",
+      market: "ETH",
+
+      stakedTokens: 5.123,
+      rewardsEarned: 100000.1128423,
+
+      isLive: true,
+      depositProgress: false,
+      withdrawLPProgress: false,
+      withdrawAllProgress: false,
+      withdrawRewardsProgress: false,
+    }]
+  }
+
+  public depositLPTokens() {
+    console.log(this.formData.amount)
+    console.log(this.currentPool)
+
+    this.currentPool.depositProgress = true;
+    setTimeout(() => {
+      this.currentPool.depositProgress = false;
+    }, 2000)
+  }
+
+  public withdrawLP() {
+    console.log("Withdraw LP")
+    this.currentPool.withdrawLPProgress = true;
+    setTimeout(() => {
+      this.currentPool.withdrawLPProgress = false;
+    }, 2000)
+  }
+
+  public withdrawRewards() {
+    console.log("Withdraw Reward")
+    this.currentPool.withdrawRewardsProgress = true;
+    setTimeout(() => {
+      this.currentPool.withdrawRewardsProgress = false;
+    }, 2000)
+  }
+
+  public withdrawAll() {
+    console.log("Withdraw All")
+    this.currentPool.withdrawAllProgress = true;
+    setTimeout(() => {
+      this.currentPool.withdrawAllProgress = false;
+    }, 2000)
   }
 }

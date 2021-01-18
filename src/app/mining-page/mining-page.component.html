@@ -7,17 +7,15 @@
       class="question" 
       mat-raised-button 
       matTooltip="
-        Stake AXN-ETH Liquidity Provider (LP) tokens and get rewarded in AXN. 10% of the dev fund has been put into a 6 month reward pool (5B tokens).
-
-        e.g: If you make up 50% of the pool from day one, you will earn 2.5B by the time the pool closes.
+        Stake {{currentPool.base}}-{{currentPool.market}} Liquidity Provider (LP) tokens and get rewarded in AXN.
 
         Rewards will be calculated on minute-by-minute basis, so you can stake and unstake whenever you want.
 
         To stake an LP token:
 
-        1) You first need to own/buy the base token (AXN), which increases buying pressure.
+        1) You first need to own/buy the base token ({{currentPool.base}}), which increases buying pressure.
 
-        2) You then fund a uniswap liquidity pool with an equal dollar amount of AXN and ETH.
+        2) You then fund a uniswap liquidity pool with an equal dollar amount of {{currentPool.base}} and {{currentPool.market}}.
 
         3) Once you add the liquidity, Uniswap automatically generates and sends you a LP token as a 'credit'.
 
@@ -32,7 +30,7 @@
     <!-- DEPOSIT -->
     <div class="axn-form-block axn-form-auction">
       <div class="axn-form-block-one axn-form-arrow p-b-none">
-        <span class="axn-form-block-one-title">Deposit AXN-ETH LP Tokens</span>
+        <span class="axn-form-block-one-title">Deposit {{currentPool.base}}-{{currentPool.market}} LP Tokens</span>
         <input
           type="text"
           *ngIf="account"
@@ -43,19 +41,16 @@
           onblur="this.placeholder = '0.0'"
           [appBigNumber]="{
             decimals: tokensDecimals['ETH'],
-            min: 1,
             max: account?.balances.ETH.wei
           }"
-          [maxValueChange]="onChangeAccount"
-          (ngModelChange)="onChangeAmount()"
-          [(ngModel)]="formsData"
+          [(ngModel)]="formData.amount"
           autocomplete="off"
         />
-        <span class="axn-cheap icon icon_uni cl-purple-bg">AXN-ETH</span>
+        <span class="axn-cheap icon icon_uni cl-purple-bg">{{currentPool.base}}-{{currentPool.market}}</span>
 
         <div class="axn-form-bottom axn-form-base-2">
           <div class="axn-form-block-sendmax">
-            <span class="axn-btn axn-btn-max" (click)="formsData.auctionAmount = account?.balances.ETH.shortBigNumber.toString()">
+            <span class="axn-btn axn-btn-max" (click)="formData.amount = account?.balances.ETH.shortBigNumber.toString()">
              &nbsp;Max&nbsp;
             </span>
 
@@ -70,12 +65,12 @@
           <div class="axn-form-block-button" layout-align="center center">
             <button
               class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid"
-              [ngClass]="{ progress: sendAuctionProgress }"
-              [disabled]="!dataSendForm || sendAuctionProgress"
-              (click)="sendETHToAuction()"
+              [ngClass]="{ progress: currentPool.depositProgress }"
+              [disabled]="!formData.amount || +formData.amount === 0 || !currentPool.isLive"
+              (click)="depositLPTokens()"
             >
               <!-- Ellipsis Loading Indicator -->
-              <span class="lds-ellipsis" *ngIf="sendAuctionProgress">
+              <span class="lds-ellipsis" *ngIf="currentPool.depositProgress">
                 <span class="lds-ellipsis-container">
                   <span></span><span></span><span></span><span></span>
                 </span>
@@ -94,17 +89,17 @@
     <div class="axn-form-block axn-form-auction">
       <div class="axn-form-base-2">
         <div class="axn-form-block-one axn-form-border-dashed-right">
-          <span class="axn-form-block-one-title">Your AXN-ETH LP</span>
+          <span class="axn-form-block-one-title">Your {{currentPool.base}}-{{currentPool.market}} LP</span>
           <span
             class="axn-form-block-one-value-small p-tb-5"
             matTooltipClass="table__tooltip"
             mat-raised-button
-            matTooltip="{{ 0 | bigNumberFormat: 0:true:false:2 || 0 }}"
+            matTooltip="{{ currentPool.stakedTokens | bigNumberFormat: tokensDecimals['HEX2X']:true:false:2 || 0 }}"
           >
-            {{ 0 | bigNumberFormat: 0:true:false:2 || 0 }}
+            {{ currentPool.stakedTokens | bigNumberFormat: 0:true:false:2 || 0 }}
           </span>
 
-          <span class="axn-cheap icon icon_uni cl-purple-bg">AXN-ETH</span>
+          <span class="axn-cheap icon icon_uni cl-purple-bg">{{currentPool.base}}-{{currentPool.market}}</span>
         </div>
         <div class="axn-form-block-one">
           <span class="axn-form-block-one-title">AXN Earned</span>
@@ -112,9 +107,9 @@
             class="axn-form-block-one-value-small p-tb-5"
             matTooltipClass="table__tooltip"
             mat-raised-button
-            matTooltip="{{0 | bigNumberFormat: tokensDecimals['ETH']:true:false:18 }}"
+            matTooltip="{{currentPool.rewardsEarned | bigNumberFormat: tokensDecimals.HEX2X:true:false:18 }}"
           >
-            {{ 0 | bigNumberFormat: tokensDecimals["ETH"]:true:false:2 }}
+            {{ currentPool.rewardsEarned | bigNumberFormat: 0:true:false:2 }}
           </span>
           <span class="axn-cheap icon icon_axn cl-blue-bg">AXN</span>
         </div>
@@ -123,10 +118,10 @@
       <!-- Buttons -->
       <div class="axn-form-base-3">
         <div class="axn-form-block-one axn-form-base-center">
-          <button class="axn-btn axn-btn-gray axn-btn-form axn-form-btn-mid" [ngClass]="{ progress: sendAuctionProgress }"
-            [disabled]="!dataSendForm || sendAuctionProgress" (click)="sendETHToAuction()">
+          <button class="axn-btn axn-btn-gray axn-btn-form axn-form-btn-mid" [ngClass]="{ progress: currentPool.withdrawLPProgress }"
+            [disabled]="currentPool.stakedTokens === 0" (click)="withdrawLP()">
             <!-- Ellipsis Loading Indicator -->
-            <span class="lds-ellipsis" *ngIf="sendAuctionProgress">
+            <span class="lds-ellipsis" *ngIf="currentPool.withdrawLPProgress">
               <span class="lds-ellipsis-container">
                 <span></span><span></span><span></span><span></span>
               </span>
@@ -138,25 +133,25 @@
         </div>
 
         <div class="axn-form-block-one axn-form-base-center">
-          <button class="axn-btn axn-btn-gray axn-btn-form" [ngClass]="{ progress: sendAuctionProgress }"
-            [disabled]="!dataSendForm || sendAuctionProgress" (click)="sendETHToAuction()">
+          <button class="axn-btn axn-btn-gray axn-btn-form" [ngClass]="{ progress: currentPool.withdrawAllProgress }"
+            [disabled]="currentPool.rewardsEarned === 0 && currentPool.stakedTokens === 0" (click)="withdrawAll()">
             <!-- Ellipsis Loading Indicator -->
-            <span class="lds-ellipsis" *ngIf="sendAuctionProgress">
+            <span class="lds-ellipsis" *ngIf="currentPool.withdrawAllProgress">
               <span class="lds-ellipsis-container">
                 <span></span><span></span><span></span><span></span>
               </span>
             </span>
           
             <!-- Button Text -->
-            <span class="axn-btn-text">Withdraw All</span>
+            <span class="axn-btn-text">Withdraw Both</span>
           </button>
         </div>
         
         <div class="axn-form-block-one axn-form-base-center">
-          <button class="axn-btn axn-btn-gray axn-btn-form" [ngClass]="{ progress: sendAuctionProgress }"
-            [disabled]="!dataSendForm || sendAuctionProgress" (click)="sendETHToAuction()">
+          <button class="axn-btn axn-btn-gray axn-btn-form" [ngClass]="{ progress: currentPool.withdrawRewardsProgress }"
+            [disabled]="currentPool.rewardsEarned === 0" (click)="withdrawRewards()">
             <!-- Ellipsis Loading Indicator -->
-            <span class="lds-ellipsis" *ngIf="sendAuctionProgress">
+            <span class="lds-ellipsis" *ngIf="currentPool.withdrawRewardsProgress">
               <span class="lds-ellipsis-container">
                 <span></span><span></span><span></span><span></span>
               </span>
