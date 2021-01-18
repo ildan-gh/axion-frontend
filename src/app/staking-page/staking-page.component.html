@@ -386,7 +386,16 @@
           <th>Shares</th>
           <th>BigPayDay</th>
           <th>Interest</th>
-          <th>APY*</th>
+          <th>APY
+            <div
+              class="question"
+              mat-raised-button
+              #tooltip="matTooltip"
+              (click)="tooltip.toggle()"
+              matTooltip="APY is an estimate based on past data and updates daily based on the interest earned."
+              matTooltipClass="question__tooltip"
+            ></div>
+          </th>
           <th width="10">&nbsp;</th>
         </tr>
       </thead>
@@ -529,7 +538,16 @@
           <th>Shares</th>
           <th>BigPayDay</th>
           <th>Interest</th>
-          <th>APY*</th>
+          <th>APY
+            <div
+              class="question"
+              mat-raised-button
+              #tooltip="matTooltip"
+              (click)="tooltip.toggle()"
+              matTooltip="APY is an estimate based on past data and updates daily based on the interest earned."
+              matTooltipClass="question__tooltip"
+            ></div>
+          </th>
           <th width="10">&nbsp;</th>
         </tr>
       </thead>
