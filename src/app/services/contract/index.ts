@@ -31,6 +31,7 @@ export interface Stake {
   isMatured: boolean;
   isWithdrawn: boolean;
   isV1: boolean;
+  apy: number;
 }
 
 export interface AuctionBid {
@@ -1127,6 +1128,8 @@ export class ContractService {
 
     const stakes = await Promise.all(stakePromises.concat(stakeV1Promises));
 
+    const dayMs = 86400 * 1000;
+
     for (const stake of stakes) {
       if (!stake.isWithdrawn) {
         const stakingInterest = await this.StakingContract.methods
@@ -1137,7 +1140,12 @@ export class ContractService {
           )
           .call();
 
+        const endMs = stake.end.getTime();
+        const end = nowMs < endMs ? nowMs : endMs;
+        const daysStaked = (end - stake.start.getTime()) / dayMs;
+
         stake.interest = new BigNumber(stakingInterest);
+        stake.apy = stake.interest.times(100).div(stake.principal).div(daysStaked).times(365).dp(2).toNumber();
       } else if (stake.isWithdrawn && !stake.isV1) {
         stake.payout = new BigNumber(stake.payout).plus(stake.bigPayDay);
         stake.interest = stake.payout.minus(stake.principal);
@@ -1242,6 +1250,7 @@ export class ContractService {
         isBpdWithdraw: stakeSession.withdrawn && !bigPayDay.isZero(),
         isBpdWithdrawn: bpdSession.withdrawn,
         isV1: true,
+        apy: 0
       };
 
       return stake;
@@ -1291,6 +1300,7 @@ export class ContractService {
         isBpdWithdraw: stakeSession.withdrawn && !bigPayDay.isZero(),
         isBpdWithdrawn: bpdSession.withdrawn,
         isV1: false,
+        apy: 0
       };
 
       return stake;
