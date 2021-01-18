@@ -1140,12 +1140,7 @@ export class ContractService {
           )
           .call();
 
-        const endMs = stake.end.getTime();
-        const end = nowMs < endMs ? nowMs : endMs;
-        const daysStaked = (end - stake.start.getTime()) / dayMs;
-
         stake.interest = new BigNumber(stakingInterest);
-        stake.apy = stake.interest.times(100).div(stake.principal).div(daysStaked).times(365).dp(2).toNumber();
       } else if (stake.isWithdrawn && !stake.isV1) {
         stake.payout = new BigNumber(stake.payout).plus(stake.bigPayDay);
         stake.interest = stake.payout.minus(stake.principal);
@@ -1156,6 +1151,14 @@ export class ContractService {
             .plus(stake.start.getTime())
             .toNumber()
         );
+      }
+
+      if (!(stake.isV1 && stake.isWithdrawn)){
+        const endMs = stake.end.getTime();
+        const end = nowMs < endMs ? nowMs : endMs;
+        const daysStaked = (end - stake.start.getTime()) / dayMs;
+
+        stake.apy = stake.interest.times(100).div(stake.principal).div(daysStaked).times(365).dp(2).toNumber();
       }
     }
 
