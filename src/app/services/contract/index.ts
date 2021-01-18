@@ -1157,6 +1157,14 @@ export class ContractService {
             .toNumber()
         );
       }
+
+      if (!stake.isV1){
+        const endMs = stake.end.getTime();
+        const end = nowMs < endMs ? nowMs : endMs;
+        const daysStaked = (end - stake.start.getTime()) / dayMs;
+
+        stake.apy = stake.interest.times(100).div(stake.principal).div(daysStaked).times(365).dp(2).toNumber();
+      }
     }
 
     return {
