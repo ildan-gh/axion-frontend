@@ -123,13 +123,13 @@ export class MiningContractService {
         
         // GET token symbol for ach token in pair
         const BASE_TOKEN_CONTRACT = this.web3Service.getContract(this.contractService.CONTRACTS_PARAMS.UniswapERC20Pair.ABI, token0)
-        const token = await BASE_TOKEN_CONTRACT.methods.symbol().call();
+        const base = await BASE_TOKEN_CONTRACT.methods.symbol().call();
 
         const MARKET_TOKEN_CONTRACT = this.web3Service.getContract(this.contractService.CONTRACTS_PARAMS.UniswapERC20Pair.ABI, token1)
         const market = await MARKET_TOKEN_CONTRACT.methods.symbol().call();
 
         resolve({
-          token,
+          base,
           market
         })
       } catch (err) {

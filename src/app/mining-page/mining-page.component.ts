@@ -139,7 +139,7 @@ export class MiningPageComponent implements OnDestroy {
       try {
         const SYMBOLS = await this.contractService.getPoolTokens(address.trim())
         if (SYMBOLS) {
-          this.createPoolData.token = SYMBOLS.token;
+          this.createPoolData.base = SYMBOLS.base;
           this.createPoolData.market = SYMBOLS.market;
         }
       } catch (err) {

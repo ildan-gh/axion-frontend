@@ -3,7 +3,7 @@
   <div class="axn-title-block">
     <span class="axn-title" (hover)="tooltip2.toggle()">Mining</span>
     <div #tooltip2="matTooltip" (click)="tooltip2.toggle()" class="question" mat-raised-button matTooltip="
-          Stake {{currentPool ? currentPool?.base - currentPool?.market : ''}} Liquidity Provider (LP) tokens and get rewarded in AXN.
+          Stake Liquidity Provider (LP) tokens and get rewarded in AXN.
 
           Rewards will be calculated on minute-by-minute basis, so you can stake and unstake whenever you want.
 
@@ -187,7 +187,7 @@
 <!-- AVAILABLE POOLS -->
 <section class="axn-section" *ngIf="account && currentPool && pools.length > 1">
   <div class="axn-title-block">
-    <span class="axn-title">Mining Pools</span>
+    <span class="axn-title">Pools</span>
 
     <div 
       #tooltip2="matTooltip" 
