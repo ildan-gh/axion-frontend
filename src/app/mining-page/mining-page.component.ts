@@ -12,6 +12,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { MiningContractService } from "../services/mining-contract";
 import { MetamaskErrorComponent } from "../components/metamaskError/metamask-error.component";
 import { ActivatedRoute } from "@angular/router";
+import { TransactionSuccessModalComponent } from "../components/transactionSuccessModal/transaction-success-modal.component";
 
 @Component({
   selector: "app-mining-page",
@@ -53,18 +54,15 @@ export class MiningPageComponent implements OnDestroy {
           if (account) {
             this.onChangeAccount.emit();
 
-            const POOLS = this.getPools(); 
-            if(POOLS.length > 0) {
-              this.pools = POOLS;
-
+            this.updatePools().then(pools => {
               // Determine which pool to load
               this.activatedRoute.params.subscribe(params => {
                 if (params['pool'])
                   this.processParams(params['pool'])
-                else 
-                  this.setCurrentPool(this.pools[0])
+                else
+                  this.setCurrentPool(pools[0])
               });
-            }
+            }); 
           }
         });
       }
@@ -75,96 +73,29 @@ export class MiningPageComponent implements OnDestroy {
     this.accountSubscribe.unsubscribe();
   }
 
-  // Process URL params to hel pwith direct linking
-  private processParams(params) {
-    try {
-      const BASE = params.split("-")[0].toUpperCase()
-      const MARKET = params.split("-")[1].toUpperCase()
-      const POOL_FOUND = this.pools.find(p => p.base === BASE && p.market === MARKET)
-
-      if (POOL_FOUND)
-        this.setCurrentPool(POOL_FOUND)
-      else
-        this.setCurrentPool(this.pools[0])
-    } catch (err) {
-      console.log("Invalid params, loading default pool...")
-      this.setCurrentPool(this.pools[0])
-    }
-  }
-
-  // TODO: Get actual pools
-  private getPools() {
-    return [
-      {
-        address: "0xaadb00551312a3c2a8b46597a39ef1105afb2c08",
-        base: "AXN",
-        market: "ETH",
-
-        startBlock: 11686417,
-        endBlock: 11752227,
-        rewardPool: 5000000000000000000000000000,
-
-        isLive: true
-      },
-      { // EXAMPLE
-        address: "0xd7f7c34dd455efafce52d8845b2646c790db0cdd",
-        base: "HEX",
-        market: "AXN",
-
-        startBlock: 11686417,
-        endBlock: 11752227,
-        rewardPool: 1000000000000000000000000000,
-
-        isLive: false
-      }
-    ]
-  }
-
-  // TODO: Get actual account data
-  private getPoolStats(address) {
-    return {
-      stakedTokens: new BigNumber(0),
-      rewardsEarned: new BigNumber(0)
-    }
-  }
-
-  private async getPoolDecimals(address) {
+  public async getPoolDecimals(address: string) {
     this.tokensDecimals = await this.contractService.getDecimals(address);
   }
 
-  public async onCreatePoolAddressChanged(){
-    const address = this.createPoolData.tokenAddress;
-
-    if(address) {
-      try {
-        const SYMBOLS = await this.contractService.getPoolTokens(address.trim())
-        if (SYMBOLS) {
-          this.createPoolData.base = SYMBOLS.base;
-          this.createPoolData.market = SYMBOLS.market;
-        }
-      } catch (err) {
-        this.dialog.open(MetamaskErrorComponent, {
-          width: "400px",
-          data: { msg: err.message },
-        });
-      }
-    }
+  public async updatePools() {
+    const POOLS = await this.contractService.getPools();
+    if (POOLS.length > 0)
+      this.pools = POOLS;
+    return POOLS;
   }
-  
-  public setCurrentPool(pool) {
-    this.switchingLoading = pool.address;
 
-    // Simulate the loading/network requests to get balance, stats & decimals
-    setTimeout(async () => {
-      try {
-        this.currentPool = pool;
-        this.currentPoolStats = this.getPoolStats(this.account.address);
-        await this.updatePoolBalances();
-        await this.getPoolDecimals(pool.address);
-      }
-      catch (err) { console.log(err) }
-      finally { this.switchingLoading = "" }
-    }, 500)
+  public openSuccessModal(txID: string) {
+    this.dialog.open(TransactionSuccessModalComponent, {
+      width: "400px",
+      data: txID,
+    });
+  }
+
+  public openErrorModal(message: string) {
+    this.dialog.open(MetamaskErrorComponent, {
+      width: "400px",
+      data: { msg: message },
+    });
   }
 
   public subscribeAccount() {
@@ -175,70 +106,91 @@ export class MiningPageComponent implements OnDestroy {
     window.open(`https://info.uniswap.org/pair/${addr}`, "_blank")
   }
 
-  public async depositLPTokens() {
-    if (this.depositAmount > 0) {
-      const methodName = "deposit";
-
-      try {
-        this.currentPool.depositProgress = true;
-        await this.contractService[methodName](this.depositAmount);
-        this.updatePoolBalances()
-        this.getPools();
-      } 
-      catch (err) {
-        if (err.message) {
-          this.dialog.open(MetamaskErrorComponent, {
-            width: "400px",
-            data: { msg: err.message },
-          });
-        }
-      } 
-      finally {
-        this.currentPool.depositProgress = false;
-      }
-    }
-  }
-
   public openCreatePoolModal() {
     this.createPoolData.ref = this.dialog.open(this.createPoolModal, {});
-  }
-
-  public createPool() {
-    if (
-      !this.createPoolData.rewardPool ||
-      !this.createPoolData.tokenAddress || 
-      !this.createPoolData.startBlock ||
-      !this.createPoolData.endBlock
-    ) {
-      this.dialog.open(MetamaskErrorComponent, {
-        width: "400px",
-        data: { msg: "Missing information. All fields must be filled." },
-      });
-      return;
-    }
-    
-    this.createPoolData.progressIndicator = true;
-
-    // TODO: Implement - Simulate the loading for now
-    setTimeout(() => {
-      const rewards = this.createPoolData.rewardPool;
-      const address = this.createPoolData.tokenAddress;
-      const startBlock = this.createPoolData.startBlock;
-      const endBlock = this.createPoolData.endBlock;
-      console.log({ rewards, address, startBlock, endBlock})
-      this.createPoolData.progressIndicator = false;
-    }, 1000)
-  }
-
-  public addMax() {
-    this.depositAmount = this.userTokenBalance.wei;
   }
 
   public async updatePoolBalances() {
     this.userTokenBalance = await this.contractService.getTokenBalance(this.currentPool.address, this.account.address);
   }
 
-  public async withdraw(type) { 
+  public async onCreatePoolAddressChanged() {
+    const address = this.createPoolData.tokenAddress;
+
+    if (address) {
+      try {
+        const SYMBOLS = await this.contractService.getPoolTokens(address.trim())
+        if (SYMBOLS) {
+          this.createPoolData.base = SYMBOLS.base;
+          this.createPoolData.market = SYMBOLS.market;
+        }
+      } catch (err) {
+        if (err.message)
+          this.openErrorModal(err.message)
+      }
+    }
+  }
+
+  public setCurrentPool(pool) {
+    this.switchingLoading = pool.address;
+
+    // Simulate the loading/network requests to get balance, stats & decimals
+    setTimeout(async () => {
+      try {
+        this.currentPool = pool;
+        this.currentPoolStats = await this.contractService.getUserPoolBalance(this.account.address);
+        await this.updatePoolBalances();
+        await this.getPoolDecimals(pool.address);
+      }
+      catch (err) { console.log(err) }
+      finally { this.switchingLoading = "" }
+    }, 500)
+  }
+
+  // Process URL params to hel pwith direct linking
+  public processParams(params) {
+    try {
+      const BASE = params.split("-")[0].toUpperCase()
+      const MARKET = params.split("-")[1].toUpperCase()
+      const POOL_FOUND = this.pools.find(p => p.base === BASE && p.market === MARKET)
+
+      if (POOL_FOUND)
+        this.setCurrentPool(POOL_FOUND)
+      else {
+        const FALLBACK_POOL = this.pools[0]
+        this.setCurrentPool(FALLBACK_POOL)
+        this.openErrorModal(`${BASE}-${MARKET} pool not found. Falling back to ${FALLBACK_POOL.base}-${FALLBACK_POOL.market}.`)
+
+        // Cosmetic: Since pool doesn't exist, take it out of the url that the user tried
+        // Doing it this way does not refresh the current page.
+        window.history.replaceState({}, document.title, "/mining");
+      }
+    } catch (err) {
+      console.log("Invalid params, loading default pool...")
+      this.setCurrentPool(this.pools[0])
+    }
+  }
+
+  public async deposit() {
+    if (this.depositAmount > 0) {
+      try {
+        this.currentPool.depositProgress = true;
+        await this.contractService.deposit(this.depositAmount);
+        this.updatePoolBalances()
+        this.updatePools();
+        // this.openSuccessModal("txID");
+      }
+      catch (err) {
+        if (err.message)
+          this.openErrorModal(err.message)
+      }
+      finally {
+        this.currentPool.depositProgress = false;
+      }
+    }
+  }
+
+  public async withdraw(type: string) { 
     let progressIndicatorVariable: string;
 
     if (type === "LP") progressIndicatorVariable = "withdrawLPProgress";
@@ -248,21 +200,45 @@ export class MiningPageComponent implements OnDestroy {
     try {
       this.currentPool[progressIndicatorVariable] = true;
       await this.contractService.withdraw(type);
-
-      // Update info after success
       this.updatePoolBalances();
-      this.getPools();
+      this.updatePools();
+      //this.openSuccessModal("txID");
     } 
     catch (err) {
-      if (err.message) {
-        this.dialog.open(MetamaskErrorComponent, {
-          width: "400px",
-          data: { msg: err.message },
-        });
-      }
+      if (err.message)
+        this.openErrorModal(err.message)
     } 
     finally {
       this.currentPool[progressIndicatorVariable] = false;
+    }
+  }
+
+  // ONLY MANAGERS
+  public async createPool() {
+    if (!this.createPoolData.rewardPool || !this.createPoolData.tokenAddress || !this.createPoolData.startBlock || !this.createPoolData.endBlock) {
+      this.openErrorModal("Missing information. All fields must be filled.")
+      return;
+    }
+
+    this.createPoolData.progressIndicator = true;
+
+    const rewards = this.createPoolData.rewardPool;
+    const address = this.createPoolData.tokenAddress;
+    const startBlock = this.createPoolData.startBlock;
+    const endBlock = this.createPoolData.endBlock;
+
+    try {
+      await this.contractService.createPool(address, rewards, startBlock, endBlock)
+
+      this.createPoolData.ref.close();
+      this.createPoolData.progressIndicator = false;
+      this.createPoolData = {};
+      this.updatePools();
+      // this.openSuccessModal("txID");
+    }
+    catch (err) {
+      if (err.message)
+        this.openErrorModal(err.message)
     }
   }
 }

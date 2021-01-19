@@ -47,7 +47,7 @@
 
         <div class="axn-form-bottom axn-form-base-2">
           <div class="axn-form-block-sendmax">
-            <span class="axn-btn axn-btn-max" (click)="addMax()">
+            <span class="axn-btn axn-btn-max" (click)="depositAmount = this.userTokenBalance.wei">
              &nbsp;Max&nbsp;
             </span>
 
@@ -64,7 +64,7 @@
               class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid"
               [ngClass]="{ progress: currentPool.depositProgress }"
               [disabled]="!depositAmount || +depositAmount === 0 || !currentPool.isLive"
-              (click)="depositLPTokens()"
+              (click)="deposit()"
             >
               <!-- Ellipsis Loading Indicator -->
               <span class="lds-ellipsis" *ngIf="currentPool.depositProgress">

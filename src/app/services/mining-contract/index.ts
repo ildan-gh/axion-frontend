@@ -30,7 +30,7 @@ export class MiningContractService {
     });
   }
 
-  // TODO: Implement correctly
+  // TODO: Implement (and maybe change name? haha)
   private checkRole() {
     this.account.isManager = true;
   }
@@ -97,11 +97,6 @@ export class MiningContractService {
     return newObserver;
   }
 
-  // TODO: implement this.
-  public isManager(address) {
-    return address !== "";
-  }
-
   public getDecimals(lpTokenAddress): any {
     const TOKEN = this.web3Service.getContract(this.contractService.CONTRACTS_PARAMS.UniswapERC20Pair.ABI, lpTokenAddress)
     return TOKEN.methods.decimals().call();
@@ -158,6 +153,51 @@ export class MiningContractService {
     })
   }
 
+  // TODO: Implement
+  public getPools(): Promise<any[]> {
+    return new Promise(async (resolve, reject) => {
+      try {
+
+        // EXAMPLE
+        resolve([
+          {
+            address: "0xaadb00551312a3c2a8b46597a39ef1105afb2c08",
+            base: "AXN",
+            market: "ETH",
+
+            startBlock: 11686417,
+            endBlock: 11752227,
+            rewardPool: 5000000000000000000000000000,
+
+            isLive: true
+          },
+          { 
+            address: "0xd7f7c34dd455efafce52d8845b2646c790db0cdd",
+            base: "HEX",
+            market: "AXN",
+
+            startBlock: 11686417,
+            endBlock: 11752227,
+            rewardPool: 1000000000000000000000000000,
+
+            isLive: false
+          }
+        ])
+      } catch (err) { reject(err) }
+    })
+  }
+
+  // TODO: Implement
+  public deposit(amount) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        console.log(amount)
+        resolve(null)
+      } catch (err) { reject (err) }
+    })
+  }
+
+  // TODO: Implement
   public async withdraw(type) {
     return new Promise((resolve, reject) => {
       let methodName;
@@ -165,10 +205,32 @@ export class MiningContractService {
       if (type === "LP") methodName = "withdrawLP";
       else if (type === "REWARDS") methodName = "withdrawRewards";
       else if (type === "ALL") methodName = "withdrawAll";
-
-      // TODO: implement
       console.log(methodName)
       resolve(null)
+    })
+  }
+
+  // TODO: Implement
+  public async getUserPoolBalance(address) {
+    return new Promise((resolve, reject) => {
+      try {
+        resolve({
+          address,
+          stakedTokens: new BigNumber(0),
+          rewardsEarned: new BigNumber(0)
+        })
+        resolve(null)
+      } catch (err) { reject(err) }
+    })
+  }
+
+  // TODO: Implement 
+  // (MANAGERS ONLY - checked from checkRole())
+  public createPool(address, rewardAmount, startBlock, endBlock) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        resolve({ address, rewardAmount, startBlock, endBlock })
+      } catch (err) { reject(err) }
     })
   }
 }
