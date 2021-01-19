@@ -134,6 +134,7 @@ export class MiningPageComponent implements OnDestroy {
   public setCurrentPool(pool) {
     this.switchingLoading = pool.address;
 
+    // TODO: remove setTimeout when implemented. 
     // Simulate the loading/network requests to get balance, stats & decimals
     setTimeout(async () => {
       try {

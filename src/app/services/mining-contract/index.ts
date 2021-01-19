@@ -133,9 +133,7 @@ export class MiningContractService {
           base,
           market
         })
-      } catch (err) {
-        reject(err)
-      }
+      } catch (err) { reject(err) }
     })
   }
 
@@ -153,42 +151,46 @@ export class MiningContractService {
           shortBigNumber: bigBalance.div(new BigNumber(10).pow(decimals)),
           display: bigBalance.div(new BigNumber(10).pow(decimals)).toFormat(2),
         })
-      } catch (err) {
-        reject(err)
-      }
+      } catch (err) { reject(err) }
     })
   }
 
-  // TODO: Implement
   public getPools(): Promise<any[]> {
     return new Promise(async (resolve, reject) => {
       try {
 
-        // EXAMPLE
-        resolve([
+        // TODO: Implement
+        // SAMPLE DATA
+        let pools = [
           {
             address: "0xaadb00551312a3c2a8b46597a39ef1105afb2c08",
-            base: "AXN",
-            market: "ETH",
-
             startBlock: 11686417,
             endBlock: 11752227,
-            rewardPool: 5000000000000000000000000000,
-
+            rewardPool: new BigNumber("5000000000000000000000000000"),
             isLive: true
           },
-          { 
+          {
             address: "0xd7f7c34dd455efafce52d8845b2646c790db0cdd",
-            base: "HEX",
-            market: "AXN",
-
             startBlock: 11686417,
             endBlock: 11752227,
-            rewardPool: 1000000000000000000000000000,
-
+            rewardPool: new BigNumber("1000000000000000000000000000"),
             isLive: false
           }
-        ])
+        ]
+
+        // Get the tokens for the pools
+        let promises = [];
+        pools.forEach(p => { 
+          promises.push(this.getPoolTokens(p.address));
+        })
+
+        const tokens = await Promise.all(promises)
+        tokens.forEach((t, idx) => {
+          pools[idx]["base"] = t.base;
+          pools[idx]["market"] = t.market;
+        })
+
+        resolve(pools)
       } catch (err) { reject(err) }
     })
   }
@@ -197,8 +199,7 @@ export class MiningContractService {
   public deposit(amount) {
     return new Promise(async (resolve, reject) => {
       try {
-        console.log(amount)
-        resolve(null)
+        resolve(amount)
       } catch (err) { reject (err) }
     })
   }
@@ -206,13 +207,14 @@ export class MiningContractService {
   // TODO: Implement
   public async withdraw(type) {
     return new Promise((resolve, reject) => {
-      let methodName;
+      try {
+        let methodName;
 
-      if (type === "LP") methodName = "withdrawLP";
-      else if (type === "REWARDS") methodName = "withdrawRewards";
-      else if (type === "ALL") methodName = "withdrawAll";
-      console.log(methodName)
-      resolve(null)
+        if (type === "LP") methodName = "withdrawLP";
+        else if (type === "REWARDS") methodName = "withdrawRewards";
+        else if (type === "ALL") methodName = "withdrawAll";
+        resolve(methodName)
+      } catch (err) { reject(err) }
     })
   }
 
@@ -235,7 +237,12 @@ export class MiningContractService {
   public createPool(address, rewardAmount, startBlock, endBlock) {
     return new Promise(async (resolve, reject) => {
       try {
-        resolve({ address, rewardAmount, startBlock, endBlock })
+        resolve({ 
+          address, 
+          rewardAmount, 
+          startBlock, 
+          endBlock 
+        })
       } catch (err) { reject(err) }
     })
   }
