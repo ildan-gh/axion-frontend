@@ -18,8 +18,14 @@ import { MetamaskErrorComponent } from "../components/metamaskError/metamask-err
   styleUrls: ["./mining-page.component.scss"],
 })
 export class MiningPageComponent implements OnDestroy {
+  @ViewChild("createPoolModal", {
+    static: true,
+  })
+  createPoolModal: TemplateRef<any>;
+
   public account;
   public tokensDecimals;
+  public createPoolData: any = {}
   public onChangeAccount: EventEmitter<any> = new EventEmitter();
   
   public pools: any[];
@@ -46,8 +52,9 @@ export class MiningPageComponent implements OnDestroy {
             this.pools  = this.getPools();
             this.currentPool = this.pools[0];
             this.currentPoolStats = this.getPoolStats(account.address);
-            this.contractService.getDecimals(this.currentPool.address).then(decimals => this.tokensDecimals = decimals )
+
             this.updatePoolBalances();    
+            this.getPoolDecimals(this.currentPool.address);
           }
         });
       }
@@ -60,12 +67,20 @@ export class MiningPageComponent implements OnDestroy {
 
   // TODO: Get actual pools
   private getPools() {
-    return [{
-      address: "0xaadb00551312a3c2a8b46597a39ef1105afb2c08",
-      base: "AXN",
-      market: "ETH",
-      isLive: true
-    }]
+    return [
+      {
+        address: "0xaadb00551312a3c2a8b46597a39ef1105afb2c08",
+        base: "AXN",
+        market: "ETH",
+        isLive: true
+      }, 
+      // { // EXAMPLE
+      //   address: "0x8d4de8dc1650e73c1c238fa3b4d01ccc4c1aaee8",
+      //   base: "CNFI",
+      //   market: "ETH",
+      //   isLive: false
+      // }
+    ]
   }
 
   // TODO: Get actual account data
@@ -76,6 +91,9 @@ export class MiningPageComponent implements OnDestroy {
     }
   }
 
+  private async getPoolDecimals(address) {
+    this.tokensDecimals = await this.contractService.getDecimals(address);
+  }
 
   public subscribeAccount() {
     this.appComponent.subscribeAccount();
@@ -103,6 +121,33 @@ export class MiningPageComponent implements OnDestroy {
         this.currentPool.depositProgress = false;
       }
     }
+  }
+
+  public openCreatePoolModal() {
+    this.createPoolData.ref = this.dialog.open(this.createPoolModal, {});
+  }
+
+  public createPool() {
+    if (
+      !this.createPoolData.rewardAmount ||
+      !this.createPoolData.tokenAddress || 
+      !this.createPoolData.startBlock ||
+      !this.createPoolData.endBlock ||
+      !this.createPoolData.tokenSymbol
+    ) {
+      this.dialog.open(MetamaskErrorComponent, {
+        width: "400px",
+        data: { msg: "Missing information. All fields must be filled." },
+      });
+      return;
+    }
+    
+    this.createPoolData.progressIndicator = true;
+
+    setTimeout(() => {
+      this.createPoolData.progressIndicator = false;
+      console.log(this.createPoolData)
+    }, 2000)
   }
 
   public addMax() {

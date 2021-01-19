@@ -118,8 +118,12 @@
       <!-- Buttons -->
       <div class="axn-form-base-3">
         <div class="axn-form-block-one axn-form-base-center">
-          <button class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid" [ngClass]="{ progress: currentPool.withdrawLPProgress }"
-            [disabled]="currentPoolStats.stakedTokens.isZero()" (click)="withdraw('LP')">
+          <button 
+            (click)="withdraw('LP')"
+            [disabled]="currentPoolStats.stakedTokens.isZero()" 
+            [ngClass]="{ progress: currentPool.withdrawLPProgress }"
+            class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid" 
+          >
             <!-- Ellipsis Loading Indicator -->
             <span class="lds-ellipsis" *ngIf="currentPool.withdrawLPProgress">
               <span class="lds-ellipsis-container">
@@ -133,8 +137,12 @@
         </div>
 
         <div class="axn-form-block-one axn-form-base-center">
-          <button class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid" [ngClass]="{ progress: currentPool.withdrawAllProgress }"
-            [disabled]="currentPoolStats.rewardsEarned.isZero() || currentPoolStats.stakedTokens.isZero()" (click)="withdraw('ALL')">
+          <button 
+            (click)="withdraw('ALL')"
+            [ngClass]="{ progress: currentPool.withdrawAllProgress }"
+            class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid" 
+            [disabled]="currentPoolStats.rewardsEarned.isZero() || currentPoolStats.stakedTokens.isZero()" 
+          >
             <!-- Ellipsis Loading Indicator -->
             <span class="lds-ellipsis" *ngIf="currentPool.withdrawAllProgress">
               <span class="lds-ellipsis-container">
@@ -148,8 +156,12 @@
         </div>
         
         <div class="axn-form-block-one axn-form-base-center">
-          <button class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid" [ngClass]="{ progress: currentPool.withdrawRewardsProgress }"
-            [disabled]="currentPoolStats.rewardsEarned.isZero()" (click)="withdraw('REWARDS')">
+          <button 
+            (click)="withdraw('REWARDS')"
+            class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid" 
+            [disabled]="currentPoolStats.rewardsEarned.isZero()" 
+            [ngClass]="{ progress: currentPool.withdrawRewardsProgress }"
+          >
             <!-- Ellipsis Loading Indicator -->
             <span class="lds-ellipsis" *ngIf="currentPool.withdrawRewardsProgress">
               <span class="lds-ellipsis-container">
@@ -167,3 +179,103 @@
 
   </div>
 </section>
+
+<!-- MANAGERS ONLY: CREATE A POOL -->
+<section class="axn-section" *ngIf="account?.isManager">
+  <div class="axn-title-block">
+    <span class="axn-title">Create a Pool</span>
+   
+    <div 
+      #tooltip2="matTooltip" 
+      (click)="tooltip2.toggle()" 
+      class="question" 
+      mat-raised-button 
+      matTooltipClass="question__tooltip"
+      matTooltip="Only Managers can see this and are able to create pools.">
+  </div>
+
+  <div class="axn-form-block-one axn-form-base-center">
+    <button 
+      (click)="openCreatePoolModal()"
+      class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid"
+      [ngClass]="{ progress: false}" 
+    >
+      <span class="axn-btn-text">Create a Pool</span>
+    </button>
+  </div>
+
+  </div>
+</section>
+
+<!-- Create Pool Modal -->
+<ng-template #createPoolModal class="dialog-block" mat-dialog-content>
+  <div class="dialog-block__content">
+    <div class="dialog-title">Create a Pool</div>
+
+    <div class="dialog-description dialog-description-slim">
+      <div class="axn-form axn-form-block-one">
+
+        <!-- Token Address -->
+        <span class="axn-form-block-one-title">LP Token Address</span>
+        <input placeholder="{{currentPool.address}}" type="text" class="axn-input" required="required" [(ngModel)]="createPoolData.tokenAddress" />
+        
+        <!-- Start & End Block -->
+        <div class="axn-form axn-form-base-2">
+            <div class="axn-form-block-one">
+              <span class="axn-form-block-one-title">Start Block</span>
+              <input placeholder="116797939" step="1" type="number" class="axn-input" required="required" [(ngModel)]="createPoolData.startBlock" />
+            </div>
+            <div class="axn-form-block-one">
+              <span class="axn-form-block-one-title">End Block</span>
+              <input placeholder="116797939" step="1" type="number" class="axn-input" required="required" [(ngModel)]="createPoolData.endBlock" />
+            </div>
+        </div>
+
+        <!-- Reward Amount -->
+        <div class="axn-form axn-form-base-2">
+          <div class="axn-form-block-one">
+            <span class="axn-form-block-one-title">Reward Pool</span>
+            <input
+              type="text"
+              class="axn-input"
+              name="reward-amount"
+              placeholder="5,000,000,000"
+              onfocus="this.placeholder = ''"
+              onblur="this.placeholder = '5,000,000,000'"
+              [(ngModel)]="createPoolData.rewardAmount"
+              [appBigNumber]="{decimals: 18, min: 1 }"
+            />
+            <span class="axn-cheap icon icon_axn cl-blue-bg">AXN</span>
+          </div>
+          <div class="axn-form-block-one">
+            <span class="axn-form-block-one-title">Token Symbol</span>
+            <input placeholder="AXN" maxlength="5" type="text" class="axn-input" required="required" [(ngModel)]="createPoolData.tokenSymbol" />
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="dialog-bottom">
+      <button class="axn-btn axn-btn-gray" type="button" mat-dialog-close>
+        <span>Close</span>
+      </button>
+
+      <button 
+        (click)="createPool()"
+        class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid"
+        [ngClass]="{ progress: createPoolData.progressIndicator }" 
+        [disabled]="createPoolData.progressIndicator"
+      >
+        <span class="lds-ellipsis" *ngIf="createPoolData.progressIndicator">
+          <span class="lds-ellipsis-container">
+            <span></span><span></span><span></span><span></span>
+          </span>
+        </span>
+
+        <span class="axn-btn-text">Create</span>
+      </button>
+    </div>
+
+  </div>
+</ng-template>

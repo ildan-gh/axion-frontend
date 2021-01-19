@@ -22,9 +22,16 @@ export class MiningContractService {
       if (account) {
         this.isActive = true;
         this.account = account;
+        
+        this.checkRole();
         this.callAllAccountsSubscribers();
       }
     });
+  }
+
+  // TODO: Implement correctly
+  private checkRole() {
+    this.account.isManager = true;
   }
 
   private callAllAccountsSubscribers() {
@@ -90,7 +97,7 @@ export class MiningContractService {
   }
 
   // TODO: implement this.
-  public async isManager(address) {
+  public isManager(address) {
     return address !== "";
   }
 
