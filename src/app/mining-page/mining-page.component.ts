@@ -57,8 +57,6 @@ export class MiningPageComponent implements OnDestroy {
             if(POOLS.length > 0) {
               this.pools = POOLS;
 
-              this.contractService.getPoolTokens(POOLS[0].address).then(sym => console.log("SYMBOL", sym));
-
               // Determine which pool to load
               this.activatedRoute.params.subscribe(params => {
                 if (params['pool'])
