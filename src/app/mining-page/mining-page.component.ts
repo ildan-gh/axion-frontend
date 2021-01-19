@@ -11,6 +11,7 @@ import { AppComponent } from "../app.component";
 import { MatDialog } from "@angular/material/dialog";
 import { MiningContractService } from "../services/mining-contract";
 import { MetamaskErrorComponent } from "../components/metamaskError/metamask-error.component";
+import { ActivatedRoute } from "@angular/router";
 
 @Component({
   selector: "app-mining-page",
@@ -25,12 +26,13 @@ export class MiningPageComponent implements OnDestroy {
 
   public account;
   public tokensDecimals;
+  public switchingLoading;
   public createPoolData: any = {}
   public onChangeAccount: EventEmitter<any> = new EventEmitter();
   
   public pools: any[];
   public userTokenBalance: any = {};
-  public currentPool: any = {};
+  public currentPool: any;
   public currentPoolStats: any = {};
   public depositAmount = 0;
   private accountSubscribe;
@@ -39,7 +41,8 @@ export class MiningPageComponent implements OnDestroy {
     public contractService: MiningContractService,
     private ngZone: NgZone,
     private appComponent: AppComponent,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private activatedRoute: ActivatedRoute
   ) {
     this.accountSubscribe = this.contractService.accountSubscribe().subscribe((account: any) => {
       if (!account || account.balances) {
@@ -49,12 +52,20 @@ export class MiningPageComponent implements OnDestroy {
 
           if (account) {
             this.onChangeAccount.emit();
-            this.pools  = this.getPools();
-            this.currentPool = this.pools[0];
-            this.currentPoolStats = this.getPoolStats(account.address);
 
-            this.updatePoolBalances();    
-            this.getPoolDecimals(this.currentPool.address);
+            const POOLS = this.getPools(); 
+            if(POOLS.length > 0) {
+              this.pools = POOLS;
+
+              // Determine which pool to load
+              this.activatedRoute.params.subscribe(params => {
+                const pool = params['pool'];
+                if (pool)
+                  this.processParams(pool)
+                else 
+                  this.setCurrentPool(this.pools[0])
+              });
+            }
           }
         });
       }
@@ -65,6 +76,23 @@ export class MiningPageComponent implements OnDestroy {
     this.accountSubscribe.unsubscribe();
   }
 
+  // Process URL params to hel pwith direct linking
+  private processParams(params) {
+    try {
+      const BASE = params.split("-")[0].toUpperCase()
+      const MARKET = params.split("-")[1].toUpperCase()
+      const POOL_FOUND = this.pools.find(p => p.base === BASE && p.market === MARKET)
+
+      if (POOL_FOUND)
+        this.setCurrentPool(POOL_FOUND)
+      else
+        this.setCurrentPool(this.pools[0])
+    } catch (err) {
+      console.log("Invalid params, loading default pool...")
+      this.setCurrentPool(this.pools[0])
+    }
+  }
+
   // TODO: Get actual pools
   private getPools() {
     return [
@@ -72,14 +100,24 @@ export class MiningPageComponent implements OnDestroy {
         address: "0xaadb00551312a3c2a8b46597a39ef1105afb2c08",
         base: "AXN",
         market: "ETH",
+
+        startBlock: 11686417,
+        endBlock: 11752227,
+        rewardPool: 5000000000000000000000000000,
+
         isLive: true
-      }, 
-      // { // EXAMPLE
-      //   address: "0x8d4de8dc1650e73c1c238fa3b4d01ccc4c1aaee8",
-      //   base: "CNFI",
-      //   market: "ETH",
-      //   isLive: false
-      // }
+      },
+      { // EXAMPLE
+        address: "0xd7f7c34dd455efafce52d8845b2646c790db0cdd",
+        base: "HEX",
+        market: "AXN",
+
+        startBlock: 11686417,
+        endBlock: 11752227,
+        rewardPool: 1000000000000000000000000000,
+
+        isLive: false
+      }
     ]
   }
 
@@ -93,6 +131,22 @@ export class MiningPageComponent implements OnDestroy {
 
   private async getPoolDecimals(address) {
     this.tokensDecimals = await this.contractService.getDecimals(address);
+  }
+
+  public setCurrentPool(pool) {
+    this.switchingLoading = pool.address;
+
+    // Simulate the loading/network requests to get balance, stats & decimals
+    setTimeout(async () => {
+      try {
+        this.currentPool = pool;
+        this.currentPoolStats = this.getPoolStats(this.account.address);
+        await this.updatePoolBalances();
+        await this.getPoolDecimals(pool.address);
+      }
+      catch (err) { console.log(err) }
+      finally { this.switchingLoading = "" }
+    }, 500)
   }
 
   public subscribeAccount() {
@@ -137,7 +191,8 @@ export class MiningPageComponent implements OnDestroy {
       !this.createPoolData.tokenAddress || 
       !this.createPoolData.startBlock ||
       !this.createPoolData.endBlock ||
-      !this.createPoolData.tokenSymbol
+      !this.createPoolData.tokenSymbol ||
+      !this.createPoolData.tokenMarket
     ) {
       this.dialog.open(MetamaskErrorComponent, {
         width: "400px",
@@ -149,6 +204,9 @@ export class MiningPageComponent implements OnDestroy {
     this.createPoolData.progressIndicator = true;
 
     setTimeout(() => {
+      const base = this.createPoolData.tokenSymbol.toUpperCase();
+      const market = this.createPoolData.tokenMarket.toUpperCase();
+
       this.createPoolData.progressIndicator = false;
       console.log(this.createPoolData)
     }, 2000)

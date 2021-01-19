@@ -1,32 +1,29 @@
+<!-- PAGE TITLE -->
 <section class="axn-section" *ngIf="account">
   <div class="axn-title-block">
     <span class="axn-title" (hover)="tooltip2.toggle()">Mining</span>
-    <div 
-      #tooltip2="matTooltip" 
-      (click)="tooltip2.toggle()" 
-      class="question" 
-      mat-raised-button 
-      matTooltip="
-        Stake {{currentPool.base}}-{{currentPool.market}} Liquidity Provider (LP) tokens and get rewarded in AXN.
+    <div #tooltip2="matTooltip" (click)="tooltip2.toggle()" class="question" mat-raised-button matTooltip="
+          Stake {{currentPool ? currentPool?.base - currentPool?.market : ''}} Liquidity Provider (LP) tokens and get rewarded in AXN.
 
-        Rewards will be calculated on minute-by-minute basis, so you can stake and unstake whenever you want.
+          Rewards will be calculated on minute-by-minute basis, so you can stake and unstake whenever you want.
 
-        To stake an LP token:
+          To stake an LP token:
 
-        1) You first need to own/buy the base token ({{currentPool.base}}), which increases buying pressure.
+          1) You first need to own/buy the base token ({{currentPool ? currentPool?.base : ''}}), which increases buying pressure.
 
-        2) You then fund a uniswap liquidity pool with an equal dollar amount of {{currentPool.base}} and {{currentPool.market}}.
+          2) You then fund a uniswap liquidity pool with an equal dollar amount of {{currentPool ? currentPool?.base : ''}} and {{currentPool ? currentPool?.market : ''}}.
 
-        3) Once you add the liquidity, Uniswap automatically generates and sends you a LP token as a 'credit'.
+          3) Once you add the liquidity, Uniswap automatically generates and sends you a LP token as a 'credit'.
 
-        4) You can deposit those LP tokens here to earn a sizeable reward in AXN!
-      "
-      matTooltipClass="question__tooltip question__extrawidth">
+          4) You can deposit those LP tokens here to earn a sizeable reward in AXN!
+        " matTooltipClass="question__tooltip question__extrawidth">
     </div>
   </div>
+</section>
 
+<!-- CURRENT POOL -->
+<section class="axn-section" *ngIf="account && currentPool">
   <div class="axn-form axn-form-base-2">
-
     <!-- DEPOSIT -->
     <div class="axn-form-block axn-form-auction">
       <div class="axn-form-block-one axn-form-arrow p-b-none">
@@ -174,21 +171,62 @@
           </button>
         </div>
       </div>
-
     </div>
-
   </div>
-</section>
 
-<!-- OPEN POOL INFO -->
-<section *ngIf="account">
-  <div class="axn-form-block-one axn-form-base-center">
-    <button (click)="openUniswapPoolInfo()"class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-big">
+  <!-- OPEN POOL INFO -->
+  <div class="axn-form-block-one axn-form-base-center" *ngIf="currentPool">
+    <button (click)="openUniswapPoolInfo()" class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-big">
       <span class="axn-btn-text">
         <span class="icon icon_uni"></span>&nbsp;&nbsp;Open Pool Stats
       </span>
     </button>
   </div>
+</section>
+
+<!-- AVAILABLE POOLS -->
+<section class="axn-section" *ngIf="account && currentPool && pools.length > 1">
+  <div class="axn-title-block">
+    <span class="axn-title">Mining Pools</span>
+
+    <div 
+      #tooltip2="matTooltip" 
+      (click)="tooltip2.toggle()" 
+      class="question" 
+      mat-raised-button
+      matTooltip="Below are the available mining pools."
+      matTooltipClass="question__tooltip">
+    </div>
+  </div>
+
+  <div class="axn-form axn-form-base-3">
+    <div class="axn-form-block-one axn-form-base-center" *ngFor="let pool of pools">
+      <p class="axn-text-subtitle">{{pool.base}}-{{pool.market}}</p>
+      <p  class="axn-text-body">
+        Start Block: {{pool.startBlock}}<br/>
+        End Block: {{pool.endBlock}}<br/><br />
+        Reward: {{pool.rewardPool | bigNumberFormat: 18:true:false:2 || 0}} AXN
+      </p>
+
+      <button 
+        (click)="setCurrentPool(pool)" 
+        class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-big" 
+        [ngClass]="{ progress: switchingLoading === pool.address }"
+        [disabled]="switchingLoading === pool.address || currentPool.address === pool.address" 
+      >
+        <!-- Ellipsis Loading Indicator -->
+        <span class="lds-ellipsis" *ngIf="switchingLoading === pool.address">
+          <span class="lds-ellipsis-container">
+            <span></span><span></span><span></span><span></span>
+          </span>
+        </span>
+      
+        <!-- Button Text -->
+        <span class="axn-btn-text">Open Pool</span>
+      </button>
+    </div>
+  </div>
+
 </section>
 
 <!-- MANAGERS ONLY: CREATE A POOL -->
@@ -212,7 +250,7 @@
 
         <!-- Token Address -->
         <span class="axn-form-block-one-title">LP Token Address</span>
-        <input placeholder="{{currentPool.address}}" type="text" class="axn-input" required="required" [(ngModel)]="createPoolData.tokenAddress" />
+        <input placeholder="0x0000000000000000000000000000000000000000" type="text" class="axn-input" required="required" [(ngModel)]="createPoolData.tokenAddress" />
         
         <!-- Start & End Block -->
         <div class="axn-form axn-form-base-2">

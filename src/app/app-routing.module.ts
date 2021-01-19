@@ -23,6 +23,10 @@ const routes: Routes = [
     component: MiningPageComponent,
   },
   {
+    path: "mining/:pool",
+    component: MiningPageComponent,
+  },
+  {
     path: "**",
     redirectTo: "claim",
     pathMatch: "full",
