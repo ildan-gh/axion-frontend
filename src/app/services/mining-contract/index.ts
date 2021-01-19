@@ -5,6 +5,7 @@ import Web3 from "web3";
 import { AppConfig } from "../../appconfig";
 import { ContractService } from "../contract";
 import { MetamaskService } from "../web3";
+import { Contract } from "web3-eth-contract";
 
 @Injectable({
   providedIn: "root",
@@ -17,21 +18,26 @@ export class MiningContractService {
   private web3Service: MetamaskService;
   private allTransactionSubscribers = [];
 
+  public contractData: any;
+  private farmManagerContract: Contract;
+
   constructor(private config: AppConfig, private contractService: ContractService) {
     this.web3Service = new MetamaskService(this.config);
     this.contractService.accountSubscribe().subscribe((account: any) => {
       if (account) {
         this.isActive = true;
         this.account = account;
+        this.contractData = contractService.CONTRACTS_PARAMS;
         
-        this.checkRole();
+        this.checkIsManager();
+        this.initializeContracts();
         this.callAllAccountsSubscribers();
       }
     });
   }
 
   // TODO: Implement (and maybe change name? haha)
-  private checkRole() {
+  private checkIsManager() {
     this.account.isManager = true;
   }
 
@@ -56,7 +62,7 @@ export class MiningContractService {
   }
 
   private initializeContracts() {
-    // this.H2TContract = this.web3Service.getContract(this.CONTRACTS_PARAMS.H2T.ABI, this.CONTRACTS_PARAMS.H2T.ADDRESS);
+    this.farmManagerContract = this.web3Service.getContract(this.contractData.FarmManager.ABI, this.contractData.FarmManager.ADDRESS);
     this.axnTokenAddress = this.contractService.CONTRACTS_PARAMS.HEX.ADDRESS;
   }
 
@@ -225,7 +231,7 @@ export class MiningContractService {
   }
 
   // TODO: Implement 
-  // (MANAGERS ONLY - checked from checkRole())
+  // (MANAGERS ONLY - checked from checkIsManager())
   public createPool(address, rewardAmount, startBlock, endBlock) {
     return new Promise(async (resolve, reject) => {
       try {

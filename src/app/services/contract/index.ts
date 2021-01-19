@@ -328,8 +328,6 @@ export class ContractService {
 
   public getAccount(noEnable?) {
     const finishIniAccount = () => {
-      if (!noEnable) {
-      }
       if (this.account) {
         this.initializeContracts();
         this.getAccountSnapshot().then(() => {
