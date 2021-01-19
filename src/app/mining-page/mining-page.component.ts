@@ -99,6 +99,10 @@ export class MiningPageComponent implements OnDestroy {
     this.appComponent.subscribeAccount();
   }
 
+  public openUniswapPoolInfo() {
+    window.open(`https://info.uniswap.org/pair/${this.currentPool.address}`, "_blank")
+  }
+
   public async depositLPTokens() {
     if (this.depositAmount > 0) {
       const methodName = "deposit";

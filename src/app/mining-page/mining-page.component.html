@@ -180,30 +180,25 @@
   </div>
 </section>
 
-<!-- MANAGERS ONLY: CREATE A POOL -->
-<section class="axn-section" *ngIf="account?.isManager">
-  <div class="axn-title-block">
-    <span class="axn-title">Create a Pool</span>
-   
-    <div 
-      #tooltip2="matTooltip" 
-      (click)="tooltip2.toggle()" 
-      class="question" 
-      mat-raised-button 
-      matTooltipClass="question__tooltip"
-      matTooltip="Only Managers can see this and are able to create pools.">
-  </div>
-
+<!-- OPEN POOL INFO -->
+<section *ngIf="account">
   <div class="axn-form-block-one axn-form-base-center">
-    <button 
-      (click)="openCreatePoolModal()"
-      class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid"
-      [ngClass]="{ progress: false}" 
-    >
-      <span class="axn-btn-text">Create a Pool</span>
+    <button (click)="openUniswapPoolInfo()"class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-big">
+      <span class="axn-btn-text">
+        <span class="icon icon_uni"></span>&nbsp;&nbsp;Open Pool Stats
+      </span>
     </button>
   </div>
+</section>
 
+<!-- MANAGERS ONLY: CREATE A POOL -->
+<section class="axn-section" *ngIf="account && account.isManager">
+  <div class="axn-form-block-one axn-form-base-center">
+    <button (click)="openCreatePoolModal()" class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-big">
+      <span class="axn-btn-text">
+        Create a Pool
+      </span>
+    </button>
   </div>
 </section>
 
