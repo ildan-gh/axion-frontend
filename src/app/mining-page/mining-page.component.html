@@ -250,8 +250,12 @@
 
         <!-- Token Address -->
         <span class="axn-form-block-one-title">LP Token Address</span>
-        <input placeholder="0x0000000000000000000000000000000000000000" type="text" class="axn-input" required="required" [(ngModel)]="createPoolData.tokenAddress" />
-        
+        <input placeholder="0x0000000000000000000000000000000000000000" type="text" class="axn-input" required="required" [(ngModel)]="createPoolData.tokenAddress" (blur)="onCreatePoolAddressChanged()"/>
+        <span class="axn-text-body" *ngIf="createPoolData.token && createPoolData.market">
+          Found Pair: 
+          <span class="axn-text-body-link"(click)="openUniswapPoolInfo(createPoolData.tokenAddress)">{{createPoolData.token}}-{{createPoolData.market}}</span>
+        </span>
+
         <!-- Start & End Block -->
         <div class="axn-form axn-form-base-2">
             <div class="axn-form-block-one">
@@ -265,25 +269,19 @@
         </div>
 
         <!-- Reward Amount -->
-        <div class="axn-form axn-form-base-2">
-          <div class="axn-form-block-one">
-            <span class="axn-form-block-one-title">Reward Pool</span>
-            <input
-              type="text"
-              class="axn-input"
-              name="reward-amount"
-              placeholder="5,000,000,000"
-              onfocus="this.placeholder = ''"
-              onblur="this.placeholder = '5,000,000,000'"
-              [(ngModel)]="createPoolData.rewardAmount"
-              [appBigNumber]="{decimals: 18, min: 1 }"
-            />
-            <span class="axn-cheap icon icon_axn cl-blue-bg">AXN</span>
-          </div>
-          <div class="axn-form-block-one">
-            <span class="axn-form-block-one-title">Token Symbol</span>
-            <input placeholder="AXN" maxlength="5" type="text" class="axn-input" required="required" [(ngModel)]="createPoolData.tokenSymbol" />
-          </div>
+        <div class="axn-form-block-one">
+          <span class="axn-form-block-one-title">Reward Pool</span>
+          <input
+            type="text"
+            class="axn-input"
+            name="reward-pool"
+            placeholder="5,000,000,000"
+            onfocus="this.placeholder = ''"
+            onblur="this.placeholder = '5,000,000,000'"
+            [(ngModel)]="createPoolData.rewardPool"
+            [appBigNumber]="{decimals: 18, min: 1 }"
+          />
+          <span class="axn-cheap icon icon_axn cl-blue-bg">AXN</span>
         </div>
 
       </div>

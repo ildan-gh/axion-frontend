@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import BigNumber from "bignumber.js";
 import { Observable } from "rxjs";
+import Web3 from "web3";
 import { AppConfig } from "../../appconfig";
 import { ContractService } from "../contract";
 import { MetamaskService } from "../web3";
@@ -102,12 +103,43 @@ export class MiningContractService {
   }
 
   public getDecimals(lpTokenAddress): any {
-    const TOKEN = this.web3Service.getContract(this.contractService.CONTRACTS_PARAMS.UniswapPair.ABI, lpTokenAddress)
+    const TOKEN = this.web3Service.getContract(this.contractService.CONTRACTS_PARAMS.UniswapERC20Pair.ABI, lpTokenAddress)
     return TOKEN.methods.decimals().call();
   }
 
+  public getPoolTokens(lpTokenAddress): any {
+    return new Promise(async (resolve, reject) => {
+      if (!Web3.utils.isAddress(lpTokenAddress)) {
+        reject({message: "Invalid address"})
+        return;
+      }
+      
+      try {
+        const UNI_PAIR_CONTRACT = this.web3Service.getContract(this.contractService.CONTRACTS_PARAMS.UniswapPair.ABI, lpTokenAddress);
+
+        // GET PAIR (token0 and token1)
+        const token0 = await UNI_PAIR_CONTRACT.methods.token0().call();
+        const token1 = await UNI_PAIR_CONTRACT.methods.token1().call();
+        
+        // GET token symbol for ach token in pair
+        const BASE_TOKEN_CONTRACT = this.web3Service.getContract(this.contractService.CONTRACTS_PARAMS.UniswapERC20Pair.ABI, token0)
+        const token = await BASE_TOKEN_CONTRACT.methods.symbol().call();
+
+        const MARKET_TOKEN_CONTRACT = this.web3Service.getContract(this.contractService.CONTRACTS_PARAMS.UniswapERC20Pair.ABI, token1)
+        const market = await MARKET_TOKEN_CONTRACT.methods.symbol().call();
+
+        resolve({
+          token,
+          market
+        })
+      } catch (err) {
+        reject(err)
+      }
+    })
+  }
+
   public getTokenBalance(lpTokenAddress, address): any {
-    const TOKEN = this.web3Service.getContract(this.contractService.CONTRACTS_PARAMS.UniswapPair.ABI, lpTokenAddress)
+    const TOKEN = this.web3Service.getContract(this.contractService.CONTRACTS_PARAMS.UniswapERC20Pair.ABI, lpTokenAddress)
     return new Promise(async (resolve, reject) => {
       try {
         const balance = await TOKEN.methods.balanceOf(address).call();

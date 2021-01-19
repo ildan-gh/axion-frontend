@@ -57,11 +57,12 @@ export class MiningPageComponent implements OnDestroy {
             if(POOLS.length > 0) {
               this.pools = POOLS;
 
+              this.contractService.getPoolTokens(POOLS[0].address).then(sym => console.log("SYMBOL", sym));
+
               // Determine which pool to load
               this.activatedRoute.params.subscribe(params => {
-                const pool = params['pool'];
-                if (pool)
-                  this.processParams(pool)
+                if (params['pool'])
+                  this.processParams(params['pool'])
                 else 
                   this.setCurrentPool(this.pools[0])
               });
@@ -133,6 +134,25 @@ export class MiningPageComponent implements OnDestroy {
     this.tokensDecimals = await this.contractService.getDecimals(address);
   }
 
+  public async onCreatePoolAddressChanged(){
+    const address = this.createPoolData.tokenAddress;
+
+    if(address) {
+      try {
+        const SYMBOLS = await this.contractService.getPoolTokens(address.trim())
+        if (SYMBOLS) {
+          this.createPoolData.token = SYMBOLS.token;
+          this.createPoolData.market = SYMBOLS.market;
+        }
+      } catch (err) {
+        this.dialog.open(MetamaskErrorComponent, {
+          width: "400px",
+          data: { msg: err.message },
+        });
+      }
+    }
+  }
+  
   public setCurrentPool(pool) {
     this.switchingLoading = pool.address;
 
@@ -153,8 +173,8 @@ export class MiningPageComponent implements OnDestroy {
     this.appComponent.subscribeAccount();
   }
 
-  public openUniswapPoolInfo() {
-    window.open(`https://info.uniswap.org/pair/${this.currentPool.address}`, "_blank")
+  public openUniswapPoolInfo(addr = this.currentPool.address) {
+    window.open(`https://info.uniswap.org/pair/${addr}`, "_blank")
   }
 
   public async depositLPTokens() {
@@ -187,12 +207,10 @@ export class MiningPageComponent implements OnDestroy {
 
   public createPool() {
     if (
-      !this.createPoolData.rewardAmount ||
+      !this.createPoolData.rewardPool ||
       !this.createPoolData.tokenAddress || 
       !this.createPoolData.startBlock ||
-      !this.createPoolData.endBlock ||
-      !this.createPoolData.tokenSymbol ||
-      !this.createPoolData.tokenMarket
+      !this.createPoolData.endBlock
     ) {
       this.dialog.open(MetamaskErrorComponent, {
         width: "400px",
@@ -203,13 +221,15 @@ export class MiningPageComponent implements OnDestroy {
     
     this.createPoolData.progressIndicator = true;
 
+    // TODO: Implement - Simulate the loading for now
     setTimeout(() => {
-      const base = this.createPoolData.tokenSymbol.toUpperCase();
-      const market = this.createPoolData.tokenMarket.toUpperCase();
-
+      const rewards = this.createPoolData.rewardPool;
+      const address = this.createPoolData.tokenAddress;
+      const startBlock = this.createPoolData.startBlock;
+      const endBlock = this.createPoolData.endBlock;
+      console.log({ rewards, address, startBlock, endBlock})
       this.createPoolData.progressIndicator = false;
-      console.log(this.createPoolData)
-    }, 2000)
+    }, 1000)
   }
 
   public addMax() {
