@@ -252,9 +252,9 @@
         <!-- Token Address -->
         <span class="axn-form-block-one-title">LP Token Address</span>
         <input placeholder="0x0000000000000000000000000000000000000000" type="text" class="axn-input" required="required" [(ngModel)]="createPoolData.tokenAddress" (blur)="onCreatePoolAddressChanged()"/>
-        <span class="axn-text-body" *ngIf="createPoolData.token && createPoolData.market">
+        <span class="axn-text-body" *ngIf="createPoolData.base && createPoolData.market">
           Found Pair: 
-          <span class="axn-text-body-link"(click)="openUniswapPoolInfo(createPoolData.tokenAddress)">{{createPoolData.token}}-{{createPoolData.market}}</span>
+          <span class="axn-text-body-link" (click)="openUniswapPoolInfo(createPoolData.tokenAddress)">{{createPoolData.base}}-{{createPoolData.market}}</span>
         </span>
 
         <!-- Start & End Block -->
