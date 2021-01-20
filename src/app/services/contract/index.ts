@@ -54,7 +54,7 @@ export class ContractService {
   private web3Service;
 
   private H2TContract: Contract;
-  private HEX2XContract: Contract;
+  private AXIONContract: Contract;
   private HEXContract: Contract;
   private NativeSwapContract: Contract;
 
@@ -75,7 +75,7 @@ export class ContractService {
     ETH: 18,
   };
 
-  private readonly ETHER = Math.pow(10, this.tokensDecimals.ETH);
+  private readonly _1e18 = Math.pow(10, 18);
 
   public account;
   private allAccountSubscribers = [];
@@ -206,8 +206,8 @@ export class ContractService {
 
   public addToken() {
     this.web3Service.addToken({
-      address: this.CONTRACTS_PARAMS.HEX2X.ADDRESS,
-      decimals: this.tokensDecimals.HEX2X,
+      address: this.CONTRACTS_PARAMS.AXION.ADDRESS,
+      decimals: this.tokensDecimals.AXION,
       image:
         "https://stake.axion.network/assets/images/icons/axion-icon.png",
       symbol: "AXN",
@@ -225,11 +225,11 @@ export class ContractService {
         .then((decimals) => {
           this.tokensDecimals.H2T = decimals;
         }),
-      this.HEX2XContract.methods
+      this.AXIONContract.methods
         .decimals()
         .call()
         .then((decimals) => {
-          this.tokensDecimals.HEX2X = decimals;
+          this.tokensDecimals.AXION = decimals;
         }),
       this.HEXContract.methods
         .decimals()
@@ -435,18 +435,18 @@ export class ContractService {
     });
   }
 
-  public updateHEX2XBalance(callEmitter?) {
+  public updateAXIONBalance(callEmitter?) {
     return new Promise((resolve, reject) => {
       if (!(this.account && this.account.address)) {
         return reject();
       }
-      return this.HEX2XContract.methods
+      return this.AXIONContract.methods
         .balanceOf(this.account.address)
         .call()
         .then((balance) => {
           const bigBalance = new BigNumber(balance);
           this.account.balances = this.account.balances || {};
-          this.account.balances.HEX2X = {
+          this.account.balances.AXION = {
             wei: balance,
             weiBigNumber: bigBalance,
             shortBigNumber: bigBalance.div(
@@ -524,7 +524,7 @@ export class ContractService {
   public loadAccountInfo() {
     const promises = [
       this.updateH2TBalance(),
-      this.updateHEX2XBalance(),
+      this.updateAXIONBalance(),
       this.updateETHBalance(),
       this.updateHEXBalance(),
     ];
@@ -567,9 +567,9 @@ export class ContractService {
     });
   }
 
-  private checkHEX2XApproval(amount, address?): Promise<any> {
+  private checkAXIONApproval(amount, address?): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.HEX2XContract.methods
+      this.AXIONContract.methods
         .allowance(this.account.address, address)
         .call()
         .then((allowance: string) => {
@@ -674,19 +674,19 @@ export class ContractService {
               return {
                 key: "Auction",
                 value: new BigNumber(res[1])
-                  .div(Math.pow(10, this.tokensDecimals.HEX2X))
+                  .div(Math.pow(10, this.tokensDecimals.AXION))
                   .toString(),
               };
             });
         }),
-      this.HEX2XContract.methods
+      this.AXIONContract.methods
         .totalSupply()
         .call()
         .then((res) => {
           return {
             key: "totalSupply",
             value: new BigNumber(res)
-              .div(Math.pow(10, this.tokensDecimals.HEX2X))
+              .div(Math.pow(10, this.tokensDecimals.AXION))
               .toString(),
           };
         }),
@@ -697,7 +697,7 @@ export class ContractService {
           return {
             key: "staking",
             value: new BigNumber(res)
-              .div(Math.pow(10, this.tokensDecimals.HEX2X))
+              .div(Math.pow(10, this.tokensDecimals.AXION))
               .toString(),
           };
         }),
@@ -709,7 +709,7 @@ export class ContractService {
             key: "BPDInfo",
             value: res.map((oneBigPayDay) => {
               return new BigNumber(oneBigPayDay)
-                .div(Math.pow(10, this.tokensDecimals.HEX2X))
+                .div(Math.pow(10, this.tokensDecimals.AXION))
                 .toString();
             }),
           };
@@ -736,7 +736,7 @@ export class ContractService {
 
       let uniswapAveragePrice: BigNumber 
         = new BigNumber(auctionReserves.uniswapMiddlePrice)
-          .div(this.ETHER);
+          .div(this._1e18);
 
       if (uniswapAveragePrice.isZero()) {
         const lastAuctionId = currentAuctionId - 1;
@@ -748,7 +748,7 @@ export class ContractService {
 
           uniswapAveragePrice 
             = new BigNumber(lastAuctionReserves.uniswapMiddlePrice)
-              .div(this.ETHER);
+              .div(this._1e18);
         }
       }
 
@@ -758,7 +758,7 @@ export class ContractService {
 
       data.axn = parseFloat(
         new BigNumber(auctionReserves.token)
-          .div(this.ETHER)
+          .div(this._1e18)
           .toFixed(8)
           .toString()
       );
@@ -773,9 +773,9 @@ export class ContractService {
         );
       }
 
-      const amountsOut = await this.getAmountsOutAsync(this.ETHER.toString());
+      const amountsOut = await this.getWethToAxionAmountsOutAsync(this._1e18.toString());
 
-      const uniswapPrice = new BigNumber(amountsOut[1]).div(this.ETHER);
+      const uniswapPrice = new BigNumber(amountsOut[1]).div(this._1e18);
 
       data.uniAxnPerEth = uniswapPrice;
 
@@ -901,7 +901,7 @@ export class ContractService {
       });
   }
 
-  public depositHEX2X(amount, days) {
+  public depositAXION(amount, days) {
     const fromAccount = this.account.address;
     const depositTokens = (resolve, reject) => {
       return this.StakingContract.methods
@@ -916,7 +916,7 @@ export class ContractService {
     };
 
     return new Promise((resolve, reject) => {
-      this.checkHEX2XApproval(
+      this.checkAXIONApproval(
         amount,
         this.StakingContract.options.address
       ).then(
@@ -924,7 +924,7 @@ export class ContractService {
           depositTokens(resolve, reject);
         },
         () => {
-          this.HEX2XContract.methods
+          this.AXIONContract.methods
             .approve(this.StakingContract.options.address, amount)
             .send({
               from: fromAccount,
@@ -1474,7 +1474,7 @@ export class ContractService {
       environment.auctionRecipientPercent
     );
 
-    const amountOut: string = (await this.getAmountsOutAsync(reducedAmount))[1];
+    const amountOut: string = (await this.getWethToAxionAmountsOutAsync(reducedAmount))[1];
 
     return this.reduceAmountByPercent(
       amountOut,
@@ -1489,11 +1489,20 @@ export class ContractService {
       .toString(10);
   }
 
-  private getAmountsOutAsync(amount: string): Promise<string[]> {
+  private getWethToAxionAmountsOutAsync(amount: string): Promise<string[]> {
     return this.UniswapV2Router02.methods
       .getAmountsOut(amount, [
         this.CONTRACTS_PARAMS.WETH.ADDRESS,
-        this.CONTRACTS_PARAMS.HEX2X.ADDRESS,
+        this.CONTRACTS_PARAMS.AXION.ADDRESS,
+      ])
+      .call();
+  }
+
+  public getAxionToUsdcAmountsOutAsync(amount: string): Promise<string[]> {
+    return this.UniswapV2Router02.methods
+      .getAmountsOut(amount, [
+        this.CONTRACTS_PARAMS.AXION.ADDRESS,
+        this.CONTRACTS_PARAMS.USDC.ADDRESS,
       ])
       .call();
   }
@@ -1758,7 +1767,7 @@ export class ContractService {
 
     const uniswapPriceWithPercent = this.adjustPrice(
       new BigNumber(auctionData.uniswapMiddlePrice)
-    ).div(this.ETHER);
+    ).div(this._1e18);
 
     const poolPrice = new BigNumber(auctionData.token).div(auctionData.eth);
 
@@ -1772,7 +1781,7 @@ export class ContractService {
       axnWithoutBorder
     );
 
-    auctionBid.winnings = userWinnings.div(this.ETHER);
+    auctionBid.winnings = userWinnings.div(this._1e18);
     auctionBid.hasWinnings = auctionBid.winnings.isPositive();
 
     if (accountBalance.ref !== "0x0000000000000000000000000000000000000000") {
@@ -1793,7 +1802,7 @@ export class ContractService {
     const averagePrice = new BigNumber(uniswapMiddlePrice);
 
     const uniswapDiscountedAveragePrice = this.adjustPrice(
-      averagePrice.div(this.ETHER)
+      averagePrice.div(this._1e18)
     );
 
     return BigNumber.minimum(
@@ -1909,9 +1918,9 @@ export class ContractService {
       this.CONTRACTS_PARAMS.H2T.ADDRESS
     );
 
-    this.HEX2XContract = this.web3Service.getContract(
-      this.CONTRACTS_PARAMS.HEX2X.ABI,
-      this.CONTRACTS_PARAMS.HEX2X.ADDRESS
+    this.AXIONContract = this.web3Service.getContract(
+      this.CONTRACTS_PARAMS.AXION.ABI,
+      this.CONTRACTS_PARAMS.AXION.ADDRESS
     );
 
     this.NativeSwapContract = this.web3Service.getContract(

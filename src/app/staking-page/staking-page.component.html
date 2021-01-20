@@ -30,9 +30,9 @@
           autocomplete="off"
           required="required"
           [appBigNumber]="{
-            decimals: tokensDecimals['HEX2X'],
+            decimals: tokensDecimals['AXION'],
             min: 1,
-            max: account?.balances.HEX2X.wei
+            max: account?.balances.AXION.wei
           }"
           name="stake-amount"
           placeholder="0.0"
@@ -49,7 +49,7 @@
           <span
             class="axn-btn axn-btn-max"
             (click)="
-              formsData.stakeAmount = account?.balances.HEX2X.wei;
+              formsData.stakeAmount = account?.balances.AXION.wei;
               onChangeAmount()
             "
             >Max</span
@@ -57,7 +57,7 @@
           <span class="axn-form-block-sendmax-text">
             Balance
             <span class="axn-form-block-sendmax-value-mid">
-              {{ account?.balances?.HEX2X.display }}
+              {{ account?.balances?.AXION.display }}
             </span></span
           >
         </div>
@@ -121,12 +121,12 @@
                 mat-raised-button
                 matTooltip="{{
                   stakingContractInfo.ShareRate || 0
-                    | bigNumberFormat: tokensDecimals.HEX2X:true:false:18
+                    | bigNumberFormat: tokensDecimals.AXION:true:false:18
                 }}"
               >
                 {{
                   stakingContractInfo.ShareRate || 0
-                    | bigNumberFormat: tokensDecimals.HEX2X:true:false:2
+                    | bigNumberFormat: tokensDecimals.AXION:true:false:2
                 }}
               </span>
               <br />
@@ -155,12 +155,12 @@
                 mat-raised-button
                 matTooltip="{{
                   bonusLongerPays
-                    | bigNumberFormat: tokensDecimals.HEX2X:true:false:18
+                    | bigNumberFormat: tokensDecimals.AXION:true:false:18
                 }}"
               >
                 {{
                   bonusLongerPays
-                    | bigNumberFormat: tokensDecimals.HEX2X:true:false:2
+                    | bigNumberFormat: tokensDecimals.AXION:true:false:2
                 }}
               </span>
               <br />
@@ -296,12 +296,12 @@
               mat-raised-button
               matTooltip="{{
                 activeStakeTotals.principal
-                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
               }}"
             >
               {{
                 activeStakeTotals.principal
-                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+                  | bigNumberFormat: tokensDecimals["AXION"]:true:false:2
               }}</span
             >
           </td>
@@ -311,12 +311,12 @@
               mat-raised-button
               matTooltip="{{
                 activeStakeTotals.shares
-                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
               }}"
             >
               {{
                 activeStakeTotals.shares
-                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+                  | bigNumberFormat: tokensDecimals["AXION"]:true:false:2
               }}</span
             >
           </td>
@@ -326,12 +326,12 @@
               mat-raised-button
               matTooltip="{{
                 activeStakeTotals.bigPayDay
-                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
               }}"
             >
               {{
                 activeStakeTotals.bigPayDay
-                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+                  | bigNumberFormat: tokensDecimals["AXION"]:true:false:2
               }}</span
             >
           </td>
@@ -341,12 +341,12 @@
               mat-raised-button
               matTooltip="{{
                 activeStakeTotals.interest
-                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
               }}"
             >
               {{
                 activeStakeTotals.interest
-                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+                  | bigNumberFormat: tokensDecimals["AXION"]:true:false:2
               }}</span
             >
           </td>
@@ -355,13 +355,13 @@
               matTooltipClass="table__tooltip"
               mat-raised-button
               matTooltip="{{
-                activeStakeTotals.total
-                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+                getDollarValue(activeStakeTotals.total) 
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
               }}"
             >
               {{
                 activeStakeTotals.total
-                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+                  | bigNumberFormat: tokensDecimals["AXION"]:true:false:2
               }}</span
             >
           </td>
@@ -425,12 +425,12 @@
               mat-raised-button
               matTooltip="{{
                 stake.principal
-                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
               }}"
             >
               {{
                 stake.principal
-                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+                  | bigNumberFormat: tokensDecimals["AXION"]:true:false:2
               }}</span
             >
           </td>
@@ -440,12 +440,12 @@
               mat-raised-button
               matTooltip="{{
                 stake.shares
-                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
               }}"
             >
               {{
                 stake.shares
-                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+                  | bigNumberFormat: tokensDecimals["AXION"]:true:false:2
               }}</span
             >
           </td>
@@ -455,12 +455,12 @@
               mat-raised-button
               matTooltip="{{
                 stake.interest
-                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
               }}"
             >
               {{
                 stake.interest
-                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+                  | bigNumberFormat: tokensDecimals["AXION"]:true:false:2
               }}</span
             ><br>
             <span
@@ -469,12 +469,12 @@
               mat-raised-button
               matTooltip="{{
                 stake.bigPayDay
-                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
               }}"
             >
                + {{
                 stake.bigPayDay
-                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+                  | bigNumberFormat: tokensDecimals["AXION"]:true:false:2
               }} BPD</span
             >
           </td>
@@ -575,12 +575,12 @@
               mat-raised-button
               matTooltip="{{
                 stake.principal
-                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
               }}"
             >
               {{
                 stake.principal
-                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+                  | bigNumberFormat: tokensDecimals["AXION"]:true:false:2
               }}</span
             >
           </td>
@@ -590,12 +590,12 @@
               mat-raised-button
               matTooltip="{{
                 stake.shares
-                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
               }}"
             >
               {{
                 stake.shares
-                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+                  | bigNumberFormat: tokensDecimals["AXION"]:true:false:2
               }}</span
             >
           </td>
@@ -605,12 +605,12 @@
               mat-raised-button
               matTooltip="{{
                 stake.interest
-                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
               }}"
             >
               {{
                 stake.interest
-                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+                  | bigNumberFormat: tokensDecimals["AXION"]:true:false:2
               }}</span
             ><br>
             <span
@@ -619,12 +619,12 @@
               mat-raised-button
               matTooltip="{{
                 stake.bigPayDay
-                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
               }}"
             >
                + {{
                 stake.bigPayDay
-                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+                  | bigNumberFormat: tokensDecimals["AXION"]:true:false:2
               }} BPD</span
             >
           </td>
@@ -733,12 +733,12 @@
               mat-raised-button
               matTooltip="{{
                 stake.principal
-                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
               }}"
             >
               {{
                 stake.principal
-                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+                  | bigNumberFormat: tokensDecimals["AXION"]:true:false:2
               }}</span
             >
           </td>
@@ -748,12 +748,12 @@
               mat-raised-button
               matTooltip="{{
                 stake.shares
-                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
               }}"
             >
               {{
                 stake.shares
-                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+                  | bigNumberFormat: tokensDecimals["AXION"]:true:false:2
               }}</span
             >
           </td>
@@ -763,12 +763,12 @@
               mat-raised-button
               matTooltip="{{
                 stake.interest
-                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
               }}"
             >
               {{
                 stake.interest
-                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+                  | bigNumberFormat: tokensDecimals["AXION"]:true:false:2
               }}</span
             ><br>
             <span
@@ -777,12 +777,12 @@
               mat-raised-button
               matTooltip="{{
                 stake.bigPayDay
-                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
               }}"
             >
                + {{
                 stake.bigPayDay
-                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+                  | bigNumberFormat: tokensDecimals["AXION"]:true:false:2
               }} BPD</span
             >
           </td>
@@ -793,12 +793,12 @@
               mat-raised-button
               matTooltip="{{
                 stake.payout
-                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
               }}"
             >
               {{
                 stake.payout
-                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+                  | bigNumberFormat: tokensDecimals["AXION"]:true:false:2
               }}</span
             >
           </td>
@@ -848,12 +848,12 @@
               mat-raised-button
               matTooltip="{{
                 stake.principal
-                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
               }}"
             >
               {{
                 stake.principal
-                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+                  | bigNumberFormat: tokensDecimals["AXION"]:true:false:2
               }}</span
             >
           </td>
@@ -863,12 +863,12 @@
               mat-raised-button
               matTooltip="{{
                 stake.bigPayDay
-                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
               }}"
             >
               {{
                 stake.bigPayDay
-                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+                  | bigNumberFormat: tokensDecimals["AXION"]:true:false:2
               }}</span
             >
           </td>
@@ -888,12 +888,12 @@
       You will get
       ~{{
         confirmWithdrawData.payout
-          | bigNumberFormat: tokensDecimals.HEX2X:true:false:2
+          | bigNumberFormat: tokensDecimals.AXION:true:false:2
       }}
       Axion,
       ~{{
         confirmWithdrawData.penalty
-          | bigNumberFormat: tokensDecimals.HEX2X:true:false:2
+          | bigNumberFormat: tokensDecimals.AXION:true:false:2
       }}
       Axion will be penalized!
     </div>
@@ -930,7 +930,7 @@
           Put your completed stake earnings (principal + interest) into a new stake in one transaction.<br/>
           Enter the length of the restake, then click the "Restake" button.
           <br/><br />
-          <b>Note:</b> Your restake would have a new share rate of <b>{{stakingContractInfo.ShareRate | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}}</b>
+          <b>Note:</b> Your restake would have a new share rate of <b>{{stakingContractInfo.ShareRate | bigNumberFormat: tokensDecimals.AXION:true:false:2}}</b>
         </p>
 
         <div class="axn-form-block-one">
@@ -962,11 +962,11 @@
 
             <!-- RIGHT COL -->
             <div class="axn-form-block-one" style="text-transform: none;display: block;" >
-              <p *ngIf="actionsModalData.amount">Amount<br/><b>{{actionsModalData.amount | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}} AXN</b></p>
-              <p *ngIf="actionsModalData.isLate">Late Penalty<br/><b>{{actionsModalData.penalty | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}} AXN</b></p>
-              <p *ngIf="actionsModalData.shares">Shares<br /><b>{{actionsModalData.shares | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}}</b></p>
-              <p *ngIf="actionsModalData.lpb">Longer Pays Better<br /><b>{{actionsModalData.lpb | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}}</b></p>
-              <p *ngIf="actionsModalData.totalShares">Total Shares<br /><b>{{actionsModalData.totalShares | bigNumberFormat: tokensDecimals.HEX2X:true:false:2}}</b></p>
+              <p *ngIf="actionsModalData.amount">Amount<br/><b>{{actionsModalData.amount | bigNumberFormat: tokensDecimals.AXION:true:false:2}} AXN</b></p>
+              <p *ngIf="actionsModalData.isLate">Late Penalty<br/><b>{{actionsModalData.penalty | bigNumberFormat: tokensDecimals.AXION:true:false:2}} AXN</b></p>
+              <p *ngIf="actionsModalData.shares">Shares<br /><b>{{actionsModalData.shares | bigNumberFormat: tokensDecimals.AXION:true:false:2}}</b></p>
+              <p *ngIf="actionsModalData.lpb">Longer Pays Better<br /><b>{{actionsModalData.lpb | bigNumberFormat: tokensDecimals.AXION:true:false:2}}</b></p>
+              <p *ngIf="actionsModalData.totalShares">Total Shares<br /><b>{{actionsModalData.totalShares | bigNumberFormat: tokensDecimals.AXION:true:false:2}}</b></p>
             </div>
           </div> 
         </div>

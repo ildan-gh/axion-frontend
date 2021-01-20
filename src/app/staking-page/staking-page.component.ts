@@ -97,6 +97,9 @@ export class StakingPageComponent implements OnDestroy {
   private settingsData: any;
   private dayEndSubscriber;
 
+  private readonly _10k: string = "10000000000000000000000";
+  private _10kAxionUsdcOut;
+
   constructor(
     private contractService: ContractService,
     private ngZone: NgZone,
@@ -107,7 +110,7 @@ export class StakingPageComponent implements OnDestroy {
       .accountSubscribe()
       .subscribe((account: any) => {
         if (!account || account.balances) {
-          this.ngZone.run(() => {
+          this.ngZone.run(async () => {
             this.account = account;
             window.dispatchEvent(new Event("resize"));
             if (account) {
@@ -127,6 +130,8 @@ export class StakingPageComponent implements OnDestroy {
                 this.getBPDInfo();
                 this.bpdInfoChecker = true;
               });
+
+              this._10kAxionUsdcOut = await this.contractService.getAxionToUsdcAmountsOutAsync(this._10k);
             }
           });
         }
@@ -218,12 +223,16 @@ export class StakingPageComponent implements OnDestroy {
       .catch(console.log);
   }
 
+  public getDollarValue(amount: BigNumber) {
+    return amount.div(this._10k).times(this._10kAxionUsdcOut);
+  }
+
   public openStake() {
     this.stakeTokensProgress = true;
     this.contractService
-      .depositHEX2X(this.formsData.stakeAmount, this.formsData.stakeDays)
+      .depositAXION(this.formsData.stakeAmount, this.formsData.stakeDays)
       .then((r) => {
-        this.contractService.updateHEX2XBalance(true).then(() => {
+        this.contractService.updateAXIONBalance(true).then(() => {
           this.stakeTokensProgress = false;
           this.shareRate = 0;
         });
@@ -249,7 +258,7 @@ export class StakingPageComponent implements OnDestroy {
   }
 
   get userShares() {
-    const divDecimals = Math.pow(10, this.tokensDecimals.HEX2X);
+    const divDecimals = Math.pow(10, this.tokensDecimals.AXION);
     return new BigNumber(this.formsData.stakeAmount || 0)
       .div(divDecimals)
       .times(this.bonusLongerPays.div(divDecimals).plus(1))
@@ -258,7 +267,7 @@ export class StakingPageComponent implements OnDestroy {
   }
 
   get userSharesRestake() {
-    const divDecimals = Math.pow(10, this.tokensDecimals.HEX2X);
+    const divDecimals = Math.pow(10, this.tokensDecimals.AXION);
     const shareRate = new BigNumber(this.stakingContractInfo.ShareRate || 0).div(divDecimals);
     const amount = new BigNumber(this.actionsModalData.amount || 0).div(divDecimals);
     return amount.div(shareRate).times(divDecimals);
@@ -279,7 +288,7 @@ export class StakingPageComponent implements OnDestroy {
   }
 
   public onChangeAmount() {
-    const divDecimals = Math.pow(10, this.tokensDecimals.HEX2X);
+    const divDecimals = Math.pow(10, this.tokensDecimals.AXION);
 
     const stareRate = new BigNumber(this.stakingContractInfo.ShareRate || 0)
       .div(divDecimals)
@@ -307,7 +316,7 @@ export class StakingPageComponent implements OnDestroy {
 
     const sharefull = new BigNumber(amount).div(
       new BigNumber(this.stakingContractInfo.ShareRate).div(
-        Math.pow(10, this.tokensDecimals.HEX2X)
+        Math.pow(10, this.tokensDecimals.AXION)
       )
     );
 
@@ -411,7 +420,7 @@ export class StakingPageComponent implements OnDestroy {
     stake.withdrawProgress = true;
     this.contractService.restake(stake, stakingDays).then(() => {
       this.stakeList();
-      this.contractService.updateHEX2XBalance(true);
+      this.contractService.updateAXIONBalance(true);
     }).finally(() => {
       stake.withdrawProgress = false;
     })
@@ -457,7 +466,7 @@ export class StakingPageComponent implements OnDestroy {
         .unstake(stake.sessionId)
         .then(() => {
           this.stakeList();
-          this.contractService.updateHEX2XBalance(true);
+          this.contractService.updateAXIONBalance(true);
           stake.withdrawProgress = false;
         })
         .catch(() => {
@@ -468,7 +477,7 @@ export class StakingPageComponent implements OnDestroy {
         .unstakeV1(stake.sessionId)
         .then(() => {
           this.stakeList();
-          this.contractService.updateHEX2XBalance(true);
+          this.contractService.updateAXIONBalance(true);
           stake.withdrawProgress = false;
         })
         .catch(() => {
@@ -484,7 +493,7 @@ export class StakingPageComponent implements OnDestroy {
       .bpdWithdraw(stake.sessionId)
       .then(() => {
         this.stakeList();
-        this.contractService.updateHEX2XBalance(true);
+        this.contractService.updateAXIONBalance(true);
         stake.withdrawProgress = false;
       })
       .catch(() => {

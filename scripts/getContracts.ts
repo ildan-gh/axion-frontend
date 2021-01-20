@@ -13,7 +13,7 @@ function sleep(ms:number) {
       ETHERSCAN_API_KEY,
       H2T_ADDRESS,
       WETH_ADDRESS,
-      HEX2X_ADDRESS,
+      AXION_ADDRESS,
       HEX_ADDRESS,
       NATIVE_SWAP_ADDRESS,
       STAKING_ADDRESS,
@@ -33,8 +33,8 @@ function sleep(ms:number) {
         "WETH": {
           "ADDRESS": WETH_ADDRESS
         },
-        "HEX2X": {
-          "ADDRESS": HEX2X_ADDRESS,
+        "AXION": {
+          "ADDRESS": AXION_ADDRESS,
           "ABI": []
         },
         "HEX": {
