@@ -23,7 +23,7 @@ const routes: Routes = [
     component: MiningPageComponent,
   },
   {
-    path: "mining/:pool",
+    path: "mining/:mine",
     component: MiningPageComponent,
   },
   {

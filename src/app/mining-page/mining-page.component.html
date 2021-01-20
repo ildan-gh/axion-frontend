@@ -9,9 +9,9 @@
 
           To stake an LP token:
 
-          1) You first need to own/buy the base token ({{currentPool ? currentPool?.base : ''}}), which increases buying pressure.
+          1) You first need to own/buy the base token ({{currentMine ? currentMine?.base : ''}}), which increases buying pressure.
 
-          2) You then fund a uniswap liquidity pool with an equal dollar amount of {{currentPool ? currentPool?.base : ''}} and {{currentPool ? currentPool?.market : ''}}.
+          2) You then fund a uniswap liquidity pool with an equal dollar amount of {{currentMine ? currentMine?.base : ''}} and {{currentMine ? currentMine?.market : ''}}.
 
           3) Once you add the liquidity, Uniswap automatically generates and sends you a LP token as a 'credit'.
 
@@ -22,12 +22,12 @@
 </section>
 
 <!-- CURRENT POOL -->
-<section class="axn-section" *ngIf="account && currentPool">
+<section class="axn-section" *ngIf="account && currentMine">
   <div class="axn-form axn-form-base-2 vertical-center">
     <!-- DEPOSIT -->
     <div class="axn-form-block axn-form-auction">
       <div class="axn-form-block-one axn-form-arrow p-b-none">
-        <span class="axn-form-block-one-title">Deposit {{currentPool.base}}-{{currentPool.market}} LP Tokens</span>
+        <span class="axn-form-block-one-title">Deposit {{currentMine.base}}-{{currentMine.market}} LP Tokens</span>
         <input
           type="text"
           *ngIf="account"
@@ -38,21 +38,21 @@
           onblur="this.placeholder = '0.0'"
           [appBigNumber]="{
             decimals: tokensDecimals,
-            max: userTokenBalance?.shortBigNumber
+            max: minerBalance?.shortBigNumber
           }"
-          [(ngModel)]="depositAmount"
+          [(ngModel)]="formData.depositAmount"
           autocomplete="off"
         />
-        <span class="axn-cheap icon icon_uni cl-purple-bg">{{currentPool.base}}-{{currentPool.market}}</span>
+        <span class="axn-cheap icon icon_uni cl-purple-bg">{{currentMine.base}}-{{currentMine.market}}</span>
 
         <div class="axn-form-bottom axn-form-base-2">
           <div class="axn-form-block-sendmax">
-            <span class="axn-btn axn-btn-max" (click)="depositAmount = this.userTokenBalance.wei">
+            <span class="axn-btn axn-btn-max" (click)="formData.depositAmount = this.minerBalance.wei">
              &nbsp;Max&nbsp;
             </span>
 
             <span class="axn-form-block-sendmax-text">
-              Balance: {{ userTokenBalance?.weiBigNumber | bigNumberFormat: tokensDecimals:true:false:2 || 0}}
+              Balance: {{ minerBalance?.weiBigNumber | bigNumberFormat: tokensDecimals:true:false:2 || 0}}
               <span class="axn-form-block-sendmax-value"></span>
             </span>
             <br/>
@@ -62,12 +62,12 @@
           <div class="axn-form-block-button" layout-align="center center">
             <button
               class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid"
-              [ngClass]="{ progress: currentPool.depositProgress }"
-              [disabled]="!depositAmount || +depositAmount === 0"
+              [ngClass]="{ progress: currentMine.depositProgress }"
+              [disabled]="!formData.depositAmount || +formData.depositAmount === 0"
               (click)="deposit()"
             >
               <!-- Ellipsis Loading Indicator -->
-              <span class="lds-ellipsis" *ngIf="currentPool.depositProgress">
+              <span class="lds-ellipsis" *ngIf="currentMine.depositProgress">
                 <span class="lds-ellipsis-container">
                   <span></span><span></span><span></span><span></span>
                 </span>
@@ -82,21 +82,21 @@
       </div>
     </div>
 
-    <!-- POOL INFO -->
+    <!-- MINE INFO -->
     <div class="axn-form-block axn-form-auction p-b-5">
       <div class="axn-form-base-2">
         <div class="axn-form-block-one axn-form-border-dashed-right">
-          <span class="axn-form-block-one-title">Your {{currentPool.base}}-{{currentPool.market}} LP</span>
+          <span class="axn-form-block-one-title">Your {{currentMine.base}}-{{currentMine.market}} LP Tokens</span>
           <span
             class="axn-form-block-one-value-small p-tb-5"
             matTooltipClass="table__tooltip"
             mat-raised-button
-            matTooltip="{{ currentPoolStats.stakedTokens | bigNumberFormat: tokensDecimals:true:false:2 || 0 }}"
+            matTooltip="{{ minerBalance.lpDeposit | bigNumberFormat: tokensDecimals:true:false:2 || 0 }}"
           >
-            {{ currentPoolStats.stakedTokens | bigNumberFormat: 0:true:false:2 || 0 }}
+            {{ minerBalance.lpDeposit | bigNumberFormat: 0:true:false:2 || 0 }}
           </span>
 
-          <span class="axn-cheap icon icon_uni cl-purple-bg">{{currentPool.base}}-{{currentPool.market}}</span>
+          <span class="axn-cheap icon icon_uni cl-purple-bg">{{currentMine.base}}-{{currentMine.market}}</span>
         </div>
         <div class="axn-form-block-one">
           <span class="axn-form-block-one-title">AXN Earned</span>
@@ -104,9 +104,9 @@
             class="axn-form-block-one-value-small p-tb-5"
             matTooltipClass="table__tooltip"
             mat-raised-button
-            matTooltip="{{currentPoolStats.rewardsEarned | bigNumberFormat: tokensDecimals:true:false:18 }}"
+            matTooltip="{{minerBalance.pendingReward | bigNumberFormat: tokensDecimals:true:false:18 }}"
           >
-            {{ currentPoolStats.rewardsEarned | bigNumberFormat: 0:true:false:2 }}
+            {{ minerBalance.pendingReward | bigNumberFormat: 0:true:false:2 }}
           </span>
           <span class="axn-cheap icon icon_axn cl-blue-bg">AXN</span>
         </div>
@@ -117,12 +117,12 @@
         <div class="axn-form-block-one axn-form-base-center">
           <button 
             (click)="withdraw('LP')"
-            [disabled]="currentPoolStats.stakedTokens.isZero()" 
-            [ngClass]="{ progress: currentPool.withdrawLPProgress }"
+            [disabled]="minerBalance.lpDeposit.isZero()" 
+            [ngClass]="{ progress: currentMine.withdrawLPProgress }"
             class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid" 
           >
             <!-- Ellipsis Loading Indicator -->
-            <span class="lds-ellipsis" *ngIf="currentPool.withdrawLPProgress">
+            <span class="lds-ellipsis" *ngIf="currentMine.withdrawLPProgress">
               <span class="lds-ellipsis-container">
                 <span></span><span></span><span></span><span></span>
               </span>
@@ -136,12 +136,12 @@
         <div class="axn-form-block-one axn-form-base-center">
           <button 
             (click)="withdraw('ALL')"
-            [ngClass]="{ progress: currentPool.withdrawAllProgress }"
+            [ngClass]="{ progress: currentMine.withdrawAllProgress }"
             class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid" 
-            [disabled]="currentPoolStats.rewardsEarned.isZero() || currentPoolStats.stakedTokens.isZero()" 
+            [disabled]="minerBalance.pendingReward.isZero() || minerBalance.lpDeposit.isZero()" 
           >
             <!-- Ellipsis Loading Indicator -->
-            <span class="lds-ellipsis" *ngIf="currentPool.withdrawAllProgress">
+            <span class="lds-ellipsis" *ngIf="currentMine.withdrawAllProgress">
               <span class="lds-ellipsis-container">
                 <span></span><span></span><span></span><span></span>
               </span>
@@ -156,11 +156,11 @@
           <button 
             (click)="withdraw('REWARDS')"
             class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid" 
-            [disabled]="currentPoolStats.rewardsEarned.isZero()" 
-            [ngClass]="{ progress: currentPool.withdrawRewardsProgress }"
+            [disabled]="minerBalance.pendingReward.isZero()" 
+            [ngClass]="{ progress: currentMine.withdrawRewardsProgress }"
           >
             <!-- Ellipsis Loading Indicator -->
-            <span class="lds-ellipsis" *ngIf="currentPool.withdrawRewardsProgress">
+            <span class="lds-ellipsis" *ngIf="currentMine.withdrawRewardsProgress">
               <span class="lds-ellipsis-container">
                 <span></span><span></span><span></span><span></span>
               </span>
@@ -175,7 +175,7 @@
   </div>
 
   <!-- OPEN POOL INFO -->
-  <div class="axn-form-block-one axn-form-base-center" *ngIf="currentPool">
+  <div class="axn-form-block-one axn-form-base-center" *ngIf="currentMine">
     <button (click)="openUniswapPoolInfo()" class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-big">
       <span class="axn-btn-text">
         <span class="icon icon_uni"></span>&nbsp;&nbsp;Open Pool Stats
@@ -184,45 +184,45 @@
   </div>
 </section>
 
-<!-- AVAILABLE POOLS -->
-<section class="axn-section" *ngIf="account && currentPool && pools.length > 1">
+<!-- AVAILABLE MINES -->
+<section class="axn-section" *ngIf="account && currentMine && mines.length > 1">
   <div class="axn-title-block">
-    <span class="axn-title">Pools</span>
+    <span class="axn-title">Mines</span>
 
     <div 
       #tooltip2="matTooltip" 
       (click)="tooltip2.toggle()" 
       class="question" 
       mat-raised-button
-      matTooltip="Below are the available mining pools."
+      matTooltip="Below are the available mines."
       matTooltipClass="question__tooltip">
     </div>
   </div>
 
   <div class="axn-form axn-form-base-3">
-    <div class="axn-form-block axn-form-block-one axn-form-base-center" *ngFor="let pool of pools">
-      <p class="axn-text-subtitle">{{pool.base}}-{{pool.market}}</p>
+    <div class="axn-form-block axn-form-block-one axn-form-base-center" *ngFor="let mine of mines">
+      <p class="axn-text-subtitle">{{mine.base}}-{{mine.market}}</p>
       <p  class="axn-text-body">
-        Start Block: {{pool.startBlock}}<br/>
-        End Block: {{pool.endBlock}}<br/><br />
-        Reward: {{pool.rewardPool | bigNumberFormat: 18:true:false:2 || 0}} AXN
+        Start Block: {{mine.startBlock}}<br/>
+        End Block: {{mine.endBlock}}<br/><br />
+        Reward: {{mine.rewardPool | bigNumberFormat: 18:true:false:2 || 0}} AXN
       </p>
 
       <button 
-        (click)="setCurrentPool(pool)" 
+        (click)="setCurrentMine(mine)" 
         class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-big" 
-        [ngClass]="{ progress: switchingLoading === pool.address }"
-        [disabled]="switchingLoading === pool.address || currentPool.address === pool.address" 
+        [ngClass]="{ progress: switchingLoading === mine.lpToken }"
+        [disabled]="switchingLoading === mine.lpToken || currentMine.lpToken === mine.lpToken" 
       >
         <!-- Ellipsis Loading Indicator -->
-        <span class="lds-ellipsis" *ngIf="switchingLoading === pool.address">
+        <span class="lds-ellipsis" *ngIf="switchingLoading === mine.lpToken">
           <span class="lds-ellipsis-container">
             <span></span><span></span><span></span><span></span>
           </span>
         </span>
       
         <!-- Button Text -->
-        <span class="axn-btn-text">Open Pool</span>
+        <span class="axn-btn-text">Open Mine</span>
       </button>
 
     </div>
@@ -233,39 +233,39 @@
 <!-- MANAGERS ONLY: CREATE A POOL -->
 <section class="axn-section" *ngIf="account && account.isManager">
   <div class="axn-form-block-one axn-form-base-center">
-    <button (click)="openCreatePoolModal()" class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-big">
+    <button (click)="openCreateMineModal()" class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-big">
       <span class="axn-btn-text">
-        Create a Pool
+        Create Mine
       </span>
     </button>
   </div>
 </section>
 
-<!-- Create Pool Modal -->
-<ng-template #createPoolModal class="dialog-block" mat-dialog-content>
+<!-- Create Mine Modal -->
+<ng-template #createMineModal class="dialog-block" mat-dialog-content>
   <div class="dialog-block__content">
-    <div class="dialog-title">Create a Pool</div>
+    <div class="dialog-title">Create a Mine</div>
 
     <div class="dialog-description dialog-description-slim">
       <div class="axn-form axn-form-block-one">
 
         <!-- Token Address -->
         <span class="axn-form-block-one-title">LP Token Address</span>
-        <input placeholder="0x0000000000000000000000000000000000000000" type="text" class="axn-input" required="required" [(ngModel)]="createPoolData.tokenAddress" (blur)="onCreatePoolAddressChanged()"/>
-        <span class="axn-text-body" *ngIf="createPoolData.base && createPoolData.market">
+        <input placeholder="0x0000000000000000000000000000000000000000" type="text" class="axn-input" required="required" [(ngModel)]="createMineData.tokenAddress" (blur)="onCreateMineAddressChanged()"/>
+        <span class="axn-text-body" *ngIf="createMineData.base && createMineData.market">
           Found Pair: 
-          <span class="axn-text-body-link" (click)="openUniswapPoolInfo(createPoolData.tokenAddress)">{{createPoolData.base}}-{{createPoolData.market}}</span>
+          <span class="axn-text-body-link" (click)="openUniswapPoolInfo(createMineData.tokenAddress)">{{createMineData.base}}-{{createMineData.market}}</span>
         </span>
 
         <!-- Start & End Block -->
         <div class="axn-form axn-form-base-2">
             <div class="axn-form-block-one">
               <span class="axn-form-block-one-title">Start Block</span>
-              <input placeholder="116797939" step="1" type="number" class="axn-input" required="required" [(ngModel)]="createPoolData.startBlock" />
+              <input placeholder="116797939" step="1" type="number" class="axn-input" required="required" [(ngModel)]="createMineData.startBlock" />
             </div>
             <div class="axn-form-block-one">
               <span class="axn-form-block-one-title">End Block</span>
-              <input placeholder="116797939" step="1" type="number" class="axn-input" required="required" [(ngModel)]="createPoolData.endBlock" />
+              <input placeholder="116797939" step="1" type="number" class="axn-input" required="required" [(ngModel)]="createMineData.endBlock" />
             </div>
         </div>
 
@@ -275,11 +275,11 @@
           <input
             type="text"
             class="axn-input"
-            name="reward-pool"
+            name="reward-mine"
             placeholder="5,000,000,000"
             onfocus="this.placeholder = ''"
             onblur="this.placeholder = '5,000,000,000'"
-            [(ngModel)]="createPoolData.rewardPool"
+            [(ngModel)]="createMineData.rewardPool"
             [appBigNumber]="{decimals: 18, min: 1 }"
           />
           <span class="axn-cheap icon icon_axn cl-blue-bg">AXN</span>
@@ -294,12 +294,12 @@
       </button>
 
       <button 
-        (click)="createPool()"
+        (click)="createMine()"
         class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid"
-        [ngClass]="{ progress: createPoolData.progressIndicator }" 
-        [disabled]="createPoolData.progressIndicator"
+        [ngClass]="{ progress: createMineData.progressIndicator }" 
+        [disabled]="createMineData.progressIndicator"
       >
-        <span class="lds-ellipsis" *ngIf="createPoolData.progressIndicator">
+        <span class="lds-ellipsis" *ngIf="createMineData.progressIndicator">
           <span class="lds-ellipsis-container">
             <span></span><span></span><span></span><span></span>
           </span>
