@@ -170,30 +170,23 @@ export class MiningPageComponent implements OnDestroy {
     finally { this.switchingLoading = "" }
   }
 
-  // Process mine pair found in URL parameter
-  public processParams(pair: string) {
-    try {
-      if (this.mines.length > 0) {
-        const BASE = pair.split("-")[0].toUpperCase()
-        const MARKET = pair.split("-")[1].toUpperCase()
-        const MINE_FOUND = this.mines.find(p => p.base === BASE && p.market === MARKET)
+  // Process mine pair address found in URL parameter
+  public processParams(lpToken: string) {
+    if (this.mines.length > 0) {
+      const MINE_FOUND = this.mines.find(p => p.lpToken === lpToken)
 
-        if (MINE_FOUND) {
-          this.setCurrentMine(MINE_FOUND)
-        }
-        else {
-          const FALLBACK_POOL = this.mines[0]
-          this.setCurrentMine(FALLBACK_POOL)
-          this.openErrorModal(`${BASE}-${MARKET} mine not found. Falling back to ${FALLBACK_POOL.base}-${FALLBACK_POOL.market}.`)
-          this.fixURL();
-        }
-      } else {
-        this.fixURL();
-        this.openErrorModal(`There are currently no active mines. Please check back later!`)
+      if (MINE_FOUND) {
+        this.setCurrentMine(MINE_FOUND)
       }
-    } catch (err) {
-      console.log("Invalid params, loading default mine...")
-      this.setCurrentMine(this.mines[0])
+      else {
+        const FALLBACK_POOL = this.mines[0]
+        this.fixURL();
+        this.setCurrentMine(FALLBACK_POOL)
+        this.openErrorModal(`Mine not found. Falling back to ${FALLBACK_POOL.base}-${FALLBACK_POOL.market}.`)
+      }
+    } else {
+      this.fixURL();
+      this.openErrorModal(`There are currently no active mines. Please check back later!`)
     }
   }
 
