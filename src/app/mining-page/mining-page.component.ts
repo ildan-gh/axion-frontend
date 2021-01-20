@@ -13,7 +13,16 @@ import { MiningContractService } from "../services/mining-contract";
 import { MetamaskErrorComponent } from "../components/metamaskError/metamask-error.component";
 import { ActivatedRoute } from "@angular/router";
 import { TransactionSuccessModalComponent } from "../components/transactionSuccessModal/transaction-success-modal.component";
-import { Mine } from '../services/mining-contract';
+import { Mine as BasicMine } from '../services/mining-contract';
+
+interface Mine extends BasicMine {
+  base: string,
+  market: string,
+  depositLoading: boolean,
+  withdrawLPLoading: boolean,
+  withdrawAllLoading: boolean,
+  withdrawRewardsLoading: boolean,
+}
 
 @Component({
   selector: "app-mining-page",
@@ -33,13 +42,17 @@ export class MiningPageComponent implements OnDestroy {
   public mines: Mine[];
   public currentMine: Mine;
   public createMineData: any = {}
-  public minerBalance: any = {};
-  public currentMineStats: any = {};
   public onChangeAccount: EventEmitter<any> = new EventEmitter();
+
   public formData = {
     depositAmount: "",
     withdrawLPAmount: ""
   }
+
+  public minerBalance = {
+    lpDeposit: new BigNumber(0),
+    pendingReward: new BigNumber(0)
+  };
 
   constructor(
     public contractService: MiningContractService,
@@ -141,7 +154,6 @@ export class MiningPageComponent implements OnDestroy {
 
     try {
       this.currentMine = mine;
-      this.currentMineStats = await this.contractService.getMinerPoolBalance(this.currentMine.lpToken);
       await this.updateMinerBalance();
     }
     catch (err) { console.log(err) }
@@ -154,7 +166,7 @@ export class MiningPageComponent implements OnDestroy {
       if (this.mines.length > 0) {
         const BASE = pair.split("-")[0].toUpperCase()
         const MARKET = pair.split("-")[1].toUpperCase()
-        const MINE_FOUND = this.mines.find(p => p["base"] === BASE && p["market"] === MARKET)
+        const MINE_FOUND = this.mines.find(p => p.base === BASE && p.market === MARKET)
 
         if (MINE_FOUND) {
           this.setCurrentMine(MINE_FOUND)
@@ -162,7 +174,7 @@ export class MiningPageComponent implements OnDestroy {
         else {
           const FALLBACK_POOL = this.mines[0]
           this.setCurrentMine(FALLBACK_POOL)
-          this.openErrorModal(`${BASE}-${MARKET} mine not found. Falling back to ${FALLBACK_POOL["base"]}-${FALLBACK_POOL["market"]}.`)
+          this.openErrorModal(`${BASE}-${MARKET} mine not found. Falling back to ${FALLBACK_POOL.base}-${FALLBACK_POOL.market}.`)
           this.fixURL();
         }
       } else {
@@ -178,7 +190,7 @@ export class MiningPageComponent implements OnDestroy {
   public async deposit() {
     if (+this.formData.depositAmount > 0) {
       try {
-        this.currentMine["depositProgress"] = true;
+        this.currentMine.depositLoading = true;
         await this.contractService.depositLPTokens(this.currentMine.lpToken, this.formData.depositAmount);
         this.updateMinerBalance();
         this.updateMines();
@@ -188,45 +200,65 @@ export class MiningPageComponent implements OnDestroy {
           this.openErrorModal(err.message)
       }
       finally {
-        this.currentMine["depositProgress"] = false;
+        this.currentMine.depositLoading = false;
       }
     }
   }
 
-  public async withdraw(type: string) { 
-    let progressIndicatorVariable: string;
-    let withdrawalMethod: string;
+  public async withdrawRewards(){
+    if(!this.minerBalance.pendingReward.isZero()) {
+      this.currentMine.withdrawRewardsLoading = true;
+      
+      try {
+        await this.contractService.withdrawReward(this.currentMine.lpToken);
+        this.updateMines();
+        this.updateMinerBalance();
+      } 
+      catch (err) {
+        if (err.message)
+          this.openErrorModal(err.message)
+      }
+      finally { 
+        this.currentMine.withdrawRewardsLoading = false 
+      }
+    }
+  }
 
-    if (type === "LP") {
-      withdrawalMethod = "withdrawLPTokens"
-      progressIndicatorVariable = "withdrawLPProgress";
-    }   
-    else if (type === "REWARDS") {
-      withdrawalMethod = "withdrawReward"
-      progressIndicatorVariable = "withdrawRewardsProgress";
-    }   
-    else if (type === "ALL") {
-      withdrawalMethod = "withdrawAll";
-      progressIndicatorVariable = "withdrawAllProgress";
-    } 
+  public async withdrawAll() { 
+    if (!this.minerBalance.pendingReward.isZero() && !this.minerBalance.lpDeposit.isZero()) {
+      this.currentMine.withdrawAllLoading = true;
 
-    try {
-      this.currentMine[progressIndicatorVariable] = true;
+      try {
+        await this.contractService.withdrawAll(this.currentMine.lpToken);
+        this.updateMines();
+        this.updateMinerBalance();
+      }
+      catch (err) {
+        if (err.message)
+          this.openErrorModal(err.message)
+      }
+      finally {
+        this.currentMine.withdrawAllLoading = false
+      }
+    }
+  }
 
-      if (withdrawalMethod === "withdrawLPTokens")
-        await this.contractService.withdrawLPTokens(this.currentMine.lpToken, "0"); // TODO: fix
-      else
-        await this.contractService[withdrawalMethod](this.currentMine.lpToken);
+  public async withdrawLPTokens(amount: string) { 
+    if (!this.minerBalance.lpDeposit.isZero()) {
+      this.currentMine.withdrawLPLoading = true;
 
-      this.updateMinerBalance();
-      this.updateMines();
-    } 
-    catch (err) {
-      if (err.message)
-        this.openErrorModal(err.message)
-    } 
-    finally {
-      this.currentMine[progressIndicatorVariable] = false;
+      try {
+        await this.contractService.withdrawLPTokens(this.currentMine.lpToken, amount);
+        this.updateMines();
+        this.updateMinerBalance();
+      }
+      catch (err) {
+        if (err.message)
+          this.openErrorModal(err.message)
+      }
+      finally {
+        this.currentMine.withdrawLPLoading = false
+      }
     }
   }
 

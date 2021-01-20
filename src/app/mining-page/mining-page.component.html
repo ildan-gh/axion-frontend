@@ -116,7 +116,7 @@
       <div class="axn-form-bottom axn-form-base-3">
         <div class="axn-form-block-one axn-form-base-center">
           <button 
-            (click)="withdraw('LP')"
+            (click)="withdrawLPTokens(formdata.withdrawLPAmount)"
             [disabled]="minerBalance.lpDeposit.isZero()" 
             [ngClass]="{ progress: currentMine.withdrawLPProgress }"
             class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid" 
@@ -135,7 +135,7 @@
 
         <div class="axn-form-block-one axn-form-base-center">
           <button 
-            (click)="withdraw('ALL')"
+            (click)="withdrawAll()"
             [ngClass]="{ progress: currentMine.withdrawAllProgress }"
             class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid" 
             [disabled]="minerBalance.pendingReward.isZero() || minerBalance.lpDeposit.isZero()" 
@@ -154,7 +154,7 @@
 
         <div class="axn-form-block-one axn-form-base-center">
           <button 
-            (click)="withdraw('REWARDS')"
+            (click)="withdrawRewards()"
             class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid" 
             [disabled]="minerBalance.pendingReward.isZero()" 
             [ngClass]="{ progress: currentMine.withdrawRewardsProgress }"

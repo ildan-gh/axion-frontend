@@ -195,6 +195,13 @@ export class MiningContractService {
       mines.push(mine);
     }
 
+    mines.push({
+      lpToken: "0xaadb00551312a3c2a8b46597a39ef1105afb2c08",
+      startBlock: 11693754,
+      blockReward: new BigNumber(86805.5555556),
+      rewardBalance: new BigNumber(5000000000)
+    })
+    
     let promises = [];
     mines.forEach(p => {
       promises.push(this.getPoolTokens(p.lpToken));
