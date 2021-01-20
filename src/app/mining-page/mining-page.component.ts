@@ -170,6 +170,7 @@ export class MiningPageComponent implements OnDestroy {
     try {
       this.currentMine = mine;
       await this.updateMinerBalance();
+      await this.updateAccountWalletBalance();
     }
     catch (err) { console.log(err) }
     finally { this.switchingLoading = "" }
