@@ -7,6 +7,25 @@ import { ContractService } from "../contract";
 import { MetamaskService } from "../web3";
 import { Contract } from "web3-eth-contract";
 
+export interface Mine {
+  lpToken: string;
+  startBlock: number;
+  blockReward: BigNumber;
+  rewardBalance: BigNumber;
+}
+
+export interface MineInfo {
+  lpToken: string;
+  rewardToken: string;
+  startBlock: string;
+  lastRewardBlock: string;
+  blockReward: string;
+  accRewardPerLPToken: string;
+  liqRepNFT: string;
+  OG5555_25NFT: string;
+  OG5555_100NFT: string;
+}
+
 @Injectable({
   providedIn: "root",
 })
@@ -19,8 +38,11 @@ export class MiningContractService {
   private allTransactionSubscribers = [];
 
   private contractData: any;
+  private axionContract: Contract;
   private mineManagerContract: Contract;
   private mineContracts: { [id: string]: Contract; } = {};
+
+  public mineAddresses: string[];
 
   constructor(config: AppConfig, contractService: ContractService) {
     this.web3Service = new MetamaskService(config);
@@ -29,6 +51,7 @@ export class MiningContractService {
         this.isActive = true;
         this.account = account;
         this.contractData = contractService.CONTRACTS_PARAMS;
+        this.axionContract = contractService.HEX2XContract;
 
         await this.initializeContracts();
         this.callAllAccountsSubscribers();
@@ -62,24 +85,18 @@ export class MiningContractService {
 
   private async initializeContracts() {
     this.mineManagerContract = this.web3Service.getContract(this.contractData.MineManager.ABI, this.contractData.MineManager.ADDRESS);
-
+    this.mineAddresses = []//await this.mineManagerContract.methods.getMineAddresses().call()
     this.getMineContracts();
   }
 
   private getMineContracts() {
-    const mineAddresses = []; //await getMineAddresses();
-
     const mineContracts = {};
 
-    for (const mineAddress of mineAddresses) {
+    for (const mineAddress of this.mineAddresses) {
       mineContracts[mineAddress] = this.web3Service.getContract(this.contractData.Mine.ABI, mineAddress);
     }
 
     this.mineContracts = mineContracts;
-  }
-
-  public getMineAddresses(): Promise<string[]> {
-    return this.mineManagerContract.methods.getMineAddresses().call();
   }
 
   private checkTx(tx, resolve, reject) {
@@ -120,7 +137,7 @@ export class MiningContractService {
     return TOKEN.methods.decimals().call();
   }
 
-  public async getPoolTokens(lpTokenAddress): Promise<any> {
+  public async getPoolTokens(lpTokenAddress: string): Promise<any> {
     if (!Web3.utils.isAddress(lpTokenAddress)) {
       throw new Error("Invalid address");
     }
@@ -160,37 +177,37 @@ export class MiningContractService {
     };
   }
 
-  public async getPools(): Promise<any[]> {
-    let pools = [
-      {
-        address: "0xaadb00551312a3c2a8b46597a39ef1105afb2c08",
-        startBlock: 11686417,
-        endBlock: 11752227,
-        rewardPool: new BigNumber("5000000000000000000000000000"),
-        isLive: true
-      },
-      {
-        address: "0xd7f7c34dd455efafce52d8845b2646c790db0cdd",
-        startBlock: 11686417,
-        endBlock: 11752227,
-        rewardPool: new BigNumber("1000000000000000000000000000"),
-        isLive: false
-      }
-    ]
+  public async getMines(): Promise<any[]> {
+    const mines: Mine[] = [];
+
+    for (const mineAddress of this.mineAddresses) {
+      const balance = await this.axionContract.methods.balanceOf(mineAddress).call();
+      const mineInfo: MineInfo = await this.mineContracts[mineAddress].methods.mineInfo().call();
+
+      const mine: Mine = {
+        lpToken: mineInfo.lpToken,
+        startBlock: +mineInfo.startBlock,
+        blockReward: new BigNumber(mineInfo.blockReward),
+        rewardBalance: new BigNumber(balance)
+      };
+
+      mines.push(mine);
+    }
+
 
     // Get the tokens for the pools
     let promises = [];
-    pools.forEach(p => {
-      promises.push(this.getPoolTokens(p.address));
+    mines.forEach(p => {
+      promises.push(this.getPoolTokens(p.lpToken));
     })
 
     const tokens = await Promise.all(promises)
     tokens.forEach((t, idx) => {
-      pools[idx]["base"] = t.base;
-      pools[idx]["market"] = t.market;
+      mines[idx]["base"] = t.base;
+      mines[idx]["market"] = t.market;
     })
 
-    return pools;
+    return mines;
   }
 
   public depositLPTokens(mineAddress: string, amount: string): Promise<void> {
@@ -209,10 +226,16 @@ export class MiningContractService {
     return this.mineContracts[mineAddress].methods.withdrawAll().send();
   }
 
-  public async getMinerPoolBalance(mineAddress: string) {
+  public async getPendingReward(mineAddress: string): Promise<BigNumber> {
+    const reward = await this.mineContracts[mineAddress].methods.getPendingReward().call();
+
+    return new BigNumber(reward);
+  }
+
+  public async getMinerPoolBalance(mineAddress: string): Promise<BigNumber> {
     const minerInfo = await this.mineContracts[mineAddress].methods.minerInfo(this.account.address).call();
 
-    return minerInfo.lpDeposit;
+    return new BigNumber(minerInfo.lpDeposit);
   }
 
   public calculateBlockReward(rewardAmount: string, startBlock: number, endBlock: number): BigNumber {

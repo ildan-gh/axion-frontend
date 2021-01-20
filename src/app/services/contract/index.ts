@@ -54,7 +54,7 @@ export class ContractService {
   private web3Service;
 
   private H2TContract: Contract;
-  private HEX2XContract: Contract;
+  public HEX2XContract: Contract;
   private HEXContract: Contract;
   private NativeSwapContract: Contract;
 

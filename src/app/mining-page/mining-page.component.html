@@ -63,7 +63,7 @@
             <button
               class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid"
               [ngClass]="{ progress: currentPool.depositProgress }"
-              [disabled]="!depositAmount || +depositAmount === 0 || !currentPool.isLive"
+              [disabled]="!depositAmount || +depositAmount === 0"
               (click)="deposit()"
             >
               <!-- Ellipsis Loading Indicator -->
