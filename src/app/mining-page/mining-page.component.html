@@ -38,7 +38,7 @@
           onblur="this.placeholder = '0.0'"
           [appBigNumber]="{
             decimals: tokensDecimals,
-            max: accountBalance?.wei
+            max: minerBalance.lpAvailable.wei
           }"
           [(ngModel)]="formData.depositAmount"
           autocomplete="off"
@@ -47,12 +47,12 @@
 
         <div class="axn-form-bottom axn-form-base-2">
           <div class="axn-form-block-sendmax">
-            <span class="axn-btn axn-btn-max" (click)="formData.depositAmount = accountBalance.wei">
+            <span class="axn-btn axn-btn-max" (click)="formData.depositAmount = minerBalance.lpAvailable.wei">
              &nbsp;Max&nbsp;
             </span>
 
             <span class="axn-form-block-sendmax-text">
-              Balance: {{ accountBalance?.weiBigNumber | bigNumberFormat: tokensDecimals:true:false:2 || 0}}
+              Balance: {{ minerBalance.lpAvailable.bn | bigNumberFormat: tokensDecimals:true:false:2 || 0}}
               <span class="axn-form-block-sendmax-value"></span>
             </span>
             <br/>

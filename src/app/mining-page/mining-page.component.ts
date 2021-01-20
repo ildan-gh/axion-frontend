@@ -41,7 +41,6 @@ export class MiningPageComponent implements OnDestroy {
   public switchingLoading;
   public mines: Mine[];
   public currentMine: Mine;
-  public accountBalance: any = {}
   public createMineData: any = {}
   public onChangeAccount: EventEmitter<any> = new EventEmitter();
 
@@ -52,7 +51,11 @@ export class MiningPageComponent implements OnDestroy {
 
   public minerBalance = {
     lpDeposit: new BigNumber(0),
-    pendingReward: new BigNumber(0)
+    pendingReward: new BigNumber(0),
+    lpAvailable: {
+      wei: "0",
+      bn: new BigNumber(0)
+    }
   };
 
   constructor(
@@ -128,13 +131,10 @@ export class MiningPageComponent implements OnDestroy {
     this.createMineData.ref = this.dialog.open(this.createMineModal, {});
   }
 
-  public async updateAccountWalletBalance() {
-    this.accountBalance = await this.contractService.getTokenBalance(this.currentMine.lpToken)
-  }
-
   public async updateMinerBalance() {
     this.minerBalance.lpDeposit = await this.contractService.getMinerPoolBalance(this.currentMine.lpToken);
     this.minerBalance.pendingReward = await this.contractService.getPendingReward(this.currentMine.lpToken);
+    this.minerBalance.lpAvailable = await this.contractService.getTokenBalance(this.currentMine.lpToken);
   }
 
   public async onCreateMineAddressChanged() {
@@ -170,7 +170,6 @@ export class MiningPageComponent implements OnDestroy {
     try {
       this.currentMine = mine;
       await this.updateMinerBalance();
-      await this.updateAccountWalletBalance();
     }
     catch (err) { console.log(err) }
     finally { this.switchingLoading = "" }

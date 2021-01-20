@@ -154,11 +154,10 @@ export class MiningContractService {
   public async getTokenBalance(mineAddress: string): Promise<any> {
     const token = this.web3Service.getContract(this.contractData.UniswapERC20Pair.ABI, mineAddress);
     const balance = await token.methods.balanceOf(this.account.address).call();
-    const bigBalance = new BigNumber(balance);
 
     return {
       wei: balance,
-      weiBigNumber: bigBalance
+      weiBigNumber: new BigNumber(balance)
     };
   }
 
