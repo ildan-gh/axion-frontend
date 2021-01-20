@@ -54,7 +54,7 @@ export class ContractService {
   private web3Service;
 
   private H2TContract: Contract;
-  private AXIONContract: Contract;
+  private AXNContract: Contract;
   private HEXContract: Contract;
   private NativeSwapContract: Contract;
 
@@ -206,8 +206,8 @@ export class ContractService {
 
   public addToken() {
     this.web3Service.addToken({
-      address: this.CONTRACTS_PARAMS.AXION.ADDRESS,
-      decimals: this.tokensDecimals.AXION,
+      address: this.CONTRACTS_PARAMS.AXN.ADDRESS,
+      decimals: this.tokensDecimals.AXN,
       image:
         "https://stake.axion.network/assets/images/icons/axion-icon.png",
       symbol: "AXN",
@@ -225,11 +225,11 @@ export class ContractService {
         .then((decimals) => {
           this.tokensDecimals.H2T = decimals;
         }),
-      this.AXIONContract.methods
+      this.AXNContract.methods
         .decimals()
         .call()
         .then((decimals) => {
-          this.tokensDecimals.AXION = decimals;
+          this.tokensDecimals.AXN = decimals;
         }),
       this.HEXContract.methods
         .decimals()
@@ -435,18 +435,18 @@ export class ContractService {
     });
   }
 
-  public updateAXIONBalance(callEmitter?) {
+  public updateAXNBalance(callEmitter?) {
     return new Promise((resolve, reject) => {
       if (!(this.account && this.account.address)) {
         return reject();
       }
-      return this.AXIONContract.methods
+      return this.AXNContract.methods
         .balanceOf(this.account.address)
         .call()
         .then((balance) => {
           const bigBalance = new BigNumber(balance);
           this.account.balances = this.account.balances || {};
-          this.account.balances.AXION = {
+          this.account.balances.AXN = {
             wei: balance,
             weiBigNumber: bigBalance,
             shortBigNumber: bigBalance.div(
@@ -524,7 +524,7 @@ export class ContractService {
   public loadAccountInfo() {
     const promises = [
       this.updateH2TBalance(),
-      this.updateAXIONBalance(),
+      this.updateAXNBalance(),
       this.updateETHBalance(),
       this.updateHEXBalance(),
     ];
@@ -567,9 +567,9 @@ export class ContractService {
     });
   }
 
-  private checkAXIONApproval(amount, address?): Promise<any> {
+  private checkAXNApproval(amount, address?): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.AXIONContract.methods
+      this.AXNContract.methods
         .allowance(this.account.address, address)
         .call()
         .then((allowance: string) => {
@@ -674,19 +674,19 @@ export class ContractService {
               return {
                 key: "Auction",
                 value: new BigNumber(res[1])
-                  .div(Math.pow(10, this.tokensDecimals.AXION))
+                  .div(Math.pow(10, this.tokensDecimals.AXN))
                   .toString(),
               };
             });
         }),
-      this.AXIONContract.methods
+      this.AXNContract.methods
         .totalSupply()
         .call()
         .then((res) => {
           return {
             key: "totalSupply",
             value: new BigNumber(res)
-              .div(Math.pow(10, this.tokensDecimals.AXION))
+              .div(Math.pow(10, this.tokensDecimals.AXN))
               .toString(),
           };
         }),
@@ -697,7 +697,7 @@ export class ContractService {
           return {
             key: "staking",
             value: new BigNumber(res)
-              .div(Math.pow(10, this.tokensDecimals.AXION))
+              .div(Math.pow(10, this.tokensDecimals.AXN))
               .toString(),
           };
         }),
@@ -709,7 +709,7 @@ export class ContractService {
             key: "BPDInfo",
             value: res.map((oneBigPayDay) => {
               return new BigNumber(oneBigPayDay)
-                .div(Math.pow(10, this.tokensDecimals.AXION))
+                .div(Math.pow(10, this.tokensDecimals.AXN))
                 .toString();
             }),
           };
@@ -901,7 +901,7 @@ export class ContractService {
       });
   }
 
-  public depositAXION(amount, days) {
+  public depositAXN(amount, days) {
     const fromAccount = this.account.address;
     const depositTokens = (resolve, reject) => {
       return this.StakingContract.methods
@@ -916,7 +916,7 @@ export class ContractService {
     };
 
     return new Promise((resolve, reject) => {
-      this.checkAXIONApproval(
+      this.checkAXNApproval(
         amount,
         this.StakingContract.options.address
       ).then(
@@ -924,7 +924,7 @@ export class ContractService {
           depositTokens(resolve, reject);
         },
         () => {
-          this.AXIONContract.methods
+          this.AXNContract.methods
             .approve(this.StakingContract.options.address, amount)
             .send({
               from: fromAccount,
@@ -1500,7 +1500,7 @@ export class ContractService {
     return this.UniswapV2Router02.methods
       .getAmountsOut(amount, [
         this.CONTRACTS_PARAMS.WETH.ADDRESS,
-        this.CONTRACTS_PARAMS.AXION.ADDRESS,
+        this.CONTRACTS_PARAMS.AXN.ADDRESS,
       ])
       .call();
   }
@@ -1925,9 +1925,9 @@ export class ContractService {
       this.CONTRACTS_PARAMS.H2T.ADDRESS
     );
 
-    this.AXIONContract = this.web3Service.getContract(
-      this.CONTRACTS_PARAMS.AXION.ABI,
-      this.CONTRACTS_PARAMS.AXION.ADDRESS
+    this.AXNContract = this.web3Service.getContract(
+      this.CONTRACTS_PARAMS.AXN.ABI,
+      this.CONTRACTS_PARAMS.AXN.ADDRESS
     );
 
     this.NativeSwapContract = this.web3Service.getContract(

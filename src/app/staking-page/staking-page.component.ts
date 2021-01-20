@@ -230,9 +230,9 @@ export class StakingPageComponent implements OnDestroy {
   public openStake() {
     this.stakeTokensProgress = true;
     this.contractService
-      .depositAXION(this.formsData.stakeAmount, this.formsData.stakeDays)
+      .depositAXN(this.formsData.stakeAmount, this.formsData.stakeDays)
       .then((r) => {
-        this.contractService.updateAXIONBalance(true).then(() => {
+        this.contractService.updateAXNBalance(true).then(() => {
           this.stakeTokensProgress = false;
           this.shareRate = 0;
         });
@@ -258,7 +258,7 @@ export class StakingPageComponent implements OnDestroy {
   }
 
   get userShares() {
-    const divDecimals = Math.pow(10, this.tokensDecimals.AXION);
+    const divDecimals = Math.pow(10, this.tokensDecimals.AXN);
     return new BigNumber(this.formsData.stakeAmount || 0)
       .div(divDecimals)
       .times(this.bonusLongerPays.div(divDecimals).plus(1))
@@ -267,7 +267,7 @@ export class StakingPageComponent implements OnDestroy {
   }
 
   get userSharesRestake() {
-    const divDecimals = Math.pow(10, this.tokensDecimals.AXION);
+    const divDecimals = Math.pow(10, this.tokensDecimals.AXN);
     const shareRate = new BigNumber(this.stakingContractInfo.ShareRate || 0).div(divDecimals);
     const amount = new BigNumber(this.actionsModalData.amount || 0).div(divDecimals);
     return amount.div(shareRate).times(divDecimals);
@@ -288,7 +288,7 @@ export class StakingPageComponent implements OnDestroy {
   }
 
   public onChangeAmount() {
-    const divDecimals = Math.pow(10, this.tokensDecimals.AXION);
+    const divDecimals = Math.pow(10, this.tokensDecimals.AXN);
 
     const stareRate = new BigNumber(this.stakingContractInfo.ShareRate || 0)
       .div(divDecimals)
@@ -316,7 +316,7 @@ export class StakingPageComponent implements OnDestroy {
 
     const sharefull = new BigNumber(amount).div(
       new BigNumber(this.stakingContractInfo.ShareRate).div(
-        Math.pow(10, this.tokensDecimals.AXION)
+        Math.pow(10, this.tokensDecimals.AXN)
       )
     );
 
@@ -420,7 +420,7 @@ export class StakingPageComponent implements OnDestroy {
     stake.withdrawProgress = true;
     this.contractService.restake(stake, stakingDays).then(() => {
       this.stakeList();
-      this.contractService.updateAXIONBalance(true);
+      this.contractService.updateAXNBalance(true);
     }).finally(() => {
       stake.withdrawProgress = false;
     })
@@ -466,7 +466,7 @@ export class StakingPageComponent implements OnDestroy {
         .unstake(stake.sessionId)
         .then(() => {
           this.stakeList();
-          this.contractService.updateAXIONBalance(true);
+          this.contractService.updateAXNBalance(true);
           stake.withdrawProgress = false;
         })
         .catch(() => {
@@ -477,7 +477,7 @@ export class StakingPageComponent implements OnDestroy {
         .unstakeV1(stake.sessionId)
         .then(() => {
           this.stakeList();
-          this.contractService.updateAXIONBalance(true);
+          this.contractService.updateAXNBalance(true);
           stake.withdrawProgress = false;
         })
         .catch(() => {
@@ -493,7 +493,7 @@ export class StakingPageComponent implements OnDestroy {
       .bpdWithdraw(stake.sessionId)
       .then(() => {
         this.stakeList();
-        this.contractService.updateAXIONBalance(true);
+        this.contractService.updateAXNBalance(true);
         stake.withdrawProgress = false;
       })
       .catch(() => {
