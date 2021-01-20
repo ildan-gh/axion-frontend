@@ -41,6 +41,7 @@ export class MiningPageComponent implements OnDestroy {
   public switchingLoading;
   public mines: Mine[];
   public currentMine: Mine;
+  public accountBalance: any = {}
   public createMineData: any = {}
   public onChangeAccount: EventEmitter<any> = new EventEmitter();
 
@@ -125,6 +126,10 @@ export class MiningPageComponent implements OnDestroy {
 
   public openCreateMineModal() {
     this.createMineData.ref = this.dialog.open(this.createMineModal, {});
+  }
+
+  public async updateAccountWalletBalance() {
+    this.accountBalance = await this.contractService.getTokenBalance(this.currentMine.lpToken)
   }
 
   public async updateMinerBalance() {

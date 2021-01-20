@@ -151,16 +151,14 @@ export class MiningContractService {
     };
   }
 
-  public async getTokenBalance(lpTokenAddress, address): Promise<any> {
-    const token = this.web3Service.getContract(this.contractData.UniswapERC20Pair.ABI, lpTokenAddress);
-    const balance = await token.methods.balanceOf(address).call();
+  public async getTokenBalance(mineAddress: string): Promise<any> {
+    const token = this.web3Service.getContract(this.contractData.UniswapERC20Pair.ABI, mineAddress);
+    const balance = await token.methods.balanceOf(this.account.address).call();
     const bigBalance = new BigNumber(balance);
 
     return {
       wei: balance,
-      weiBigNumber: bigBalance,
-      shortBigNumber: bigBalance.div(new BigNumber(10).pow(18)),
-      display: bigBalance.div(new BigNumber(10).pow(18)).toFormat(2),
+      weiBigNumber: bigBalance
     };
   }
 
