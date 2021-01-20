@@ -294,9 +294,9 @@
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{
-                activeStakeTotals.principal
-                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
+              matTooltip="${{
+                getDollarValue(activeStakeTotals.principal)
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:2
               }}"
             >
               {{
@@ -324,9 +324,9 @@
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{
-                activeStakeTotals.bigPayDay
-                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
+              matTooltip="${{
+                getDollarValue(activeStakeTotals.bigPayDay)
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:2
               }}"
             >
               {{
@@ -339,9 +339,9 @@
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{
-                activeStakeTotals.interest
-                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
+              matTooltip="${{
+                getDollarValue(activeStakeTotals.interest)
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:2
               }}"
             >
               {{
@@ -354,9 +354,9 @@
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{
+              matTooltip="${{
                 getDollarValue(activeStakeTotals.total) 
-                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:2
               }}"
             >
               {{
@@ -423,9 +423,9 @@
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{
-                stake.principal
-                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
+              matTooltip="${{
+                getDollarValue(stake.principal)
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:2
               }}"
             >
               {{
@@ -453,9 +453,9 @@
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{
-                stake.interest
-                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
+              matTooltip="${{
+                getDollarValue(stake.interest)
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:2
               }}"
             >
               {{
@@ -467,9 +467,9 @@
               *ngIf="!stake.bigPayDay.isZero()"
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{
-                stake.bigPayDay
-                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
+              matTooltip="${{
+                getDollarValue(stake.bigPayDay)
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:2
               }}"
             >
                + {{
@@ -573,9 +573,9 @@
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{
-                stake.principal
-                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
+              matTooltip="${{
+                getDollarValue(stake.principal)
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:2
               }}"
             >
               {{
@@ -603,9 +603,9 @@
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{
-                stake.interest
-                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
+              matTooltip="${{
+                getDollarValue(stake.interest)
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:2
               }}"
             >
               {{
@@ -617,9 +617,9 @@
               *ngIf="!stake.bigPayDay.isZero()"
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{
-                stake.bigPayDay
-                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
+              matTooltip="${{
+                getDollarValue(stake.bigPayDay)
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:2
               }}"
             >
                + {{
@@ -731,9 +731,9 @@
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{
-                stake.principal
-                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
+              matTooltip="${{
+                getDollarValue(stake.principal)
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:2
               }}"
             >
               {{
@@ -761,9 +761,9 @@
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{
-                stake.interest
-                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
+              matTooltip="${{
+                getDollarValue(stake.interest)
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:2
               }}"
             >
               {{
@@ -775,9 +775,9 @@
               *ngIf="!stake.bigPayDay.isZero()"
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{
-                stake.bigPayDay
-                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
+              matTooltip="${{
+                getDollarValue(stake.bigPayDay)
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:2
               }}"
             >
                + {{
@@ -791,9 +791,9 @@
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{
-                stake.payout
-                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
+              matTooltip="${{
+                getDollarValue(stake.payout)
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:2
               }}"
             >
               {{
@@ -846,9 +846,9 @@
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{
-                stake.principal
-                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
+              matTooltip="${{
+                getDollarValue(stake.principal)
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:2
               }}"
             >
               {{
@@ -861,9 +861,9 @@
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{
-                stake.bigPayDay
-                  | bigNumberFormat: tokensDecimals['AXION']:true:false:18
+              matTooltip="${{
+                getDollarValue(stake.bigPayDay)
+                  | bigNumberFormat: tokensDecimals['AXION']:true:false:2
               }}"
             >
               {{

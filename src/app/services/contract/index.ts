@@ -75,7 +75,7 @@ export class ContractService {
     ETH: 18,
   };
 
-  private readonly _1e18 = Math.pow(10, 18);
+  public readonly _1e18: string = Math.pow(10, 18).toString();
 
   public account;
   private allAccountSubscribers = [];
@@ -1489,6 +1489,13 @@ export class ContractService {
       .toString(10);
   }
 
+  public async getAxnToUsdcAmountsOutAsync(axnAmount: string): Promise<BigNumber> {
+    const axnForOneEth = (await this.getWethToAxionAmountsOutAsync(this._1e18))[1];
+    const usdcForOneEth = (await this.getWethToUsdcAmountsOutAsync(this._1e18))[1];
+
+    return new BigNumber(axnAmount).div(axnForOneEth).times(usdcForOneEth).dp(2);
+  }
+
   private getWethToAxionAmountsOutAsync(amount: string): Promise<string[]> {
     return this.UniswapV2Router02.methods
       .getAmountsOut(amount, [
@@ -1498,10 +1505,10 @@ export class ContractService {
       .call();
   }
 
-  public getAxionToUsdcAmountsOutAsync(amount: string): Promise<string[]> {
+  private getWethToUsdcAmountsOutAsync(amount: string): Promise<string[]> {
     return this.UniswapV2Router02.methods
       .getAmountsOut(amount, [
-        this.CONTRACTS_PARAMS.AXION.ADDRESS,
+        this.CONTRACTS_PARAMS.WETH.ADDRESS,
         this.CONTRACTS_PARAMS.USDC.ADDRESS,
       ])
       .call();

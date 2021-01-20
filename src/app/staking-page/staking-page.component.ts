@@ -97,7 +97,7 @@ export class StakingPageComponent implements OnDestroy {
   private settingsData: any;
   private dayEndSubscriber;
 
-  private readonly _10k: string = "10000000000000000000000";
+  private readonly _10k = "10000000000000000000000"
   private _10kAxionUsdcOut;
 
   constructor(
@@ -130,8 +130,6 @@ export class StakingPageComponent implements OnDestroy {
                 this.getBPDInfo();
                 this.bpdInfoChecker = true;
               });
-
-              this._10kAxionUsdcOut = await this.contractService.getAxionToUsdcAmountsOutAsync(this._10k);
             }
           });
         }
@@ -180,7 +178,7 @@ export class StakingPageComponent implements OnDestroy {
     this.contractService
       .getWalletStakesAsync()
       .then(
-        (res: {
+        async (res: {
           closed: Stake[];
           active: Stake[];
           matured: Stake[];
@@ -211,6 +209,8 @@ export class StakingPageComponent implements OnDestroy {
               .plus(this.activeStakeTotals.bigPayDay);
           }
 
+          this._10kAxionUsdcOut = await this.contractService.getAxnToUsdcAmountsOutAsync(this._10k);;
+
           this.applySort("active");
           this.applySort("closed");
           this.applySort("matured");
@@ -224,7 +224,7 @@ export class StakingPageComponent implements OnDestroy {
   }
 
   public getDollarValue(amount: BigNumber) {
-    return amount.div(this._10k).times(this._10kAxionUsdcOut);
+    return amount.div("10000000000").times(this._10kAxionUsdcOut);
   }
 
   public openStake() {
