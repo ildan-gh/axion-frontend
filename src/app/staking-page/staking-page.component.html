@@ -384,7 +384,6 @@
           <th>Progress</th>
           <th>Principal</th>
           <th>Shares</th>
-          <th>BigPayDay</th>
           <th>Interest</th>
           <th>APY
             <div
@@ -455,27 +454,26 @@
               matTooltipClass="table__tooltip"
               mat-raised-button
               matTooltip="{{
-                stake.bigPayDay
+                stake.interest
                   | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
               }}"
             >
               {{
-                stake.bigPayDay
+                stake.interest
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
               }}</span
-            >
-          </td>
-          <td>
+            ><br>
             <span
+              *ngIf="!stake.bigPayDay.isZero()"
               matTooltipClass="table__tooltip"
               mat-raised-button
               matTooltip="{{
-                stake.interest
+                stake.bigPayDay
                   | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
               }}"
             >
-              {{
-                stake.interest
+               + BPD {{
+                stake.bigPayDay
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
               }}</span
             >
@@ -536,7 +534,6 @@
           <th>Progress</th>
           <th>Principal</th>
           <th>Shares</th>
-          <th>BigPayDay</th>
           <th>Interest</th>
           <th>APY
             <div
@@ -607,27 +604,26 @@
               matTooltipClass="table__tooltip"
               mat-raised-button
               matTooltip="{{
-                stake.bigPayDay
+                stake.interest
                   | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
               }}"
             >
               {{
-                stake.bigPayDay
+                stake.interest
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
               }}</span
-            >
-          </td>
-          <td>
+            ><br>
             <span
+              *ngIf="!stake.bigPayDay.isZero()"
               matTooltipClass="table__tooltip"
               mat-raised-button
               matTooltip="{{
-                stake.interest
+                stake.bigPayDay
                   | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
               }}"
             >
-              {{
-                stake.interest
+               + BPD {{
+                stake.bigPayDay
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
               }}</span
             >
@@ -687,7 +683,7 @@
           <th>Target End</th>
           <th>Actual End</th>
           <th>Principal</th>
-          <th>BigPayDay</th>
+          <th>Shares</th>
           <th>Interest/Penalty</th>
           <th>APY
             <div
@@ -751,12 +747,12 @@
               matTooltipClass="table__tooltip"
               mat-raised-button
               matTooltip="{{
-                stake.bigPayDay
+                stake.shares
                   | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
               }}"
             >
               {{
-                stake.bigPayDay
+                stake.shares
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
               }}</span
             >
@@ -772,6 +768,20 @@
             >
               {{
                 stake.interest
+                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+              }}</span
+            ><br>
+            <span
+              *ngIf="!stake.bigPayDay.isZero()"
+              matTooltipClass="table__tooltip"
+              mat-raised-button
+              matTooltip="{{
+                stake.bigPayDay
+                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+              }}"
+            >
+               + BPD {{
+                stake.bigPayDay
                   | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
               }}</span
             >
