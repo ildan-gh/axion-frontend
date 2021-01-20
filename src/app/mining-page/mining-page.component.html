@@ -104,7 +104,7 @@
             class="axn-form-block-one-value-small p-tb-5"
             matTooltipClass="table__tooltip"
             mat-raised-button
-            matTooltip="{{minerBalance.pendingReward | bigNumberFormat: tokensDecimals:true:false:18 }}"
+            matTooltip="{{minerBalance.pendingReward | bigNumberFormat: tokensDecimals:true:false:2 || 0 }}"
           >
             {{ minerBalance.pendingReward | bigNumberFormat: 0:true:false:2 }}
           </span>
@@ -202,10 +202,9 @@
   <div class="axn-form axn-form-base-3">
     <div class="axn-form-block axn-form-block-one axn-form-base-center" *ngFor="let mine of mines">
       <p class="axn-text-subtitle">{{mine.base}}-{{mine.market}}</p>
-      <p  class="axn-text-body">
-        Start Block: {{mine.startBlock}}<br/>
-        End Block: {{mine.endBlock}}<br/><br />
-        Reward: {{mine.rewardPool | bigNumberFormat: 18:true:false:2 || 0}} AXN
+      <p class="axn-text-body">
+        Start: Block {{mine.startBlock}}<br/>
+        Reward: {{mine.rewardBalance | bigNumberFormat: tokensDecimals:true:false:2 || 0}} AXN
       </p>
 
       <button 
@@ -281,14 +280,14 @@
             (ngModelChange)="onRewardAmountChanged()"
             
             onblur="this.placeholder = '5,000,000,000'"
-            [(ngModel)]="createMineData.rewardPool"
-            [appBigNumber]="{decimals: 18, min: 1 }"
+            [(ngModel)]="createMineData.rewardBalance"
+            [appBigNumber]="{decimals: tokensDecimals, min: 1 }"
           />
           <span class="axn-cheap icon icon_axn cl-blue-bg">AXN</span>
         </div>
 
         <span class="axn-text-body" *ngIf="createMineData.blockReward">
-          Block Reward: {{createMineData.blockReward | bigNumberFormat: 18:true:false:2}} AXN
+          Block Reward: {{createMineData.blockReward | bigNumberFormat: tokensDecimals:true:false:2}} AXN
         </span>
       </div>
     </div>

@@ -141,13 +141,13 @@ export class MiningContractService {
     const uniPairContract = this.web3Service.getContract(this.contractData.UniswapPair.ABI, lpTokenAddress);
 
     // Get base token symbol
-    const token0 = await uniPairContract.methods.token0().call();
-    const baseTokenContract = this.web3Service.getContract(this.contractData.UniswapERC20Pair.ABI, token0)
-    const base = await baseTokenContract.methods.symbol().call();
+    const token1 = await uniPairContract.methods.token1().call();
+    const baseTokenContract = this.web3Service.getContract(this.contractData.UniswapERC20Pair.ABI, token1)
+    const market = await baseTokenContract.methods.symbol().call();
 
     return {
-      base,
-      market: "AXN"
+      base: "AXN",
+      market
     };
   }
 

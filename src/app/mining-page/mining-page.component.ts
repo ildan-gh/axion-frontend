@@ -150,9 +150,9 @@ export class MiningPageComponent implements OnDestroy {
   }
 
   public onRewardAmountChanged() {
-    if(this.createMineData.rewardPool && this.createMineData.startBlock && this.createMineData.endBlock) {
+    if (this.createMineData.rewardBalance && this.createMineData.startBlock && this.createMineData.endBlock) {
       this.createMineData.blockReward = this.contractService.calculateBlockReward(
-        this.createMineData.rewardPool,
+        this.createMineData.rewardBalance,
         this.createMineData.startBlock,
         this.createMineData.endBlock,
       )
@@ -267,14 +267,14 @@ export class MiningPageComponent implements OnDestroy {
 
   // ONLY MANAGERS
   public async createMine() {
-    if (!this.createMineData.rewardPool || !this.createMineData.tokenAddress || !this.createMineData.startBlock || !this.createMineData.endBlock) {
+    if (!this.createMineData.rewardBalance || !this.createMineData.tokenAddress || !this.createMineData.startBlock || !this.createMineData.endBlock) {
       this.openErrorModal("Missing information. All fields must be filled.")
       return;
     }
 
     this.createMineData.progressIndicator = true;
 
-    const rewards = this.createMineData.rewardPool;
+    const rewards = this.createMineData.rewardBalance;
     const address = this.createMineData.tokenAddress;
     const startBlock = this.createMineData.startBlock;
     const endBlock = this.createMineData.endBlock;
