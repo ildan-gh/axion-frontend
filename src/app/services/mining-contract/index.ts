@@ -133,48 +133,34 @@ export class MiningContractService {
     return newObserver;
   }
 
-  public getDecimals(lpTokenAddress): Promise<any> {
-    const TOKEN = this.web3Service.getContract(this.contractData.UniswapERC20Pair.ABI, lpTokenAddress)
-    return TOKEN.methods.decimals().call();
-  }
-
   public async getPoolTokens(lpTokenAddress: string): Promise<any> {
     if (!Web3.utils.isAddress(lpTokenAddress)) {
       throw new Error("Invalid address");
     }
 
-    const UNI_PAIR_CONTRACT = this.web3Service.getContract(this.contractData.UniswapPair.ABI, lpTokenAddress);
+    const uniPairContract = this.web3Service.getContract(this.contractData.UniswapPair.ABI, lpTokenAddress);
 
-    // GET PAIR (token0 and token1)
-    const token0 = await UNI_PAIR_CONTRACT.methods.token0().call();
-    const token1 = await UNI_PAIR_CONTRACT.methods.token1().call();
-
-    // GET token symbol for ach token in pair
-    const BASE_TOKEN_CONTRACT = this.web3Service.getContract(this.contractData.UniswapERC20Pair.ABI, token0)
-    const base = await BASE_TOKEN_CONTRACT.methods.symbol().call();
-
-    const MARKET_TOKEN_CONTRACT = this.web3Service.getContract(this.contractData.UniswapERC20Pair.ABI, token1)
-    const market = await MARKET_TOKEN_CONTRACT.methods.symbol().call();
+    // Get base token symbol
+    const token0 = await uniPairContract.methods.token0().call();
+    const baseTokenContract = this.web3Service.getContract(this.contractData.UniswapERC20Pair.ABI, token0)
+    const base = await baseTokenContract.methods.symbol().call();
 
     return {
       base,
-      market
+      market: "AXN"
     };
   }
 
   public async getTokenBalance(lpTokenAddress, address): Promise<any> {
-    const TOKEN = this.web3Service.getContract(this.contractData.UniswapERC20Pair.ABI, lpTokenAddress);
-
-    const balance = await TOKEN.methods.balanceOf(address).call();
-    const decimals = await TOKEN.methods.decimals().call();
-
+    const token = this.web3Service.getContract(this.contractData.UniswapERC20Pair.ABI, lpTokenAddress);
+    const balance = await token.methods.balanceOf(address).call();
     const bigBalance = new BigNumber(balance);
 
     return {
       wei: balance,
       weiBigNumber: bigBalance,
-      shortBigNumber: bigBalance.div(new BigNumber(10).pow(decimals)),
-      display: bigBalance.div(new BigNumber(10).pow(decimals)).toFormat(2),
+      shortBigNumber: bigBalance.div(new BigNumber(10).pow(18)),
+      display: bigBalance.div(new BigNumber(10).pow(18)).toFormat(2),
     };
   }
 
@@ -195,13 +181,6 @@ export class MiningContractService {
       mines.push(mine);
     }
 
-    mines.push({
-      lpToken: "0xaadb00551312a3c2a8b46597a39ef1105afb2c08",
-      startBlock: 11693754,
-      blockReward: new BigNumber(86805.5555556),
-      rewardBalance: new BigNumber(5000000000)
-    })
-    
     let promises = [];
     mines.forEach(p => {
       promises.push(this.getPoolTokens(p.lpToken));

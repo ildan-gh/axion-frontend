@@ -149,6 +149,16 @@ export class MiningPageComponent implements OnDestroy {
     }
   }
 
+  public onRewardAmountChanged() {
+    if(this.createMineData.rewardPool && this.createMineData.startBlock && this.createMineData.endBlock) {
+      this.createMineData.blockReward = this.contractService.calculateBlockReward(
+        this.createMineData.rewardPool,
+        this.createMineData.startBlock,
+        this.createMineData.endBlock,
+      )
+    }
+  }
+
   public async setCurrentMine(mine) {
     this.switchingLoading = mine.lpToken;
 
@@ -275,8 +285,7 @@ export class MiningPageComponent implements OnDestroy {
     const address = this.createMineData.tokenAddress;
     const startBlock = this.createMineData.startBlock;
     const endBlock = this.createMineData.endBlock;
-    const blocks = endBlock - startBlock;
-    const blockReward = new BigNumber(rewards / blocks);
+    const blockReward = this.contractService.calculateBlockReward(rewards, startBlock, endBlock);
     
     try {
       await this.contractService.createMine(address, rewards, blockReward, startBlock)

@@ -1,7 +1,7 @@
 <!-- PAGE TITLE -->
 <section class="axn-section" *ngIf="account">
   <div class="axn-title-block">
-    <span class="axn-title" (hover)="tooltip2.toggle()">Liquidity Mining</span>
+    <span class="axn-title" (hover)="tooltip2.toggle()">Mining</span>
     <div #tooltip2="matTooltip" (click)="tooltip2.toggle()" class="question" mat-raised-button matTooltip="
           Stake Liquidity Provider (LP) tokens and get rewarded in AXN.
 
@@ -231,7 +231,7 @@
 </section>
 
 <!-- MANAGERS ONLY: CREATE A POOL -->
-<section class="axn-section" *ngIf="account && account.isManager">
+<section class="axn-section" *ngIf="account && !account.isManager">
   <div class="axn-form-block-one axn-form-base-center">
     <button (click)="openCreateMineModal()" class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-big">
       <span class="axn-btn-text">
@@ -253,7 +253,7 @@
         <span class="axn-form-block-one-title">LP Token Address</span>
         <input placeholder="0x0000000000000000000000000000000000000000" type="text" class="axn-input" required="required" [(ngModel)]="createMineData.tokenAddress" (blur)="onCreateMineAddressChanged()"/>
         <span class="axn-text-body" *ngIf="createMineData.base && createMineData.market">
-          Found Pair: 
+          Pair: 
           <span class="axn-text-body-link" (click)="openUniswapPoolInfo(createMineData.tokenAddress)">{{createMineData.base}}-{{createMineData.market}}</span>
         </span>
 
@@ -278,6 +278,8 @@
             name="reward-mine"
             placeholder="5,000,000,000"
             onfocus="this.placeholder = ''"
+            (ngModelChange)="onRewardAmountChanged()"
+            
             onblur="this.placeholder = '5,000,000,000'"
             [(ngModel)]="createMineData.rewardPool"
             [appBigNumber]="{decimals: 18, min: 1 }"
@@ -285,6 +287,9 @@
           <span class="axn-cheap icon icon_axn cl-blue-bg">AXN</span>
         </div>
 
+        <span class="axn-text-body" *ngIf="createMineData.blockReward">
+          Block Reward: {{createMineData.blockReward | bigNumberFormat: 18:true:false:2}} AXN
+        </span>
       </div>
     </div>
 
