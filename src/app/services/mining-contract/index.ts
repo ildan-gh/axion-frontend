@@ -194,8 +194,6 @@ export class MiningContractService {
       mines.push(mine);
     }
 
-
-    // Get the tokens for the pools
     let promises = [];
     mines.forEach(p => {
       promises.push(this.getPoolTokens(p.lpToken));
