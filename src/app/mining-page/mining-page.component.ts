@@ -244,9 +244,10 @@ export class MiningPageComponent implements OnDestroy {
     const startBlock = this.createMineData.startBlock;
     const endBlock = this.createMineData.endBlock;
     const blocks = endBlock - startBlock;
-    const blockReward = rewards / blocks;
+    const blockReward = new BigNumber(rewards / blocks);
+    
     try {
-      await this.contractService.createMine(address, rewards, new BigNumber(blockReward), startBlock)
+      await this.contractService.createMine(address, rewards, blockReward, startBlock)
       this.createMineData.ref.close();
       this.createMineData = {};
       this.updateMines();

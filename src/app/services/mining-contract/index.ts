@@ -50,12 +50,12 @@ export class MiningContractService {
       if (account) {
         this.isActive = true;
         this.account = account;
-        this.account.isManager = await this.checkIsManager();
         this.contractData = contractService.CONTRACTS_PARAMS;
         this.axionContract = contractService.HEX2XContract;
-
+        
         await this.initializeContracts();
         this.callAllAccountsSubscribers();
+        this.account.isManager = await this.checkIsManager();
       }
     });
   }
