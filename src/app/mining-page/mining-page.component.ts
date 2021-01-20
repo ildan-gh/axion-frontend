@@ -176,7 +176,7 @@ export class MiningPageComponent implements OnDestroy {
     if (this.depositAmount > 0) {
       try {
         this.currentPool.depositProgress = true;
-        await this.contractService.deposit(this.depositAmount);
+        await this.contractService.depositLPTokens(this.depositAmount);
         this.updatePoolBalances()
         this.updatePools();
         // this.openSuccessModal("txID");

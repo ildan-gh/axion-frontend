@@ -11,34 +11,33 @@ import { Contract } from "web3-eth-contract";
   providedIn: "root",
 })
 export class MiningContractService {
-  public account;
+  private account;
+
   private isActive: boolean;
-  public axnTokenAddress: string;
   private allAccountSubscribers = [];
   private web3Service: MetamaskService;
   private allTransactionSubscribers = [];
 
-  public contractData: any;
-  private farmManagerContract: Contract;
+  private contractData: any;
+  private mineManagerContract: Contract;
+  private mineContracts: { [id: string]: Contract; } = {};
 
-  constructor(private config: AppConfig, private contractService: ContractService) {
-    this.web3Service = new MetamaskService(this.config);
-    this.contractService.accountSubscribe().subscribe((account: any) => {
+  constructor(config: AppConfig, contractService: ContractService) {
+    this.web3Service = new MetamaskService(config);
+    contractService.accountSubscribe().subscribe(async (account: any) => {
       if (account) {
         this.isActive = true;
         this.account = account;
         this.contractData = contractService.CONTRACTS_PARAMS;
-        
-        this.checkIsManager();
-        this.initializeContracts();
+
+        await this.initializeContracts();
         this.callAllAccountsSubscribers();
       }
     });
   }
 
-  // TODO: Implement (and maybe change name? haha)
-  private checkIsManager() {
-    this.account.isManager = true;
+  public checkIsManager(): Promise<boolean> {
+    return this.mineManagerContract.methods.isManager().call({ from: this.account.address });
   }
 
   private callAllAccountsSubscribers() {
@@ -61,9 +60,26 @@ export class MiningContractService {
     });
   }
 
-  private initializeContracts() {
-    this.farmManagerContract = this.web3Service.getContract(this.contractData.FarmManager.ABI, this.contractData.FarmManager.ADDRESS);
-    this.axnTokenAddress = this.contractService.CONTRACTS_PARAMS.HEX.ADDRESS;
+  private async initializeContracts() {
+    this.mineManagerContract = this.web3Service.getContract(this.contractData.MineManager.ABI, this.contractData.MineManager.ADDRESS);
+
+    this.getMineContracts();
+  }
+
+  private getMineContracts() {
+    const mineAddresses = []; //await getMineAddresses();
+
+    const mineContracts = {};
+
+    for (const mineAddress of mineAddresses) {
+      mineContracts[mineAddress] = this.web3Service.getContract(this.contractData.Mine.ABI, mineAddress);
+    }
+
+    this.mineContracts = mineContracts;
+  }
+
+  public getMineAddresses(): Promise<string[]> {
+    return this.mineManagerContract.methods.getMineAddresses().call();
   }
 
   private checkTx(tx, resolve, reject) {
@@ -79,17 +95,13 @@ export class MiningContractService {
     }, reject);
   }
 
-  //////////////////
-  // PUBLIC METHODS
-  //////////////////
-
   public accountSubscribe() {
     const newObserver = new Observable((observer) => {
       observer.next(this.account);
       this.allAccountSubscribers.push(observer);
       return {
-        unsubscribe: () => { 
-          this.allAccountSubscribers = this.allAccountSubscribers.filter(a => a !== newObserver) 
+        unsubscribe: () => {
+          this.allAccountSubscribers = this.allAccountSubscribers.filter(a => a !== newObserver)
         },
       };
     });
@@ -103,147 +115,115 @@ export class MiningContractService {
     return newObserver;
   }
 
-  public getDecimals(lpTokenAddress): any {
-    const TOKEN = this.web3Service.getContract(this.contractService.CONTRACTS_PARAMS.UniswapERC20Pair.ABI, lpTokenAddress)
+  public getDecimals(lpTokenAddress): Promise<any> {
+    const TOKEN = this.web3Service.getContract(this.contractData.UniswapERC20Pair.ABI, lpTokenAddress)
     return TOKEN.methods.decimals().call();
   }
 
-  public getPoolTokens(lpTokenAddress): any {
-    return new Promise(async (resolve, reject) => {
-      if (!Web3.utils.isAddress(lpTokenAddress)) {
-        reject({message: "Invalid address"})
-        return;
+  public async getPoolTokens(lpTokenAddress): Promise<any> {
+    if (!Web3.utils.isAddress(lpTokenAddress)) {
+      throw new Error("Invalid address");
+    }
+
+    const UNI_PAIR_CONTRACT = this.web3Service.getContract(this.contractData.UniswapPair.ABI, lpTokenAddress);
+
+    // GET PAIR (token0 and token1)
+    const token0 = await UNI_PAIR_CONTRACT.methods.token0().call();
+    const token1 = await UNI_PAIR_CONTRACT.methods.token1().call();
+
+    // GET token symbol for ach token in pair
+    const BASE_TOKEN_CONTRACT = this.web3Service.getContract(this.contractData.UniswapERC20Pair.ABI, token0)
+    const base = await BASE_TOKEN_CONTRACT.methods.symbol().call();
+
+    const MARKET_TOKEN_CONTRACT = this.web3Service.getContract(this.contractData.UniswapERC20Pair.ABI, token1)
+    const market = await MARKET_TOKEN_CONTRACT.methods.symbol().call();
+
+    return {
+      base,
+      market
+    };
+  }
+
+  public async getTokenBalance(lpTokenAddress, address): Promise<any> {
+    const TOKEN = this.web3Service.getContract(this.contractData.UniswapERC20Pair.ABI, lpTokenAddress);
+
+    const balance = await TOKEN.methods.balanceOf(address).call();
+    const decimals = await TOKEN.methods.decimals().call();
+
+    const bigBalance = new BigNumber(balance);
+
+    return {
+      wei: balance,
+      weiBigNumber: bigBalance,
+      shortBigNumber: bigBalance.div(new BigNumber(10).pow(decimals)),
+      display: bigBalance.div(new BigNumber(10).pow(decimals)).toFormat(2),
+    };
+  }
+
+  public async getPools(): Promise<any[]> {
+    let pools = [
+      {
+        address: "0xaadb00551312a3c2a8b46597a39ef1105afb2c08",
+        startBlock: 11686417,
+        endBlock: 11752227,
+        rewardPool: new BigNumber("5000000000000000000000000000"),
+        isLive: true
+      },
+      {
+        address: "0xd7f7c34dd455efafce52d8845b2646c790db0cdd",
+        startBlock: 11686417,
+        endBlock: 11752227,
+        rewardPool: new BigNumber("1000000000000000000000000000"),
+        isLive: false
       }
-      
-      try {
-        const UNI_PAIR_CONTRACT = this.web3Service.getContract(this.contractService.CONTRACTS_PARAMS.UniswapPair.ABI, lpTokenAddress);
+    ]
 
-        // GET PAIR (token0 and token1)
-        const token0 = await UNI_PAIR_CONTRACT.methods.token0().call();
-        const token1 = await UNI_PAIR_CONTRACT.methods.token1().call();
-        
-        // GET token symbol for ach token in pair
-        const BASE_TOKEN_CONTRACT = this.web3Service.getContract(this.contractService.CONTRACTS_PARAMS.UniswapERC20Pair.ABI, token0)
-        const base = await BASE_TOKEN_CONTRACT.methods.symbol().call();
-
-        const MARKET_TOKEN_CONTRACT = this.web3Service.getContract(this.contractService.CONTRACTS_PARAMS.UniswapERC20Pair.ABI, token1)
-        const market = await MARKET_TOKEN_CONTRACT.methods.symbol().call();
-
-        resolve({
-          base,
-          market
-        })
-      } catch (err) { reject(err) }
+    // Get the tokens for the pools
+    let promises = [];
+    pools.forEach(p => {
+      promises.push(this.getPoolTokens(p.address));
     })
+
+    const tokens = await Promise.all(promises)
+    tokens.forEach((t, idx) => {
+      pools[idx]["base"] = t.base;
+      pools[idx]["market"] = t.market;
+    })
+
+    return pools;
   }
 
-  public getTokenBalance(lpTokenAddress, address): any {
-    const TOKEN = this.web3Service.getContract(this.contractService.CONTRACTS_PARAMS.UniswapERC20Pair.ABI, lpTokenAddress)
-    return new Promise(async (resolve, reject) => {
-      try {
-        const balance = await TOKEN.methods.balanceOf(address).call();
-        const decimals = await TOKEN.methods.decimals().call();
-        
-        const bigBalance = new BigNumber(balance);
-        resolve({
-          wei: balance,
-          weiBigNumber: bigBalance,
-          shortBigNumber: bigBalance.div(new BigNumber(10).pow(decimals)),
-          display: bigBalance.div(new BigNumber(10).pow(decimals)).toFormat(2),
-        })
-      } catch (err) { reject(err) }
-    })
+  public depositLPTokens(mineAddress: string, amount: string): Promise<void> {
+    return this.mineContracts[mineAddress].methods.depositLPTokens(amount).send();
   }
 
-  public getPools(): Promise<any[]> {
-    return new Promise(async (resolve, reject) => {
-      try {
-
-        // TODO: Implement
-        // SAMPLE DATA
-        let pools = [
-          {
-            address: "0xaadb00551312a3c2a8b46597a39ef1105afb2c08",
-            startBlock: 11686417,
-            endBlock: 11752227,
-            rewardPool: new BigNumber("5000000000000000000000000000"),
-            isLive: true
-          },
-          {
-            address: "0xd7f7c34dd455efafce52d8845b2646c790db0cdd",
-            startBlock: 11686417,
-            endBlock: 11752227,
-            rewardPool: new BigNumber("1000000000000000000000000000"),
-            isLive: false
-          }
-        ]
-
-        // Get the tokens for the pools
-        let promises = [];
-        pools.forEach(p => { 
-          promises.push(this.getPoolTokens(p.address));
-        })
-
-        const tokens = await Promise.all(promises)
-        tokens.forEach((t, idx) => {
-          pools[idx]["base"] = t.base;
-          pools[idx]["market"] = t.market;
-        })
-
-        resolve(pools)
-      } catch (err) { reject(err) }
-    })
+  public withdrawLPTokens(mineAddress: string, amount: string): Promise<void> {
+    return this.mineContracts[mineAddress].methods.depositLPTokens(amount).send();
   }
 
-  // TODO: Implement
-  public deposit(amount) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        resolve(amount)
-      } catch (err) { reject (err) }
-    })
+  public withdrawReward(mineAddress: string): Promise<void> {
+    return this.mineContracts[mineAddress].methods.withdrawReward().send();
   }
 
-  // TODO: Implement
-  public async withdraw(type) {
-    return new Promise((resolve, reject) => {
-      try {
-        let methodName;
-
-        if (type === "LP") methodName = "withdrawLP";
-        else if (type === "REWARDS") methodName = "withdrawRewards";
-        else if (type === "ALL") methodName = "withdrawAll";
-        resolve(methodName)
-      } catch (err) { reject(err) }
-    })
+  public withdrawAll(mineAddress: string): Promise<void> {
+    return this.mineContracts[mineAddress].methods.withdrawAll().send();
   }
 
-  // TODO: Implement
-  public async getUserPoolBalance(address) {
-    return new Promise((resolve, reject) => {
-      try {
-        resolve({
-          address,
-          stakedTokens: new BigNumber(0),
-          rewardsEarned: new BigNumber(0)
-        })
-        resolve(null)
-      } catch (err) { reject(err) }
-    })
+  public async getMinerPoolBalance(mineAddress: string) {
+    const minerInfo = await this.mineContracts[mineAddress].methods.minerInfo(this.account.address).call();
+
+    return minerInfo.lpDeposit;
   }
 
-  // TODO: Implement 
-  // (MANAGERS ONLY - checked from checkIsManager())
-  public createPool(address, rewardAmount, startBlock, endBlock) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        resolve({ 
-          address, 
-          rewardAmount, 
-          startBlock, 
-          endBlock 
-        })
-      } catch (err) { reject(err) }
-    })
+  public calculateBlockReward(rewardAmount: string, startBlock: number, endBlock: number): BigNumber {
+    const blocks = endBlock - startBlock;
+
+    return new BigNumber(rewardAmount).div(blocks);
+  }
+
+  public async createMine(lpTokenAddress: string, rewardAmount: string, blockReward: BigNumber, startBlock: number) {
+    await this.mineManagerContract.methods.createMine(lpTokenAddress, rewardAmount, blockReward, startBlock).send();
+
+    this.getMineContracts();
   }
 }
