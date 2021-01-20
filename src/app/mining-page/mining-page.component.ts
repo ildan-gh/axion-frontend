@@ -96,9 +96,9 @@ export class MiningPageComponent implements OnDestroy {
   }
 
   public async updateMines() {
-    const MINES = await this.contractService.getMines();
-    this.mines = MINES;
-    return MINES;
+    const mines = await this.contractService.getMines();
+    this.mines = mines;
+    return mines;
   }
 
   public openSuccessModal(txID: string) {
@@ -137,10 +137,10 @@ export class MiningPageComponent implements OnDestroy {
 
     if (address) {
       try {
-        const SYMBOLS = await this.contractService.getPoolTokens(address.trim())
-        if (SYMBOLS) {
-          this.createMineData.base = SYMBOLS.base;
-          this.createMineData.market = SYMBOLS.market;
+        const symbols = await this.contractService.getPoolTokens(address.trim())
+        if (symbols) {
+          this.createMineData.base = symbols.base;
+          this.createMineData.market = symbols.market;
         }
       } catch (err) {
         if (err.message)
@@ -150,9 +150,9 @@ export class MiningPageComponent implements OnDestroy {
   }
 
   public onRewardAmountChanged() {
-    if (this.createMineData.rewardBalance && this.createMineData.startBlock && this.createMineData.endBlock) {
+    if (this.createMineData.rewardAmount && this.createMineData.startBlock && this.createMineData.endBlock) {
       this.createMineData.blockReward = this.contractService.calculateBlockReward(
-        this.createMineData.rewardBalance,
+        this.createMineData.rewardAmount,
         this.createMineData.startBlock,
         this.createMineData.endBlock,
       )
@@ -173,16 +173,16 @@ export class MiningPageComponent implements OnDestroy {
   // Process mine pair address found in URL parameter
   public processParams(lpToken: string) {
     if (this.mines.length > 0) {
-      const MINE_FOUND = this.mines.find(p => p.lpToken === lpToken)
+      const mineFound = this.mines.find(p => p.lpToken === lpToken)
 
-      if (MINE_FOUND) {
-        this.setCurrentMine(MINE_FOUND)
+      if (mineFound) {
+        this.setCurrentMine(mineFound)
       }
       else {
-        const FALLBACK_POOL = this.mines[0]
+        const fallbackPool = this.mines[0]
         this.fixURL();
-        this.setCurrentMine(FALLBACK_POOL)
-        this.openErrorModal(`Mine not found. Falling back to ${FALLBACK_POOL.base}-${FALLBACK_POOL.market}.`)
+        this.setCurrentMine(fallbackPool)
+        this.openErrorModal(`Mine not found. Falling back to ${fallbackPool.base}-${fallbackPool.market}.`)
       }
     } else {
       this.fixURL();
@@ -267,14 +267,14 @@ export class MiningPageComponent implements OnDestroy {
 
   // ONLY MANAGERS
   public async createMine() {
-    if (!this.createMineData.rewardBalance || !this.createMineData.tokenAddress || !this.createMineData.startBlock || !this.createMineData.endBlock) {
+    if (!this.createMineData.rewardAmount || !this.createMineData.tokenAddress || !this.createMineData.startBlock || !this.createMineData.endBlock) {
       this.openErrorModal("Missing information. All fields must be filled.")
       return;
     }
 
     this.createMineData.progressIndicator = true;
 
-    const rewards = this.createMineData.rewardBalance;
+    const rewards = this.createMineData.rewardAmount;
     const address = this.createMineData.tokenAddress;
     const startBlock = this.createMineData.startBlock;
     const endBlock = this.createMineData.endBlock;
