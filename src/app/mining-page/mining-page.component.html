@@ -230,7 +230,7 @@
 </section>
 
 <!-- MANAGERS ONLY: CREATE A POOL -->
-<section class="axn-section" *ngIf="account && !account.isManager">
+<section class="axn-section" *ngIf="account && account.isManager">
   <div class="axn-form-block-one axn-form-base-center">
     <button (click)="openCreateMineModal()" class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-big">
       <span class="axn-btn-text">
