@@ -276,6 +276,17 @@ export class AuctionPageComponent implements OnDestroy {
       }
     }
 
+    const refAddress = this.cookieService.get("ref")
+    if (refAddress.toLowerCase() === this.account.address.toLowerCase()){
+      this.dialog.open(MetamaskErrorComponent, {
+        width: "400px",
+        data: {
+          msg: "It appears you are trying to self refer using your own referral link. Please use a different referral link before proceeding.",
+        },
+      });
+      return;
+    }
+
     this.sendAuctionProgress = true;
 
     const callMethod =
@@ -285,7 +296,7 @@ export class AuctionPageComponent implements OnDestroy {
 
     this.contractService[callMethod](
       this.formsData.auctionAmount,
-      this.cookieService.get("ref")
+      refAddress
     )
       .then(
         ({ transactionHash }) => {
