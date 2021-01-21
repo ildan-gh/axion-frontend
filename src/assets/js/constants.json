@@ -8748,13 +8748,7 @@
             }
           ],
           "name": "createMine",
-          "outputs": [
-            {
-              "internalType": "address",
-              "name": "",
-              "type": "address"
-            }
-          ],
+          "outputs": [],
           "stateMutability": "payable",
           "type": "function"
         },
@@ -8892,7 +8886,7 @@
           "inputs": [
             {
               "internalType": "address",
-              "name": "_mineManager",
+              "name": "_manager",
               "type": "address"
             },
             {
@@ -21247,13 +21241,7 @@
             }
           ],
           "name": "createMine",
-          "outputs": [
-            {
-              "internalType": "address",
-              "name": "",
-              "type": "address"
-            }
-          ],
+          "outputs": [],
           "stateMutability": "payable",
           "type": "function"
         },
@@ -21391,7 +21379,7 @@
           "inputs": [
             {
               "internalType": "address",
-              "name": "_mineManager",
+              "name": "_manager",
               "type": "address"
             },
             {

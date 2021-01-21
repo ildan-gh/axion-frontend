@@ -310,5 +310,8 @@ export class MiningPageComponent implements OnDestroy {
       if (err.message)
         this.openErrorModal(err.message)
     }
+    finally {
+      this.createMineData.progressIndicator = false;
+    }
   }
 }
