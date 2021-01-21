@@ -129,6 +129,8 @@ export class StakingPageComponent implements OnDestroy {
                 this.getBPDInfo();
                 this.bpdInfoChecker = true;
               });
+
+              this.usdcPerAxnPrice = await this.contractService.getUsdcPerAxnPrice();
             }
           });
         }
@@ -207,8 +209,6 @@ export class StakingPageComponent implements OnDestroy {
               .plus(this.activeStakeTotals.interest)
               .plus(this.activeStakeTotals.bigPayDay);
           }
-
-          this.usdcPerAxnPrice = await this.contractService.getUsdcPerAxnPrice();
 
           this.applySort("active");
           this.applySort("closed");

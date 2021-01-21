@@ -756,12 +756,8 @@ export class ContractService {
 
       data.eth = new BigNumber(auctionReserves.eth);
 
-      data.axn = parseFloat(
-        new BigNumber(auctionReserves.token)
-          .div(this._1e18)
-          .toFixed(8)
-          .toString()
-      );
+      data.axn = new BigNumber(auctionReserves.token)
+        .div(this._1e18);
 
       let auctionPriceFromPool: BigNumber;
 
@@ -1491,10 +1487,14 @@ export class ContractService {
 
   public async getUsdcPerAxnPrice(): Promise<BigNumber> {
     const axnForOneEth = (await this.getWethToAxionAmountsOutAsync(this._1e18))[1];
-    const usdcForOneEth = (await this.getWethToUsdcAmountsOutAsync(this._1e18))[1];
+    const usdcForOneEth = await this.getWethToUsdcAmountsOutAsync(this._1e18);
 
     // USDC uses 6 decimal places
-    return new BigNumber(this._1e18).div(axnForOneEth).times(usdcForOneEth).div("1000000");
+    return new BigNumber(this._1e18).div(axnForOneEth).times(usdcForOneEth);
+  }
+
+  public getUsdcPerEthPrice(): Promise<BigNumber> {
+    return this.getWethToUsdcAmountsOutAsync(this._1e18);
   }
 
   private getWethToAxionAmountsOutAsync(amount: string): Promise<string[]> {
@@ -1506,13 +1506,13 @@ export class ContractService {
       .call();
   }
 
-  private getWethToUsdcAmountsOutAsync(amount: string): Promise<string[]> {
-    return this.UniswapV2Router02.methods
+  private async getWethToUsdcAmountsOutAsync(amount: string): Promise<BigNumber> {
+    return new BigNumber((await this.UniswapV2Router02.methods
       .getAmountsOut(amount, [
         this.CONTRACTS_PARAMS.WETH.ADDRESS,
         this.CONTRACTS_PARAMS.USDC.ADDRESS,
       ])
-      .call();
+      .call())[1]).div("1000000");
   }
 
   public getAuctionsData(todaysAuctionId: number, start: number) {
