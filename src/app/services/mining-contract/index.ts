@@ -191,8 +191,14 @@ export class MiningContractService {
 
     return mines;
   }
-  public getCurrentBlock(): Promise<any> {
-    return this.web3Service.getBlock();
+
+  public getCurrentBlock(): Promise<number> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const latestBlock = await this.web3Service.getBlock();
+        resolve(latestBlock.number)
+      } catch (err) { reject(err) }
+    })
   }
 
   public depositLPTokens(mineAddress: string, amount: string): Promise<void> {
