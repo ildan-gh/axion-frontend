@@ -51,7 +51,7 @@ export class MiningContractService {
         this.isActive = true;
         this.account = account;
         this.contractData = contractService.CONTRACTS_PARAMS;
-        this.axionContract = contractService.HEX2XContract;
+        this.axionContract = contractService.AXNContract;
         
         await this.initializeContracts();
         this.callAllAccountsSubscribers();
