@@ -92,6 +92,9 @@ export class AuctionPageComponent implements OnDestroy {
 
   private settings: any = {};
 
+  private usdcPerAxnPrice: BigNumber;
+  private usdcPerEthPrice: BigNumber;
+
   constructor(
     public contractService: ContractService,
     private cookieService: CookieService,
@@ -105,7 +108,7 @@ export class AuctionPageComponent implements OnDestroy {
       .accountSubscribe()
       .subscribe((account: any) => {
         if (!account || account.balances) {
-          this.ngZone.run(() => {
+          this.ngZone.run(async () => {
             this.account = account;
             window.dispatchEvent(new Event("resize"));
 
@@ -120,6 +123,9 @@ export class AuctionPageComponent implements OnDestroy {
                 this.getAuctionPool();
                 this.auctionPoolChecker = true;
               });
+
+              this.usdcPerAxnPrice = await this.contractService.getUsdcPerAxnPrice();
+              this.usdcPerEthPrice = await this.contractService.getUsdcPerEthPrice();
             }
           });
         }
@@ -202,7 +208,7 @@ export class AuctionPageComponent implements OnDestroy {
   public onChangeAmount() {
     this.dataSendForm =
       Number(this.formsData.auctionAmount) <= 0 ||
-      this.formsData.auctionAmount === undefined
+        this.formsData.auctionAmount === undefined
         ? false
         : true;
 
@@ -215,7 +221,7 @@ export class AuctionPageComponent implements OnDestroy {
 
     this.dataSendForm =
       new BigNumber(this.formsData.auctionAmount).toNumber() <= 0 ||
-      this.formsData.auctionAmount === undefined
+        this.formsData.auctionAmount === undefined
         ? false
         : true;
 
@@ -326,7 +332,7 @@ export class AuctionPageComponent implements OnDestroy {
     this.withdrawData.dialog.close();
 
     this.bidWithdraw(
-      this.withdrawData.bid, 
+      this.withdrawData.bid,
       this.withdrawData.autoStakeDays
     )
 
@@ -362,6 +368,14 @@ export class AuctionPageComponent implements OnDestroy {
 
   public subscribeAccount() {
     this.appComponent.subscribeAccount();
+  }
+
+  public getAxnDollarValue(amount: BigNumber) {
+    return amount.times(this.usdcPerAxnPrice);
+  }
+
+  public getEthDollarValue(amount: BigNumber) {
+    return amount.times(this.usdcPerEthPrice);
   }
 
   // private applySort() {

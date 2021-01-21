@@ -95,7 +95,7 @@
             class="axn-form-block-one-value-small p-tb-5"
             matTooltipClass="table__tooltip"
             mat-raised-button
-            matTooltip="{{ poolInfo.axn || 0 }}"
+            matTooltip="${{ getAxnDollarValue(poolInfo.axn) | bigNumberFormat: 0:true:false:2 || 0 }}"
           >
             {{ poolInfo.axn | bigNumberFormat: 0:true:false:2 || 0 }}
           </span>
@@ -107,9 +107,9 @@
             class="axn-form-block-one-value-small p-tb-5"
             matTooltipClass="table__tooltip"
             mat-raised-button
-            matTooltip="{{
-              poolInfo.eth
-                | bigNumberFormat: tokensDecimals['ETH']:true:false:18
+            matTooltip="${{
+              getEthDollarValue(poolInfo.eth)
+                | bigNumberFormat: tokensDecimals['ETH']:true:false:2
             }}"
           >
             {{
@@ -244,14 +244,14 @@
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{
-                bid.axnInPool
-                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+              matTooltip="${{
+                getAxnDollarValue(bid.axnInPool)
+                  | bigNumberFormat: tokensDecimals['AXN']:true:false:2
               }}"
             >
               {{
                 bid.axnInPool
-                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+                  | bigNumberFormat: tokensDecimals["AXN"]:true:false:2
               }}
             </span>
           </td>
@@ -259,9 +259,9 @@
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{
-                bid.ethInPool
-                  | bigNumberFormat: tokensDecimals['ETH']:true:false:18
+              matTooltip="${{
+                getEthDollarValue(bid.ethInPool)
+                  | bigNumberFormat: tokensDecimals['ETH']:true:false:2
               }}"
             >
               {{
@@ -274,9 +274,9 @@
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{
-                bid.ethBid
-                  | bigNumberFormat: tokensDecimals['ETH']:true:false:18
+              matTooltip="${{
+                getEthDollarValue(bid.ethBid)
+                  | bigNumberFormat: tokensDecimals['ETH']:true:false:2
               }}"
             >
               {{
@@ -288,8 +288,8 @@
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{
-                bid.winnings | bigNumberFormat: false:true:false:18
+              matTooltip="${{
+                getAxnDollarValue(bid.winnings) | bigNumberFormat: false:true:false:2
               }}"
             >
               {{ bid.winnings | bigNumberFormat: false:true:false:2 }}
@@ -299,8 +299,8 @@
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{
-                bid.axnPerEth | bigNumberFormat: false:true:false:18
+              matTooltip="${{
+                getAxnDollarValue(bid.axnPerEth) | bigNumberFormat: false:true:false:2
               }}"
             >
               {{ bid.axnPerEth | bigNumberFormat: false:true:false:2 }}
@@ -366,14 +366,14 @@
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{
-                auction.axnInPool
-                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+              matTooltip="${{
+                getAxnDollarValue(auction.axnInPool)
+                  | bigNumberFormat: tokensDecimals['AXN']:true:false:2
               }}"
             >
               {{
                 auction.axnInPool
-                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+                  | bigNumberFormat: tokensDecimals["AXN"]:true:false:2
               }}
             </span>
           </td>
@@ -381,9 +381,9 @@
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{
-                auction.ethInPool
-                  | bigNumberFormat: tokensDecimals['ETH']:true:false:18
+              matTooltip="${{
+                getEthDollarValue(auction.ethInPool)
+                  | bigNumberFormat: tokensDecimals['ETH']:true:false:2
               }}"
             >
               {{
@@ -396,9 +396,9 @@
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{
-                auction.ethBid
-                  | bigNumberFormat: tokensDecimals['ETH']:true:false:18
+              matTooltip="${{
+                getEthDollarValue(auction.ethBid)
+                  | bigNumberFormat: tokensDecimals['ETH']:true:false:2
               }}"
             >
               {{
@@ -411,8 +411,8 @@
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{
-                auction.winnings | bigNumberFormat: false:true:false:18
+              matTooltip="${{
+                getAxnDollarValue(auction.winnings) | bigNumberFormat: false:true:false:2
               }}"
             >
               {{ auction.winnings | bigNumberFormat: false:true:false:2 }}
@@ -422,8 +422,8 @@
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{
-                auction.axnPerEth | bigNumberFormat: false:true:false:18
+              matTooltip="${{
+                getAxnDollarValue(auction.axnPerEth) | bigNumberFormat: false:true:false:2
               }}"
             >
               {{ auction.axnPerEth | bigNumberFormat: false:true:false:2 }}
@@ -479,14 +479,14 @@
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{
-                auction.data.axnInPool
-                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+              matTooltip="${{
+                getAxnDollarValue(auction.data.axnInPool)
+                  | bigNumberFormat: tokensDecimals['AXN']:true:false:2
               }}"
             >
               {{
                 auction.data.axnInPool
-                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+                  | bigNumberFormat: tokensDecimals["AXN"]:true:false:2
               }}
             </span>
           </td>
@@ -554,14 +554,14 @@
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{
-                auction.data.axnInPool
-                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+              matTooltip="${{
+                getAxnDollarValue(auction.data.axnInPool)
+                  | bigNumberFormat: tokensDecimals['AXN']:true:false:2
               }}"
             >
               {{
                 auction.data.axnInPool
-                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+                  | bigNumberFormat: tokensDecimals["AXN"]:true:false:2
               }}
             </span>
           </td>
@@ -569,9 +569,9 @@
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{
-                auction.data.ethInPool
-                  | bigNumberFormat: tokensDecimals['ETH']:true:false:18
+              matTooltip="${{
+                getEthDollarValue(auction.data.ethInPool)
+                  | bigNumberFormat: tokensDecimals['ETH']:true:false:2
               }}"
             >
               {{
@@ -584,8 +584,8 @@
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{
-                auction.axnPerEth | bigNumberFormat: false:true:false:18
+              matTooltip="${{
+                getAxnDollarValue(auction.axnPerEth) | bigNumberFormat: false:true:false:2
               }}"
             >
               {{ auction.axnPerEth | bigNumberFormat: false:true:false:2 }}
@@ -626,14 +626,14 @@
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{
-                auction.axnInPool
-                  | bigNumberFormat: tokensDecimals['HEX2X']:true:false:18
+              matTooltip="${{
+                getAxnDollarValue(auction.axnInPool)
+                  | bigNumberFormat: tokensDecimals['AXN']:true:false:2
               }}"
             >
               {{
                 auction.axnInPool
-                  | bigNumberFormat: tokensDecimals["HEX2X"]:true:false:2
+                  | bigNumberFormat: tokensDecimals["AXN"]:true:false:2
               }}
             </span>
           </td>
@@ -641,9 +641,9 @@
             <span
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="{{
-                auction.ethInPool
-                  | bigNumberFormat: tokensDecimals['ETH']:true:false:18
+              matTooltip="${{
+                getEthDollarValue(auction.ethInPool)
+                  | bigNumberFormat: tokensDecimals['ETH']:true:false:2
               }}"
             >
               {{
