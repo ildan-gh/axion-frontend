@@ -138,8 +138,10 @@ export class MiningPageComponent implements OnDestroy {
     window.open(`https://info.uniswap.org/pair/${addr}`, "_blank")
   }
 
-  public openCreateMineModal() {
+  public async openCreateMineModal() {
     this.createMineData.ref = this.dialog.open(this.createMineModal, {});
+    const latestBlock = await this.contractService.getCurrentBlock();
+    this.createMineData.startBlock = latestBlock.number;
   }
 
   public async updateMinerBalance() {

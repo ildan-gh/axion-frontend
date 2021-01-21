@@ -191,6 +191,9 @@ export class MiningContractService {
 
     return mines;
   }
+  public getCurrentBlock(): Promise<any> {
+    return this.web3Service.getBlock();
+  }
 
   public depositLPTokens(mineAddress: string, amount: string): Promise<void> {
     return this.mineContracts[mineAddress].methods.depositLPTokens(amount).send();
