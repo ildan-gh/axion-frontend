@@ -62,12 +62,12 @@
           <div class="axn-form-block-button" layout-align="center center">
             <button
               class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid"
-              [ngClass]="{ progress: currentMine.depositProgress }"
-              [disabled]="!formData.depositAmount || +formData.depositAmount === 0"
+              [ngClass]="{ progress: currentMine.depositLoading }"
+              [disabled]="!formData.depositAmount || +formData.depositAmount === 0 || currentMine.depositLoading"
               (click)="deposit()"
             >
               <!-- Ellipsis Loading Indicator -->
-              <span class="lds-ellipsis" *ngIf="currentMine.depositProgress">
+              <span class="lds-ellipsis" *ngIf="currentMine.depositLoading">
                 <span class="lds-ellipsis-container">
                   <span></span><span></span><span></span><span></span>
                 </span>
@@ -117,12 +117,12 @@
         <div class="axn-form-block-one axn-form-base-center">
           <button 
             (click)="withdrawLPTokens(formdata.withdrawLPAmount)"
-            [disabled]="minerBalance.lpDeposit.isZero()" 
-            [ngClass]="{ progress: currentMine.withdrawLPProgress }"
+            [disabled]="minerBalance.lpDeposit.isZero() || currentMine.withdrawLPLoading" 
+            [ngClass]="{ progress: currentMine.withdrawLPLoading }"
             class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid" 
           >
             <!-- Ellipsis Loading Indicator -->
-            <span class="lds-ellipsis" *ngIf="currentMine.withdrawLPProgress">
+            <span class="lds-ellipsis" *ngIf="currentMine.withdrawLPLoading">
               <span class="lds-ellipsis-container">
                 <span></span><span></span><span></span><span></span>
               </span>
@@ -136,12 +136,12 @@
         <div class="axn-form-block-one axn-form-base-center">
           <button 
             (click)="withdrawAll()"
-            [ngClass]="{ progress: currentMine.withdrawAllProgress }"
+            [ngClass]="{ progress: currentMine.withdrawAllLoading }"
             class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid" 
-            [disabled]="minerBalance.pendingReward.isZero() || minerBalance.lpDeposit.isZero()" 
+            [disabled]="minerBalance.pendingReward.isZero() || minerBalance.lpDeposit.isZero() || currentMine.withdrawAllLoading" 
           >
             <!-- Ellipsis Loading Indicator -->
-            <span class="lds-ellipsis" *ngIf="currentMine.withdrawAllProgress">
+            <span class="lds-ellipsis" *ngIf="currentMine.withdrawAllLoading">
               <span class="lds-ellipsis-container">
                 <span></span><span></span><span></span><span></span>
               </span>
@@ -156,11 +156,11 @@
           <button 
             (click)="withdrawRewards()"
             class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid" 
-            [disabled]="minerBalance.pendingReward.isZero()" 
-            [ngClass]="{ progress: currentMine.withdrawRewardsProgress }"
+            [disabled]="minerBalance.pendingReward.isZero() || currentMine.withdrawRewardsLoading" 
+            [ngClass]="{ progress: currentMine.withdrawRewardsLoading }"
           >
             <!-- Ellipsis Loading Indicator -->
-            <span class="lds-ellipsis" *ngIf="currentMine.withdrawRewardsProgress">
+            <span class="lds-ellipsis" *ngIf="currentMine.withdrawRewardsLoading">
               <span class="lds-ellipsis-container">
                 <span></span><span></span><span></span><span></span>
               </span>
