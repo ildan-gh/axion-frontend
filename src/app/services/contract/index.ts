@@ -195,7 +195,7 @@ export class ContractService {
       const IS_PRODUCTION = environment.production;
       this.CONTRACTS_PARAMS =
         result[1][
-          IS_PRODUCTION ? "mainnet" : this.settingsApp.settings.network
+        IS_PRODUCTION ? "mainnet" : this.settingsApp.settings.network
         ];
       this.isActive = true;
       if (this.account) {
@@ -734,7 +734,7 @@ export class ContractService {
         .reservesOf(currentAuctionId)
         .call();
 
-      let uniswapAveragePrice: BigNumber 
+      let uniswapAveragePrice: BigNumber
         = new BigNumber(auctionReserves.uniswapMiddlePrice)
           .div(this._1e18);
 
@@ -746,7 +746,7 @@ export class ContractService {
             .reservesOf(lastAuctionId)
             .call();
 
-          uniswapAveragePrice 
+          uniswapAveragePrice
             = new BigNumber(lastAuctionReserves.uniswapMiddlePrice)
               .div(this._1e18);
         }
@@ -1153,7 +1153,7 @@ export class ContractService {
         );
       }
 
-      if (!(stake.isV1 && stake.isWithdrawn)){
+      if (!(stake.isV1 && stake.isWithdrawn)) {
         const endMs = stake.end.getTime();
         const end = nowMs < endMs ? nowMs : endMs;
         const daysStaked = (end - stake.start.getTime()) / dayMs;
@@ -1246,7 +1246,7 @@ export class ContractService {
         firstPayout: stakeSession.nextPayout,
         lastPayout:
           (stakeSession.end - stakeSession.start) /
-            this.settingsApp.settings.time.seconds +
+          this.settingsApp.settings.time.seconds +
           +stakeSession.nextPayout,
         isMatured: nowMs > endMs,
         isWithdrawn: stakeSession.shares === "0",
@@ -1336,8 +1336,8 @@ export class ContractService {
     const restakeMethod = stake.isV1 ? 'restakeV1' : 'restake';
 
     return this.StakingContract.methods[restakeMethod](stake.sessionId, stakeDays).send({
-        from: this.account.address,
-      })
+      from: this.account.address,
+    })
       .then((res) => {
         return this.checkTransaction(res);
       });
@@ -1489,11 +1489,12 @@ export class ContractService {
       .toString(10);
   }
 
-  public async getAxnToUsdcAmountsOutAsync(axnAmount: string): Promise<BigNumber> {
+  public async getUsdcPerAxnPrice(): Promise<BigNumber> {
     const axnForOneEth = (await this.getWethToAxionAmountsOutAsync(this._1e18))[1];
     const usdcForOneEth = (await this.getWethToUsdcAmountsOutAsync(this._1e18))[1];
 
-    return new BigNumber(axnAmount).div(axnForOneEth).times(usdcForOneEth).dp(2);
+    // USDC uses 6 decimal places
+    return new BigNumber(this._1e18).div(axnForOneEth).times(usdcForOneEth).div("1000000");
   }
 
   private getWethToAxionAmountsOutAsync(amount: string): Promise<string[]> {
@@ -1562,8 +1563,8 @@ export class ContractService {
                 nowDateTS > startDateTS && nowDateTS < endDateTS
                   ? "progress"
                   : nowDateTS > endDateTS
-                  ? "finished"
-                  : "feature",
+                    ? "finished"
+                    : "feature",
             },
             data: {
               axnInPool: axnInPool,
@@ -1589,8 +1590,8 @@ export class ContractService {
         return auction1.id < auction2.id
           ? 1
           : auction1.id > auction2.id
-          ? -1
-          : 0;
+            ? -1
+            : 0;
       });
     });
   }
@@ -1856,8 +1857,8 @@ export class ContractService {
           this.account.snapshot.hexAmount =
             new BigNumber(this.account.snapshot.hex_amount).toNumber() > 0
               ? new BigNumber(
-                  this.account.snapshot.hex_amount.div(10000000000).toFixed(0)
-                )
+                this.account.snapshot.hex_amount.div(10000000000).toFixed(0)
+              )
               : 0;
         },
         () => {
