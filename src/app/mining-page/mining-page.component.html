@@ -40,14 +40,14 @@
             decimals: tokensDecimals,
             max: minerBalance.lpAvailable.wei
           }"
-          [(ngModel)]="formData.depositAmount"
+          [(ngModel)]="formData.depositLPAmount"
           autocomplete="off"
         />
         <span class="axn-cheap icon icon_uni cl-purple-bg">{{currentMine.base}}-{{currentMine.market}}</span>
 
         <div class="axn-form-bottom axn-form-base-2">
           <div class="axn-form-block-sendmax">
-            <span class="axn-btn axn-btn-max" (click)="formData.depositAmount = minerBalance.lpAvailable.wei">
+            <span class="axn-btn axn-btn-max" (click)="formData.depositLPAmount = minerBalance.lpAvailable.wei">
              &nbsp;Max&nbsp;
             </span>
 
@@ -62,12 +62,12 @@
           <div class="axn-form-block-button" layout-align="center center">
             <button
               class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid"
-              [ngClass]="{ progress: currentMine.depositLoading }"
-              [disabled]="!formData.depositAmount || +formData.depositAmount === 0 || currentMine.depositLoading"
+              [ngClass]="{ progress: currentMine.depositLPLoading }"
+              [disabled]="!formData.depositLPAmount || +formData.depositLPAmount === 0 || currentMine.depositLPLoading"
               (click)="deposit()"
             >
               <!-- Ellipsis Loading Indicator -->
-              <span class="lds-ellipsis" *ngIf="currentMine.depositLoading">
+              <span class="lds-ellipsis" *ngIf="currentMine.depositLPLoading">
                 <span class="lds-ellipsis-container">
                   <span></span><span></span><span></span><span></span>
                 </span>
@@ -116,7 +116,7 @@
       <div class="axn-form-bottom axn-form-base-3">
         <div class="axn-form-block-one axn-form-base-center">
           <button 
-            (click)="withdrawLPTokens(formdata.withdrawLPAmount)"
+            (click)="openWithdrawLPModal()"
             [disabled]="minerBalance.lpDeposit.isZero() || currentMine.withdrawLPLoading" 
             [ngClass]="{ progress: currentMine.withdrawLPLoading }"
             class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid" 
@@ -310,6 +310,70 @@
         </span>
 
         <span class="axn-btn-text">Create</span>
+      </button>
+    </div>
+
+  </div>
+</ng-template>
+
+<!-- WIthdraw LP Modal -->
+<ng-template #withdrawLPModal class="dialog-block" mat-dialog-content>
+  <div class="dialog-block__content">
+    <div class="dialog-title">Withdraw LP Tokens</div>
+
+    <div class="dialog-description dialog-description-slim">
+      <div class="axn-form axn-form-block-one">
+        <span class="axn-form-block-one-title">Amount</span>
+        <input
+          type="text"
+          *ngIf="account"
+          required="required"
+          class="axn-input axn-input-mid"
+          placeholder="0.0"
+          onfocus="this.placeholder = ''"
+          onblur="this.placeholder = '0.0'"
+          [appBigNumber]="{
+            decimals: tokensDecimals,
+            max: minerBalance.lpDeposit
+          }"
+          [(ngModel)]="formData.withdrawLPAmount"
+          autocomplete="off"
+        />
+        <span class="axn-cheap icon icon_uni cl-purple-bg">{{currentMine?.base}}-{{currentMine?.market}}</span>
+
+        <div class="axn-form-block-sendmax">
+          <span class="axn-btn axn-btn-max" (click)="formData.withdrawLPAmount = minerBalance.lpDeposit.toString()">
+            &nbsp;Max&nbsp;
+          </span>
+        
+          <span class="axn-form-block-sendmax-text">
+            Balance: {{ minerBalance?.lpDeposit | bigNumberFormat: tokensDecimals:true:false:2 || 0}}
+            <span class="axn-form-block-sendmax-value"></span>
+          </span>
+          <br />
+        </div>
+
+      </div>
+    </div>
+
+    <div class="dialog-bottom">
+      <button class="axn-btn axn-btn-gray" type="button" mat-dialog-close>
+        <span>Close</span>
+      </button>
+
+      <button 
+        (click)="withdrawLPTokens()" 
+        class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid"
+        [ngClass]="{ progress: currentMine?.withdrawLPLoading }" 
+        [disabled]="currentMine?.withdrawLPLoading || +formData.withdrawLPAmount === 0"
+      >
+        <span class="lds-ellipsis" *ngIf="currentMine?.withdrawLPLoading">
+          <span class="lds-ellipsis-container">
+            <span></span><span></span><span></span><span></span>
+          </span>
+        </span>
+
+        <span class="axn-btn-text">Withdraw</span>
       </button>
     </div>
 

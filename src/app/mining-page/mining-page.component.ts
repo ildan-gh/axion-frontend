@@ -18,7 +18,7 @@ import { Mine as BasicMine } from '../services/mining-contract';
 interface Mine extends BasicMine {
   base: string,
   market: string,
-  depositLoading: boolean,
+  depositLPLoading: boolean,
   withdrawLPLoading: boolean,
   withdrawAllLoading: boolean,
   withdrawRewardsLoading: boolean,
@@ -34,6 +34,12 @@ export class MiningPageComponent implements OnDestroy {
     static: true,
   })
   createMineModal: TemplateRef<any>;
+
+  @ViewChild("withdrawLPModal", {
+    static: true,
+  })
+  withdrawLPModal: TemplateRef<any>;
+
   private accountSubscribe;
   public tokensDecimals = 18;  // Always 18 UNI-V2 pairs
 
@@ -45,8 +51,9 @@ export class MiningPageComponent implements OnDestroy {
   public onChangeAccount: EventEmitter<any> = new EventEmitter();
 
   public formData = {
-    depositAmount: "",
-    withdrawLPAmount: ""
+    depositLPAmount: "",
+    withdrawLPAmount: "",
+    ref: null
   }
 
   public minerBalance = {
@@ -119,6 +126,10 @@ export class MiningPageComponent implements OnDestroy {
     });
   }
 
+  public openWithdrawLPModal() {
+    this.formData.ref = this.dialog.open(this.withdrawLPModal, {});
+  }
+
   public subscribeAccount() {
     this.appComponent.subscribeAccount();
   }
@@ -164,7 +175,7 @@ export class MiningPageComponent implements OnDestroy {
     }
   }
 
-  public async setCurrentMine(mine) {
+  public async setCurrentMine(mine: Mine) {
     this.switchingLoading = mine.lpToken;
 
     try {
@@ -196,10 +207,10 @@ export class MiningPageComponent implements OnDestroy {
   }
 
   public async deposit() {
-    if (+this.formData.depositAmount > 0) {
+    if (+this.formData.depositLPAmount > 0) {
       try {
-        this.currentMine.depositLoading = true;
-        await this.contractService.depositLPTokens(this.currentMine.lpToken, this.formData.depositAmount);
+        this.currentMine.depositLPLoading = true;
+        await this.contractService.depositLPTokens(this.currentMine.lpToken, this.formData.depositLPAmount);
         this.updateMinerBalance();
         this.updateMines();
       }
@@ -208,7 +219,7 @@ export class MiningPageComponent implements OnDestroy {
           this.openErrorModal(err.message)
       }
       finally {
-        this.currentMine.depositLoading = false;
+        this.currentMine.depositLPLoading = false;
       }
     }
   }
@@ -251,14 +262,15 @@ export class MiningPageComponent implements OnDestroy {
     }
   }
 
-  public async withdrawLPTokens(amount: string) { 
+  public async withdrawLPTokens() { 
     if (!this.minerBalance.lpDeposit.isZero()) {
       this.currentMine.withdrawLPLoading = true;
 
       try {
-        await this.contractService.withdrawLPTokens(this.currentMine.lpToken, amount);
+        await this.contractService.withdrawLPTokens(this.currentMine.lpToken, this.formData.withdrawLPAmount);
         this.updateMines();
         this.updateMinerBalance();
+        this.formData.ref.close();
       }
       catch (err) {
         if (err.message)
