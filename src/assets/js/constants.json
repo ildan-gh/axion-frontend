@@ -205,7 +205,10 @@
     "WETH": {
       "ADDRESS": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
     },
-    "HEX2X": {
+    "USDC": {
+      "ADDRESS": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+    },
+    "AXN": {
       "ADDRESS": "0x71F85B2E46976bD21302B64329868fd15eb0D127",
       "ABI": [
         {
@@ -9368,7 +9371,7 @@
     "WETH": {
       "ADDRESS": "0xc778417E063141139Fce010982780140Aa0cD5Ab"
     },
-    "HEX2X": {
+    "AXN": {
       "ADDRESS": "0x0Addc94b8A7f7f2F2D96686a4c2Aa4fbedEcCE2F",
       "ABI": [
         {
