@@ -47,8 +47,20 @@ export class MiningPageComponent implements OnDestroy {
   public switchingLoading;
   public mines: Mine[];
   public currentMine: Mine;
-  public createMineData: any = {}
+
   public onChangeAccount: EventEmitter<any> = new EventEmitter();
+
+  public createMineData = {
+    base: "",
+    market: "",
+    endBlock: null,
+    startBlock: null,
+    tokenAddress: "",
+    rewardAmount: "",
+    progressIndicator: false,
+    blockReward: new BigNumber(0),
+    ref: null,
+  }
 
   public formData = {
     depositLPAmount: "",
@@ -301,9 +313,9 @@ export class MiningPageComponent implements OnDestroy {
     const blockReward = this.contractService.calculateBlockReward(rewards, startBlock, endBlock);
     
     try {
-      await this.contractService.createMine(address, rewards, blockReward, startBlock)
+      await this.contractService.createMine(address, new BigNumber(rewards), blockReward, startBlock)
       this.createMineData.ref.close();
-      this.createMineData = {};
+      this.createMineData = null;
       this.updateMines();
     }
     catch (err) {

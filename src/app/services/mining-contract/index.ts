@@ -235,7 +235,7 @@ export class MiningContractService {
     return new BigNumber(rewardAmount).div(blocks);
   }
 
-  public async createMine(lpTokenAddress: string, rewardAmount: string, blockReward: BigNumber, startBlock: number) {
+  public async createMine(lpTokenAddress: string, rewardAmount: BigNumber, blockReward: BigNumber, startBlock: number) {
     await this.mineManagerContract.methods.createMine(lpTokenAddress, rewardAmount, blockReward, startBlock).send({ from: this.account.address });
 
     this.getMineContracts();
