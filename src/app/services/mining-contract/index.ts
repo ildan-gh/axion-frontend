@@ -52,7 +52,7 @@ export class MiningContractService {
         this.account = account;
         this.contractData = contractService.CONTRACTS_PARAMS;
         this.axionContract = contractService.AXNContract;
-        
+
         await this.initializeContracts();
         this.callAllAccountsSubscribers();
         this.account.isManager = await this.checkIsManager();
@@ -78,17 +78,14 @@ export class MiningContractService {
     });
   }
 
-  private checkApproval(amount, address): Promise<any> {
-    return new Promise((resolve, reject) => {
-      this.axionContract.methods
-        .allowance(this.account.address, address)
-        .call()
-        .then((allowance: string) => {
-          const allow = new BigNumber(allowance);
-          const allowed = allow.minus(amount);
-          allowed.isNegative() ? reject() : resolve(null);
-        });
-    });
+  private async isAXNApproved(amount, address): Promise<boolean> {
+    const allowance = await this.axionContract.methods
+      .allowance(this.account.address, address)
+      .call();
+
+    const allow = new BigNumber(allowance);
+    const allowed = allow.minus(amount);
+    return !allowed.isNegative();
   }
 
   private checkTransaction(tx) {
@@ -99,8 +96,12 @@ export class MiningContractService {
 
   private async initializeContracts() {
     this.mineManagerContract = this.web3Service.getContract(this.contractData.MineManager.ABI, this.contractData.MineManager.ADDRESS);
-    this.mineAddresses = await this.mineManagerContract.methods.getMineAddresses().call();
+    await this.getMineAddresses();
     this.getMineContracts();
+  }
+
+  private async getMineAddresses() {
+    this.mineAddresses = await this.mineManagerContract.methods.getMineAddresses().call();
   }
 
   private getMineContracts() {
@@ -249,22 +250,19 @@ export class MiningContractService {
   }
 
   public async createMine(lpTokenAddress: string, rewardAmount: BigNumber, blockReward: BigNumber, startBlock: number) {
-    const create = (resolve, reject) => {
-      return this.mineManagerContract.methods.createMine(lpTokenAddress, rewardAmount, blockReward, startBlock)
-        .send({ from: this.account.address })
-        .then(res => this.checkTransaction(res).then(() => this.getMineContracts())).then(resolve, reject);
-    };
+    const isApproved = await this.isAXNApproved(rewardAmount, this.mineManagerContract.options.address);
 
-    return new Promise((resolve, reject) => {
-      this.checkApproval(rewardAmount, this.mineManagerContract.options.address)
-      .then(
-        () => { create(resolve, reject) },
-        () => {
-          this.axionContract.methods.approve(this.mineManagerContract.options.address, rewardAmount)
-            .send({ from: this.account.address })
-            .then(() => { create(resolve, reject) }, reject);
-        }
-      );
-    });
-  }
+    if (!isApproved) {
+      await this.axionContract.methods.approve(this.mineManagerContract.options.address, rewardAmount)
+        .send({ from: this.account.address })
+    } else {
+      const res = await this.mineManagerContract.methods.createMine(lpTokenAddress, rewardAmount, blockReward, startBlock)
+        .send({ from: this.account.address })
+
+      await this.checkTransaction(res);
+
+      await this.getMineAddresses();
+      this.getMineContracts();
+    }
+  };
 }
