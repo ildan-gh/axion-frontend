@@ -47,7 +47,7 @@ export class MiningContractService {
 
   public mineAddresses: string[];
 
-  constructor(config: AppConfig, contractService: ContractService) {
+  constructor(config: AppConfig, private contractService: ContractService) {
     this.web3Service = new MetamaskService(config);
     contractService.accountSubscribe().subscribe(async (account: any) => {
       if (account) {
@@ -277,4 +277,8 @@ export class MiningContractService {
 
     return res;
   };
+
+  public getUsdcPerAxnPrice(): Promise<BigNumber> {
+    return this.contractService.getUsdcPerAxnPrice();
+  }
 }

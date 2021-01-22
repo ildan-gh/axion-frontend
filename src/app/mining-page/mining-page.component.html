@@ -104,7 +104,7 @@
             class="axn-form-block-one-value-small p-tb-5"
             matTooltipClass="table__tooltip"
             mat-raised-button
-            matTooltip="{{minerBalance.pendingReward | bigNumberFormat: tokensDecimals:true:false:2 || 0 }}"
+            matTooltip="${{getDollarValue(minerBalance.pendingReward) | bigNumberFormat: tokensDecimals:true:false:2 || 0 }}"
           >
             {{ minerBalance.pendingReward | bigNumberFormat: tokensDecimals:true:false:2 }}
           </span>

@@ -75,6 +75,8 @@ export class MiningPageComponent implements OnDestroy {
     }
   };
 
+  private  usdcPerAxnPrice: BigNumber;
+
   constructor(
     public contractService: MiningContractService,
     private ngZone: NgZone,
@@ -84,7 +86,7 @@ export class MiningPageComponent implements OnDestroy {
   ) {
     this.accountSubscribe = this.contractService.accountSubscribe().subscribe((account: any) => {
       if (!account || account.balances) {
-        this.ngZone.run(() => {
+        this.ngZone.run(async () => {
           this.account = account;
           window.dispatchEvent(new Event("resize"));
 
@@ -100,6 +102,8 @@ export class MiningPageComponent implements OnDestroy {
                   this.setCurrentMine(mines[0])
               });
             }); 
+
+            this.usdcPerAxnPrice = await this.contractService.getUsdcPerAxnPrice();
           }
         });
       }
@@ -120,6 +124,10 @@ export class MiningPageComponent implements OnDestroy {
     const mines = await this.contractService.getMines();
     this.mines = mines;
     return mines;
+  }
+
+  public getDollarValue(amount: BigNumber) {
+    return amount.times(this.usdcPerAxnPrice);
   }
 
   public openSuccessModal(txID: string) {
