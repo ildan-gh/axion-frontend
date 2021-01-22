@@ -86,7 +86,7 @@ export class MiningContractService {
 
   private async initializeContracts() {
     this.mineManagerContract = this.web3Service.getContract(this.contractData.MineManager.ABI, this.contractData.MineManager.ADDRESS);
-    this.mineAddresses = []//await this.mineManagerContract.methods.getMineAddresses().call()
+    this.mineAddresses = await this.mineManagerContract.methods.getMineAddresses().call();
     this.getMineContracts();
   }
 
