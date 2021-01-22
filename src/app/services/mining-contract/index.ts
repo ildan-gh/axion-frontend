@@ -211,17 +211,24 @@ export class MiningContractService {
     })
   }
 
-  public async depositLPTokens(mineAddress: string, lpTokenAddress: string, amount: BigNumber): Promise<void> {
-    const isApproved = await this.isAXNApproved(amount, lpTokenAddress);
+  // TODO: WIP
+  public async depositLPTokens(mineAddress: string, lpTokenAddress: string, amount: BigNumber): Promise<any> {
+    // const isApproved = await this.isAXNApproved(amount, lpTokenAddress);
 
-    if (!isApproved) {
-      const res = await this.axionContract.methods.approve(lpTokenAddress, amount).send({ from: this.account.address });
-      await this.checkTransaction(res);
-    } else {
-      const res = await this.mineContracts[mineAddress].methods.depositLPTokens(amount).send({ from: this.account.address });
-      await this.checkTransaction(res);
-      return res;
-    }
+    // console.log(lpTokenAddress)
+    
+    const token = this.web3Service.getContract(this.contractData.UniswapERC20Pair.ABI, lpTokenAddress);
+    const resut = await token.methods.approve(mineAddress, amount).send({ from: this.account.address });
+    await this.checkTransaction(resut);
+
+    // if (!isApproved) {
+     
+    // }
+
+    const res = await this.mineContracts[mineAddress].methods.depositLPTokens(amount).send({ from: this.account.address });
+    await this.checkTransaction(res);
+    
+    return res;
   }
 
   public withdrawLPTokens(mineAddress: string, amount: string): Promise<void> {
@@ -258,18 +265,16 @@ export class MiningContractService {
     const isApproved = await this.isAXNApproved(rewardAmount, this.mineManagerContract.options.address);
 
     if (!isApproved) {
-      const res = await this.axionContract.methods.approve(this.mineManagerContract.options.address, rewardAmount)
-        .send({ from: this.account.address });
-
+      const res = await this.axionContract.methods.approve(this.mineManagerContract.options.address, rewardAmount).send({ from: this.account.address });
       await this.checkTransaction(res);
-    } else {
-      const res = await this.mineManagerContract.methods.createMine(lpTokenAddress, rewardAmount, blockReward, startBlock)
-        .send({ from: this.account.address });
-
-      await this.checkTransaction(res);
-
-      await this.getMineAddresses();
-      this.getMineContracts();
     }
+    
+    const res = await this.mineManagerContract.methods.createMine(lpTokenAddress, rewardAmount, blockReward, startBlock).send({ from: this.account.address });
+    await this.checkTransaction(res);
+
+    await this.getMineAddresses();
+    this.getMineContracts();
+
+    return res;
   };
 }

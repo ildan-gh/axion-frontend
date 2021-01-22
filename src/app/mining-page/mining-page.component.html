@@ -93,7 +93,7 @@
             mat-raised-button
             matTooltip="{{ minerBalance.lpDeposit | bigNumberFormat: tokensDecimals:true:false:2 || 0 }}"
           >
-            {{ minerBalance.lpDeposit | bigNumberFormat: 0:true:false:2 || 0 }}
+            {{ minerBalance.lpDeposit | bigNumberFormat: tokensDecimals:true:false:2 || 0 }}
           </span>
 
           <span class="axn-cheap icon icon_uni cl-purple-bg">{{currentMine.base}}-{{currentMine.market}}</span>
@@ -106,7 +106,7 @@
             mat-raised-button
             matTooltip="{{minerBalance.pendingReward | bigNumberFormat: tokensDecimals:true:false:2 || 0 }}"
           >
-            {{ minerBalance.pendingReward | bigNumberFormat: 0:true:false:2 }}
+            {{ minerBalance.pendingReward | bigNumberFormat: tokensDecimals:true:false:2 }}
           </span>
           <span class="axn-cheap icon icon_axn cl-blue-bg">AXN</span>
         </div>

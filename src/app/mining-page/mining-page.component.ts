@@ -223,9 +223,10 @@ export class MiningPageComponent implements OnDestroy {
     if (+this.formData.depositLPAmount > 0) {
       try {
         this.currentMine.depositLPLoading = true;
-        await this.contractService.depositLPTokens(this.currentMine.mineAddress, this.currentMine.lpToken, new BigNumber(this.formData.depositLPAmount));
+        const result = await this.contractService.depositLPTokens(this.currentMine.mineAddress, this.currentMine.lpToken, new BigNumber(this.formData.depositLPAmount));
         this.updateMinerBalance();
         this.updateMines();
+        console.log(result)
       }
       catch (err) {
         if (err.message)
@@ -242,7 +243,7 @@ export class MiningPageComponent implements OnDestroy {
       this.currentMine.withdrawRewardsLoading = true;
       
       try {
-        await this.contractService.withdrawReward(this.currentMine.lpToken);
+        await this.contractService.withdrawReward(this.currentMine.mineAddress);
         this.updateMines();
         this.updateMinerBalance();
       } 
@@ -261,7 +262,7 @@ export class MiningPageComponent implements OnDestroy {
       this.currentMine.withdrawAllLoading = true;
 
       try {
-        await this.contractService.withdrawAll(this.currentMine.lpToken);
+        await this.contractService.withdrawAll(this.currentMine.mineAddress);
         this.updateMines();
         this.updateMinerBalance();
       }
@@ -280,7 +281,7 @@ export class MiningPageComponent implements OnDestroy {
       this.currentMine.withdrawLPLoading = true;
 
       try {
-        await this.contractService.withdrawLPTokens(this.currentMine.lpToken, this.formData.withdrawLPAmount);
+        await this.contractService.withdrawLPTokens(this.currentMine.mineAddress, this.formData.withdrawLPAmount);
         this.updateMines();
         this.updateMinerBalance();
         this.formData.ref.close();
