@@ -246,18 +246,20 @@ export class MiningContractService {
   public calculateBlockReward(rewardAmount: string, startBlock: number, endBlock: number): BigNumber {
     const blocks = endBlock - startBlock;
 
-    return new BigNumber(rewardAmount).div(blocks);
+    return new BigNumber(rewardAmount).div(blocks).dp(0);
   }
 
   public async createMine(lpTokenAddress: string, rewardAmount: BigNumber, blockReward: BigNumber, startBlock: number) {
     const isApproved = await this.isAXNApproved(rewardAmount, this.mineManagerContract.options.address);
 
     if (!isApproved) {
-      await this.axionContract.methods.approve(this.mineManagerContract.options.address, rewardAmount)
-        .send({ from: this.account.address })
+      const res = await this.axionContract.methods.approve(this.mineManagerContract.options.address, rewardAmount)
+        .send({ from: this.account.address });
+
+      await this.checkTransaction(res);
     } else {
       const res = await this.mineManagerContract.methods.createMine(lpTokenAddress, rewardAmount, blockReward, startBlock)
-        .send({ from: this.account.address })
+        .send({ from: this.account.address });
 
       await this.checkTransaction(res);
 
