@@ -202,23 +202,23 @@ export class MiningContractService {
   }
 
   public depositLPTokens(mineAddress: string, amount: string): Promise<void> {
-    return this.mineContracts[mineAddress].methods.depositLPTokens(amount).send();
+    return this.mineContracts[mineAddress].methods.depositLPTokens(amount).send({ from: this.account.address });
   }
 
   public withdrawLPTokens(mineAddress: string, amount: string): Promise<void> {
-    return this.mineContracts[mineAddress].methods.depositLPTokens(amount).send();
+    return this.mineContracts[mineAddress].methods.withdrawLPTokens(amount).send({ from: this.account.address });
   }
 
   public withdrawReward(mineAddress: string): Promise<void> {
-    return this.mineContracts[mineAddress].methods.withdrawReward().send();
+    return this.mineContracts[mineAddress].methods.withdrawReward().send({ from: this.account.address });
   }
 
   public withdrawAll(mineAddress: string): Promise<void> {
-    return this.mineContracts[mineAddress].methods.withdrawAll().send();
+    return this.mineContracts[mineAddress].methods.withdrawAll().send({ from: this.account.address });
   }
 
   public async getPendingReward(mineAddress: string): Promise<BigNumber> {
-    const reward = await this.mineContracts[mineAddress].methods.getPendingReward().call();
+    const reward = await this.mineContracts[mineAddress].methods.getPendingReward().call({ from: this.account.address });
 
     return new BigNumber(reward);
   }
