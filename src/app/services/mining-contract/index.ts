@@ -78,6 +78,19 @@ export class MiningContractService {
     });
   }
 
+  private checkApproval(amount, address): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.axionContract.methods
+        .allowance(this.account.address, address)
+        .call()
+        .then((allowance: string) => {
+          const allow = new BigNumber(allowance);
+          const allowed = allow.minus(amount);
+          allowed.isNegative() ? reject() : resolve(null);
+        });
+    });
+  }
+
   private checkTransaction(tx) {
     return new Promise((resolve, reject) => {
       this.checkTx(tx, resolve, reject);
@@ -236,8 +249,22 @@ export class MiningContractService {
   }
 
   public async createMine(lpTokenAddress: string, rewardAmount: BigNumber, blockReward: BigNumber, startBlock: number) {
-    await this.mineManagerContract.methods.createMine(lpTokenAddress, rewardAmount, blockReward, startBlock).send({ from: this.account.address });
+    const create = (resolve, reject) => {
+      return this.mineManagerContract.methods.createMine(lpTokenAddress, rewardAmount, blockReward, startBlock)
+        .send({ from: this.account.address })
+        .then(res => this.checkTransaction(res).then(() => this.getMineContracts())).then(resolve, reject);
+    };
 
-    this.getMineContracts();
+    return new Promise((resolve, reject) => {
+      this.checkApproval(rewardAmount, this.mineManagerContract.options.address)
+      .then(
+        () => { create(resolve, reject) },
+        () => {
+          this.axionContract.methods.approve(this.mineManagerContract.options.address, rewardAmount)
+            .send({ from: this.account.address })
+            .then(() => { create(resolve, reject) }, reject);
+        }
+      );
+    });
   }
 }
