@@ -16,12 +16,10 @@ import { TransactionSuccessModalComponent } from "../components/transactionSucce
 import { Mine as BasicMine } from '../services/mining-contract';
 
 interface Mine extends BasicMine {
-  base: string,
-  market: string,
-  depositLPLoading: boolean,
-  withdrawLPLoading: boolean,
-  withdrawAllLoading: boolean,
-  withdrawRewardsLoading: boolean,
+  depositLPLoading?: boolean,
+  withdrawLPLoading?: boolean,
+  withdrawAllLoading?: boolean,
+  withdrawRewardsLoading?: boolean,
 }
 
 @Component({
@@ -158,8 +156,8 @@ export class MiningPageComponent implements OnDestroy {
   }
 
   public async updateMinerBalance() {
-    this.minerBalance.lpDeposit = await this.contractService.getMinerPoolBalance(this.currentMine.lpToken);
-    this.minerBalance.pendingReward = await this.contractService.getPendingReward(this.currentMine.lpToken);
+    this.minerBalance.lpDeposit = await this.contractService.getMinerPoolBalance(this.currentMine.mineAddress);
+    this.minerBalance.pendingReward = await this.contractService.getPendingReward(this.currentMine.mineAddress);
     this.minerBalance.lpAvailable = await this.contractService.getTokenBalance(this.currentMine.lpToken);
   }
 

@@ -8,8 +8,11 @@ import { MetamaskService } from "../web3";
 import { Contract } from "web3-eth-contract";
 
 export interface Mine {
+  base: string;
+  market: string;
   lpToken: string;
   startBlock: number;
+  mineAddress: string;
   blockReward: BigNumber;
   rewardBalance: BigNumber;
 }
@@ -165,13 +168,13 @@ export class MiningContractService {
     };
   }
 
-  public async getTokenBalance(mineAddress: string): Promise<any> {
-    const token = this.web3Service.getContract(this.contractData.UniswapERC20Pair.ABI, mineAddress);
+  public async getTokenBalance(lpTokenAddress: string): Promise<any> {
+    const token = this.web3Service.getContract(this.contractData.UniswapERC20Pair.ABI, lpTokenAddress);
     const balance = await token.methods.balanceOf(this.account.address).call();
 
     return {
       wei: balance,
-      weiBigNumber: new BigNumber(balance)
+      bn: new BigNumber(balance)
     };
   }
 
@@ -181,8 +184,12 @@ export class MiningContractService {
     for (const mineAddress of this.mineAddresses) {
       const balance = await this.axionContract.methods.balanceOf(mineAddress).call();
       const mineInfo: MineInfo = await this.mineContracts[mineAddress].methods.mineInfo().call();
+      const poolTokens = await this.getPoolTokens(mineInfo.lpToken);
 
       const mine: Mine = {
+        mineAddress,
+        base: poolTokens.base,
+        market: poolTokens.market,
         lpToken: mineInfo.lpToken,
         startBlock: +mineInfo.startBlock,
         blockReward: new BigNumber(mineInfo.blockReward),
@@ -191,17 +198,6 @@ export class MiningContractService {
 
       mines.push(mine);
     }
-
-    let promises = [];
-    mines.forEach(p => {
-      promises.push(this.getPoolTokens(p.lpToken));
-    })
-
-    const tokens = await Promise.all(promises)
-    tokens.forEach((t, idx) => {
-      mines[idx]["base"] = t.base;
-      mines[idx]["market"] = t.market;
-    })
 
     return mines;
   }
