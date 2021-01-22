@@ -21088,7 +21088,7 @@
       ]
     },
     "MineManager": {
-      "ADDRESS": "0xbA6Acc05Bb64fE6a3F348F7BaF49d359b96c396A",
+      "ADDRESS": "0x6FE94a30560A84cfe8cd650A4DdA00E1Ec74290e",
       "ABI": [
         {
           "anonymous": false,
