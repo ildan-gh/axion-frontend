@@ -223,7 +223,7 @@ export class MiningPageComponent implements OnDestroy {
     if (+this.formData.depositLPAmount > 0) {
       try {
         this.currentMine.depositLPLoading = true;
-        await this.contractService.depositLPTokens(this.currentMine.lpToken, this.formData.depositLPAmount);
+        await this.contractService.depositLPTokens(this.currentMine.mineAddress, this.currentMine.lpToken, new BigNumber(this.formData.depositLPAmount));
         this.updateMinerBalance();
         this.updateMines();
       }

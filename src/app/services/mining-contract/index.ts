@@ -211,8 +211,17 @@ export class MiningContractService {
     })
   }
 
-  public depositLPTokens(mineAddress: string, amount: string): Promise<void> {
-    return this.mineContracts[mineAddress].methods.depositLPTokens(amount).send({ from: this.account.address });
+  public async depositLPTokens(mineAddress: string, lpTokenAddress: string, amount: BigNumber): Promise<void> {
+    const isApproved = await this.isAXNApproved(amount, lpTokenAddress);
+
+    if (!isApproved) {
+      const res = await this.axionContract.methods.approve(lpTokenAddress, amount).send({ from: this.account.address });
+      await this.checkTransaction(res);
+    } else {
+      const res = await this.mineContracts[mineAddress].methods.depositLPTokens(amount).send({ from: this.account.address });
+      await this.checkTransaction(res);
+      return res;
+    }
   }
 
   public withdrawLPTokens(mineAddress: string, amount: string): Promise<void> {
