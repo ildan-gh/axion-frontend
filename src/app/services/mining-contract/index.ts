@@ -91,6 +91,15 @@ export class MiningContractService {
     return !allowed.isNegative();
   }
 
+  private async isLPApproved(amount, mineAddress, lpTokenAddress): Promise<boolean> {    
+    const token = this.web3Service.getContract(this.contractData.UniswapERC20Pair.ABI, lpTokenAddress);
+    const allowance = await token.methods.allowance(this.account.address, mineAddress).call();
+
+    const allow = new BigNumber(allowance);
+    const allowed = allow.minus(amount);
+    return !allowed.isNegative();
+  }
+
   private checkTransaction(tx) {
     return new Promise((resolve, reject) => {
       this.checkTx(tx, resolve, reject);
@@ -211,35 +220,29 @@ export class MiningContractService {
     })
   }
 
-  // TODO: WIP
   public async depositLPTokens(mineAddress: string, lpTokenAddress: string, amount: BigNumber): Promise<any> {
-    // const isApproved = await this.isAXNApproved(amount, lpTokenAddress);
+    const isApproved = await this.isLPApproved(amount, mineAddress, lpTokenAddress);
 
-    // console.log(lpTokenAddress)
-    
-    const token = this.web3Service.getContract(this.contractData.UniswapERC20Pair.ABI, lpTokenAddress);
-    const resut = await token.methods.approve(mineAddress, amount).send({ from: this.account.address });
-    await this.checkTransaction(resut);
-
-    // if (!isApproved) {
-     
-    // }
+    if (!isApproved) {
+      const token = this.web3Service.getContract(this.contractData.UniswapERC20Pair.ABI, lpTokenAddress);
+      const resut = await token.methods.approve(mineAddress, amount).send({ from: this.account.address });
+      await this.checkTransaction(resut);
+    }
 
     const res = await this.mineContracts[mineAddress].methods.depositLPTokens(amount).send({ from: this.account.address });
     await this.checkTransaction(res);
-    
     return res;
   }
 
-  public withdrawLPTokens(mineAddress: string, amount: string): Promise<void> {
+  public withdrawLPTokens(mineAddress: string, amount: string): Promise<any> {
     return this.mineContracts[mineAddress].methods.withdrawLPTokens(amount).send({ from: this.account.address });
   }
 
-  public withdrawReward(mineAddress: string): Promise<void> {
+  public withdrawReward(mineAddress: string): Promise<any> {
     return this.mineContracts[mineAddress].methods.withdrawReward().send({ from: this.account.address });
   }
 
-  public withdrawAll(mineAddress: string): Promise<void> {
+  public withdrawAll(mineAddress: string): Promise<any> {
     return this.mineContracts[mineAddress].methods.withdrawAll().send({ from: this.account.address });
   }
 
