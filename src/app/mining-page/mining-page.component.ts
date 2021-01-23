@@ -330,9 +330,19 @@ export class MiningPageComponent implements OnDestroy {
         startBlock
       )
       this.createMineData.ref.close();
-      this.createMineData = null;
       this.updateMines();
       this.openSuccessModal(tx.transactionHash);
+      this.createMineData = {
+        base: "",
+        market: "",
+        endBlock: null,
+        startBlock: null,
+        tokenAddress: "",
+        rewardAmount: "",
+        progressIndicator: false,
+        blockReward: new BigNumber(0),
+        ref: null,
+      };
     }
     catch (err) {
       if (err.message)
