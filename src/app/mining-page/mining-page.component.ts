@@ -197,7 +197,7 @@ export class MiningPageComponent implements OnDestroy {
   }
 
   public async setCurrentMine(mine: Mine) {
-    this.switchingLoading = mine.lpToken;
+    this.switchingLoading = mine.mineAddress;
 
     try {
       this.currentMine = mine;

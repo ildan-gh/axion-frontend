@@ -138,7 +138,7 @@
             (click)="withdrawAll()"
             [ngClass]="{ progress: currentMine.withdrawAllLoading }"
             class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid" 
-            [disabled]="minerBalance.pendingReward.isZero() || minerBalance.lpDeposit.isZero() || currentMine.withdrawAllLoading" 
+            [disabled]="minerBalance.pendingReward.isZero() || minerBalance.lpDeposit.isZero() || currentMine.withdrawAllLoading || currentMine.withdrawLPLoading ||  currentMine.withdrawRewardsLoading" 
           >
             <!-- Ellipsis Loading Indicator -->
             <span class="lds-ellipsis" *ngIf="currentMine.withdrawAllLoading">
@@ -203,25 +203,26 @@
     <div class="axn-form-block axn-form-block-one axn-form-base-center" *ngFor="let mine of mines">
       <p class="axn-text-subtitle">{{mine.base}}-{{mine.market}}</p>
       <p class="axn-text-body">
-        Start: Block {{mine.startBlock}}<br/>
-        Reward: {{mine.rewardBalance | bigNumberFormat: tokensDecimals:true:false:2 || 0}} AXN
+        Mine Start Block: <b>{{mine.startBlock}}</b><br/>
+        Available Rewards: <b>{{mine.rewardBalance | bigNumberFormat: tokensDecimals:true:false:2 || 0}} AXN</b><br />
+        Block Reward: <b>{{mine.blockReward | bigNumberFormat: tokensDecimals:true:false:4 || 0}} AXN</b>
       </p>
 
       <button 
         (click)="setCurrentMine(mine)" 
         class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-big" 
-        [ngClass]="{ progress: switchingLoading === mine.lpToken }"
-        [disabled]="switchingLoading === mine.lpToken || currentMine.lpToken === mine.lpToken" 
+        [ngClass]="{ progress: switchingLoading === mine.mineAddress }"
+        [disabled]="switchingLoading === mine.mineAddress || currentMine.mineAddress === mine.mineAddress" 
       >
         <!-- Ellipsis Loading Indicator -->
-        <span class="lds-ellipsis" *ngIf="switchingLoading === mine.lpToken">
+        <span class="lds-ellipsis" *ngIf="switchingLoading === mine.mineAddress">
           <span class="lds-ellipsis-container">
             <span></span><span></span><span></span><span></span>
           </span>
         </span>
       
         <!-- Button Text -->
-        <span class="axn-btn-text">Open Mine</span>
+        <span class="axn-btn-text">{{currentMine.mineAddress === mine.mineAddress ? "Current" : "View"}} Mine</span>
       </button>
 
     </div>
