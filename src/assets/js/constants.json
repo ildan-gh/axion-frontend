@@ -11374,7 +11374,7 @@
       ]
     },
     "USDC": {
-      "ADDRESS": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      "ADDRESS": "0x6ee856ae55b6e1a249f04cd3b947141bc146273c"
     },
     "WETH": {
       "ADDRESS": "0xc778417E063141139Fce010982780140Aa0cD5Ab"
@@ -21842,7 +21842,6 @@
       ]
     },
     "Mine": {
-      "ADDRESS": "",
       "ABI": [
         {
           "inputs": [

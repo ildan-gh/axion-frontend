@@ -15,6 +15,7 @@ export interface Mine {
   mineAddress: string;
   blockReward: BigNumber;
   rewardBalance: BigNumber;
+  apr: number;
 }
 
 export interface MineInfo {
@@ -43,7 +44,7 @@ export class MiningContractService {
   private contractData: any;
   private axionContract: Contract;
   private mineManagerContract: Contract;
-  private mineContracts: { [id: string]: Contract; } = {};
+  private mineData: { [id: string]: {contract: Contract, info: MineInfo} } = {};
 
   public mineAddresses: string[];
 
@@ -109,21 +110,20 @@ export class MiningContractService {
   private async initializeContracts() {
     this.mineManagerContract = this.web3Service.getContract(this.contractData.MineManager.ABI, this.contractData.MineManager.ADDRESS);
     await this.getMineAddresses();
-    this.getMineContracts();
+    await this.getMineData();
   }
 
   private async getMineAddresses() {
     this.mineAddresses = await this.mineManagerContract.methods.getMineAddresses().call();
   }
 
-  private getMineContracts() {
-    const mineContracts = {};
-
+  private async getMineData() {
     for (const mineAddress of this.mineAddresses) {
-      mineContracts[mineAddress] = this.web3Service.getContract(this.contractData.Mine.ABI, mineAddress);
-    }
+      const contract = this.web3Service.getContract(this.contractData.Mine.ABI, mineAddress);
+      const info: MineInfo = await contract.methods.mineInfo().call();
 
-    this.mineContracts = mineContracts;
+      this.mineData[mineAddress] = {contract, info};
+    }
   }
 
   private checkTx(tx, resolve, reject) {
@@ -192,7 +192,8 @@ export class MiningContractService {
 
     for (const mineAddress of this.mineAddresses) {
       const balance = await this.axionContract.methods.balanceOf(mineAddress).call();
-      const mineInfo: MineInfo = await this.mineContracts[mineAddress].methods.mineInfo().call();
+
+      const mineInfo = this.mineData[mineAddress].info;
       const poolTokens = await this.getPoolTokens(mineInfo.lpToken);
 
       const mine: Mine = {
@@ -202,7 +203,8 @@ export class MiningContractService {
         lpToken: mineInfo.lpToken,
         startBlock: +mineInfo.startBlock,
         blockReward: new BigNumber(mineInfo.blockReward),
-        rewardBalance: new BigNumber(balance)
+        rewardBalance: new BigNumber(balance),
+        apr: 0
       };
 
       mines.push(mine);
@@ -229,31 +231,31 @@ export class MiningContractService {
       await this.checkTransaction(resut);
     }
 
-    const res = await this.mineContracts[mineAddress].methods.depositLPTokens(amount).send({ from: this.account.address });
+    const res = await this.mineData[mineAddress].contract.methods.depositLPTokens(amount).send({ from: this.account.address });
     await this.checkTransaction(res);
     return res;
   }
 
   public withdrawLPTokens(mineAddress: string, amount: string): Promise<any> {
-    return this.mineContracts[mineAddress].methods.withdrawLPTokens(amount).send({ from: this.account.address });
+    return this.mineData[mineAddress].contract.methods.withdrawLPTokens(amount).send({ from: this.account.address });
   }
 
   public withdrawReward(mineAddress: string): Promise<any> {
-    return this.mineContracts[mineAddress].methods.withdrawReward().send({ from: this.account.address });
+    return this.mineData[mineAddress].contract.methods.withdrawReward().send({ from: this.account.address });
   }
 
   public withdrawAll(mineAddress: string): Promise<any> {
-    return this.mineContracts[mineAddress].methods.withdrawAll().send({ from: this.account.address });
+    return this.mineData[mineAddress].contract.methods.withdrawAll().send({ from: this.account.address });
   }
 
   public async getPendingReward(mineAddress: string): Promise<BigNumber> {
-    const reward = await this.mineContracts[mineAddress].methods.getPendingReward().call({ from: this.account.address });
+    const reward = await this.mineData[mineAddress].contract.methods.getPendingReward().call({ from: this.account.address });
 
     return new BigNumber(reward);
   }
 
   public async getMinerPoolBalance(mineAddress: string): Promise<BigNumber> {
-    const minerInfo = await this.mineContracts[mineAddress].methods.minerInfo(this.account.address).call();
+    const minerInfo = await this.mineData[mineAddress].contract.methods.minerInfo(this.account.address).call();
 
     return new BigNumber(minerInfo.lpDeposit);
   }
@@ -276,7 +278,7 @@ export class MiningContractService {
     await this.checkTransaction(res);
 
     await this.getMineAddresses();
-    this.getMineContracts();
+    await this.getMineData();
 
     return res;
   };
