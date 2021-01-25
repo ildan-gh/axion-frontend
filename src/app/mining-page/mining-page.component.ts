@@ -105,7 +105,7 @@ export class MiningPageComponent implements OnDestroy {
                 if (params['mine'])
                   this.processParams(params['mine'])
                 else if (mines.length > 0)
-                  this.setCurrentMine(mines[0])
+                  this.selectMine(mines[0])
               });
             });
 
@@ -210,7 +210,7 @@ export class MiningPageComponent implements OnDestroy {
     }
   }
 
-  public async setCurrentMine(mine: Mine) {
+  public async selectMine(mine: Mine) {
     this.switchingLoading = mine.mineAddress;
 
     try {
@@ -227,12 +227,12 @@ export class MiningPageComponent implements OnDestroy {
       const mineFound = this.mines.find(p => p.lpToken === lpToken)
 
       if (mineFound) {
-        this.setCurrentMine(mineFound)
+        this.selectMine(mineFound)
       }
       else {
         const fallbackPool = this.mines[0]
         this.fixURL();
-        this.setCurrentMine(fallbackPool)
+        this.selectMine(fallbackPool)
         this.openErrorModal(`Mine not found. Falling back to ${fallbackPool.base}-${fallbackPool.market}.`)
       }
     } else {

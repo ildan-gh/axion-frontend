@@ -239,8 +239,8 @@
     <span class="axn-title">Mines</span>
   </div>
 
-  <div class="axn-farms">
-    <div class="axn-form-block axn-form-block-one axn-form-base-center axn-farm" *ngFor="let mine of mines">
+  <div class="axn-mines">
+    <div class="axn-form-block axn-form-block-one axn-form-base-center axn-mine" *ngFor="let mine of mines">
       <p class="axn-text-subtitle">{{mine.base}}-{{mine.market}}</p>
       <p class="axn-text-body">
         Mine Start Block: <b>{{mine.startBlock}}</b><br/>
@@ -249,7 +249,7 @@
       </p>
 
       <button 
-        (click)="setCurrentMine(mine)" 
+        (click)="selectMine(mine)" 
         class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-big" 
         [ngClass]="{ progress: switchingLoading === mine.mineAddress }"
         [disabled]="switchingLoading === mine.mineAddress || selectedMine.mineAddress === mine.mineAddress" 
@@ -262,7 +262,7 @@
         </span>
       
         <!-- Button Text -->
-        <span class="axn-btn-text">{{selectedMine.mineAddress === mine.mineAddress ? "Current" : "View"}} Mine</span>
+        <span class="axn-btn-text">{{selectedMine.mineAddress === mine.mineAddress ? "Selected" : "View"}} Mine</span>
       </button>
 
     </div>
