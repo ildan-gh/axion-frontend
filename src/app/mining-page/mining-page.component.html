@@ -209,14 +209,14 @@
           <b>{{selectedMine.apy}}%</b>
         </span>
         <span class="axn-form-block-shares-text-min axn-text-center">
-          Rewards Left<br />
+          Your Reward per Block<br />
           <span
             class="axn-form-block-one-value-small p-tb-5"
             matTooltipClass="table__tooltip"
             mat-raised-button
-            matTooltip="${{getDollarValue(selectedMine.rewardBalance) | bigNumberFormat: tokensDecimals:true:false:2 || 0 }}"
+            matTooltip="${{getDollarValue(minerBalance.rewardPerBlock) | bigNumberFormat: tokensDecimals:true:false:2 || 0 }}"
           >
-          <b>{{selectedMine.rewardBalance | bigNumberFormat: tokensDecimals:true:false:2 }} AXN</b>
+          <b>{{minerBalance.rewardPerBlock | bigNumberFormat: tokensDecimals:true:false:2 }} AXN</b>
           </span>
         </span>
         <span class="axn-form-block-shares-text-min axn-text-center">
@@ -231,14 +231,14 @@
           </span>
         </span>
         <span class="axn-form-block-shares-text-min axn-text-center">
-          Your Reward per Block<br />
+          Rewards Left<br />
           <span
             class="axn-form-block-one-value-small p-tb-5"
             matTooltipClass="table__tooltip"
             mat-raised-button
-            matTooltip="${{getDollarValue(minerBalance.rewardPerBlock) | bigNumberFormat: tokensDecimals:true:false:2 || 0 }}"
+            matTooltip="${{getDollarValue(selectedMine.rewardBalance) | bigNumberFormat: tokensDecimals:true:false:2 || 0 }}"
           >
-          <b>{{minerBalance.rewardPerBlock | bigNumberFormat: tokensDecimals:true:false:2 }} AXN</b>
+          <b>{{selectedMine.rewardBalance | bigNumberFormat: tokensDecimals:true:false:2 }} AXN</b>
           </span>
         </span>
       </div>
@@ -268,6 +268,7 @@
     <div class="axn-form-block axn-form-block-one axn-form-base-center axn-mine" *ngFor="let mine of mines">
       <p class="axn-text-subtitle">{{mine.base}}-{{mine.market}}</p>
       <p class="axn-text-body">
+        APY: <b>{{mine.apy}}%</b><br/>
         Mine Start Block: <b>{{mine.startBlock}}</b><br/>
         Available Rewards: <b>{{mine.rewardBalance | bigNumberFormat: tokensDecimals:true:false:2 || 0}} AXN</b><br />
         Block Reward: <b>{{mine.blockReward | bigNumberFormat: tokensDecimals:true:false:4 || 0}} AXN</b>
