@@ -39,6 +39,7 @@ export class MiningPageComponent implements OnDestroy {
   withdrawLPModal: TemplateRef<any>;
 
   private accountSubscribe;
+  private mineNotFoundModal;
   public tokensDecimals = 18;  // Always 18 UNI-V2 pairs
 
   public account;
@@ -142,7 +143,7 @@ export class MiningPageComponent implements OnDestroy {
   }
 
   public openErrorModal(message: string) {
-    this.dialog.open(MetamaskErrorComponent, {
+    return this.dialog.open(MetamaskErrorComponent, {
       width: "400px",
       data: { msg: message },
     });
@@ -239,7 +240,9 @@ export class MiningPageComponent implements OnDestroy {
         const fallbackPool = this.mines[0]
         this.fixURL();
         this.selectMine(fallbackPool)
-        this.openErrorModal(`Mine not found. Falling back to ${fallbackPool.base}-${fallbackPool.market}.`)
+        if(!this.mineNotFoundModal) {
+          this.mineNotFoundModal = this.openErrorModal(`Mine not found. Falling back to ${fallbackPool.base}-${fallbackPool.market}.`)
+        }
       }
     } else {
       this.fixURL();
