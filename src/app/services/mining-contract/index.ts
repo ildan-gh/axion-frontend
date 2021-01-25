@@ -8,7 +8,7 @@ import { MetamaskService } from "../web3";
 import { Contract } from "web3-eth-contract";
 
 export interface Mine {
-  apr: number;
+  apy: number;
   base: string;
   market: string;
   lpToken: string;
@@ -94,7 +94,7 @@ export class MiningContractService {
   }
 
   private async isLPApproved(amount: BigNumber, mineAddress: string, lpTokenAddress: string): Promise<boolean> {
-    const token = this.web3Service.getContract(this.contractData.UniswapERC20Pair.ABI, lpTokenAddress);
+    const token = this.web3Service.getContract(this.contractData.ERC20.ABI, lpTokenAddress);
     const allowance = await token.methods.allowance(this.account.address, mineAddress).call();
 
     const allow = new BigNumber(allowance);
@@ -183,7 +183,7 @@ export class MiningContractService {
 
     // Get market token symbol
     const address = await uniPairContract.methods.token1().call();
-    const contract = this.web3Service.getContract(this.contractData.UniswapERC20Pair.ABI, address)
+    const contract = this.web3Service.getContract(this.contractData.ERC20.ABI, address)
     const market = await contract.methods.symbol().call();
 
     return {
@@ -224,7 +224,7 @@ export class MiningContractService {
   }
 
   public async getTokenBalance(lpTokenAddress: string): Promise<any> {
-    const token = this.web3Service.getContract(this.contractData.UniswapERC20Pair.ABI, lpTokenAddress);
+    const token = this.web3Service.getContract(this.contractData.ERC20.ABI, lpTokenAddress);
     const balance = await token.methods.balanceOf(this.account.address).call();
 
     return {
@@ -246,12 +246,12 @@ export class MiningContractService {
       const poolTokens = await this.getPoolTokens(mineInfo.lpToken);
       const blockReward = new BigNumber(mineInfo.blockReward);
 
-      let apr = 0;
-      try { apr = await this.getMineApr(mineInfo.lpToken, blockReward) }
-      catch (err) { console.log("Not enough liquidity to provide APR.") }
+      let apy = 30;
+      try { apy = await this.getMineApr(mineInfo.lpToken, blockReward) }
+      catch (err) { console.log("Unable to calculate pool APY.") }
 
       const mine: Mine = {
-        apr,
+        apy,
         blockReward,
         mineAddress,
         base: poolTokens.base,
@@ -303,7 +303,7 @@ export class MiningContractService {
     const isApproved = await this.isLPApproved(amount, mineAddress, lpTokenAddress);
 
     if (!isApproved) {
-      const token = this.web3Service.getContract(this.contractData.UniswapERC20Pair.ABI, lpTokenAddress);
+      const token = this.web3Service.getContract(this.contractData.ERC20.ABI, lpTokenAddress);
       const result = await token.methods.approve(mineAddress, amount).send({ from: this.account.address });
       await this.checkTransaction(result);
     }
