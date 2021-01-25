@@ -370,17 +370,25 @@
   }
 
   &-farms {
+    margin-top: 3%;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    justify-content: space-evenly;
   }
 
   &-farm {
-    flex: 1 1 30%; /*grow | shrink | basis */
-    margin: 1%;
+    width: 31%;
+    margin: 1%
   }
 }
 
 .table-container {
   overflow: auto;
+}
+
+@media screen and (max-width: 800px) {
+  .axn-farm {
+    width: 80%;
+  }
 }
