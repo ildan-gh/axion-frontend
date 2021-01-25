@@ -166,7 +166,9 @@ export class MiningPageComponent implements OnDestroy {
   public async openCreateMineModal() {
     this.createMineData.ref = this.dialog.open(this.createMineModal, {});
     try {
-      this.createMineData.startBlock = (await this.contractService.getCurrentBlock()) + 50;
+      const startBlock = await this.contractService.getCurrentBlock();
+      this.createMineData.startBlock = startBlock + 25;
+      this.createMineData.endBlock = startBlock + 3400000;
     } catch (err) { console.log(err) }
   }
 

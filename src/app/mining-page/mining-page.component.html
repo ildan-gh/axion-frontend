@@ -5,7 +5,7 @@
     <div #tooltip2="matTooltip" (click)="tooltip2.toggle()" class="question" mat-raised-button matTooltip="
           Deposit Liquidity Provider (LP) tokens and get rewarded in AXN!
 
-          Rewards will be calculated on block-by-block basis, so you can deposit and withdraw whenever you want.
+          Rewards will be calculated on block-by-block basis - on average, a new block is created every 13 seconds.
 
           To deposit into a mine:
 
@@ -210,15 +210,36 @@
         </span>
         <span class="axn-form-block-shares-text-min axn-text-center">
           Rewards Left<br />
+          <span
+            class="axn-form-block-one-value-small p-tb-5"
+            matTooltipClass="table__tooltip"
+            mat-raised-button
+            matTooltip="${{getDollarValue(selectedMine.rewardBalance) | bigNumberFormat: tokensDecimals:true:false:2 || 0 }}"
+          >
           <b>{{selectedMine.rewardBalance | bigNumberFormat: tokensDecimals:true:false:2 }} AXN</b>
+          </span>
         </span>
         <span class="axn-form-block-shares-text-min axn-text-center">
           Block Reward<br />
+          <span
+            class="axn-form-block-one-value-small p-tb-5"
+            matTooltipClass="table__tooltip"
+            mat-raised-button
+            matTooltip="${{getDollarValue(selectedMine.blockReward) | bigNumberFormat: tokensDecimals:true:false:2 || 0 }}"
+          >
           <b>{{selectedMine.blockReward | bigNumberFormat: tokensDecimals:true:false:2 }} AXN</b>
+          </span>
         </span>
         <span class="axn-form-block-shares-text-min axn-text-center">
           Your Reward per Block<br />
+          <span
+            class="axn-form-block-one-value-small p-tb-5"
+            matTooltipClass="table__tooltip"
+            mat-raised-button
+            matTooltip="${{getDollarValue(minerBalance.rewardPerBlock) | bigNumberFormat: tokensDecimals:true:false:2 || 0 }}"
+          >
           <b>{{minerBalance.rewardPerBlock | bigNumberFormat: tokensDecimals:true:false:2 }} AXN</b>
+          </span>
         </span>
       </div>
 
@@ -305,11 +326,11 @@
         <div class="axn-form axn-form-base-2">
             <div class="axn-form-block-one">
               <span class="axn-form-block-one-title">Start Block</span>
-              <input placeholder="{{createMineData.startBlock || 116797939}}" step="1" type="number" class="axn-input" required="required" [(ngModel)]="createMineData.startBlock" />
+              <input placeholder="{{createMineData.startBlock}}" step="1" type="number" class="axn-input" required="required" [(ngModel)]="createMineData.startBlock" />
             </div>
             <div class="axn-form-block-one">
               <span class="axn-form-block-one-title">End Block</span>
-              <input placeholder="{{createMineData.startBlock + 100000 || 116797939}}" step="1" type="number" class="axn-input" required="required" [(ngModel)]="createMineData.endBlock" />
+              <input placeholder="{{createMineData.endBlock}}" step="1" type="number" class="axn-input" required="required" [(ngModel)]="createMineData.endBlock" />
             </div>
         </div>
 
