@@ -934,11 +934,11 @@
         </p>
 
         <div class="axn-form-block-one">
-          <div class="axn-form axn-form-base-2">
+          <div class="axn-form axn-form-base-3">
             
             <!-- LEFT COL -->
             <div class="axn-form-block-one axn-form-border-dashed-right">
-              <span class="axn-form-block-one-title" style="text-transform: none; font-size: 1rem;">Restake Period</span>
+              <span class="axn-form-block-one-title">Restake Period</span>
               <input 
                 class="axn-input" 
                 type="number" 
@@ -949,7 +949,6 @@
                 autocomplete="off" 
                 onblur="this.placeholder = '0'" 
                 onfocus="this.placeholder = ''" 
-                style="width: auto;font-size: 1.5rem;"
                 (ngModelChange)="onRestakeDaysChanged()"
                 [(ngModel)]="actionsModalData.stakingDays" 
                 [appMinMaxNumber]="{max: stakeMaxDays}" 
@@ -958,6 +957,30 @@
               <div class="axn-form-block-sendmax axn-form-bottom-mid">
                 <span class="axn-btn axn-btn-max" (click)="actionsModalData.stakingDays = stakeMaxDays;">Max Days</span>
               </div>
+            </div>
+
+              <!-- CENTER COL -->
+            <div class="axn-form axn-form-block-one axn-form-border-dashed-right">
+              <span class="axn-form-block-one-title">TopUp (Optional)</span>
+              <input
+                *ngIf="account"
+                class="axn-input"
+                required="required"
+                name="stake-amount"
+                placeholder="0"
+                onfocus="this.placeholder = ''"
+                onblur="this.placeholder = '0'"
+                (ngModelChange)="onRestakeTopUpChanged()"
+                [(ngModel)]="actionsModalData.topUp"
+                [appBigNumber]="{ decimals: tokensDecimals['AXN'], min: 0, max: account.balances.AXN.wei }"
+              />
+              <span class="axn-cheap icon icon_axn cl-blue-bg">AXN</span>
+              <div class="axn-form-block-sendmax axn-form-bottom-mid">
+                <span class="axn-btn axn-btn-max" (click)="actionsModalData.topUp = account.balances.AXN.wei;">Max TopUp</span>
+                <span class="axn-form-block-text">
+                  Balance: <b>{{ account?.balances?.AXN.display }}</b>
+                </span>
+              </div>  
             </div>
 
             <!-- RIGHT COL -->
@@ -977,7 +1000,7 @@
       <button class="axn-btn axn-btn-cancel" type="button" mat-dialog-close>
         <span>Cancel</span>
       </button>
-      <button class="axn-btn axn-btn-gray" [disabled]="!actionsModalData.stakingDays" type="button" (click)="restake(actionsModalData.stake, actionsModalData.stakingDays)">
+      <button class="axn-btn axn-btn-gray" [disabled]="!actionsModalData.stakingDays" type="button" (click)="restake(actionsModalData.stake)">
         <span>Restake</span>
       </button>
       <button class="axn-btn axn-btn-gray" type="button" (click)="successWithPenaltyActions(actionsModalData.stake)">

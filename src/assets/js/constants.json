@@ -4134,6 +4134,11 @@
               "internalType": "uint256",
               "name": "stakingDays",
               "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "topup",
+              "type": "uint256"
             }
           ],
           "name": "restake",
@@ -4151,6 +4156,11 @@
             {
               "internalType": "uint256",
               "name": "stakingDays",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "topup",
               "type": "uint256"
             }
           ],

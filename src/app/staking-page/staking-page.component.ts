@@ -286,6 +286,12 @@ export class StakingPageComponent implements OnDestroy {
     this.actionsModalData.totalShares = shares.plus(LPB)
   }
 
+  public onRestakeTopUpChanged() {
+    this.actionsModalData.topUp = new BigNumber(this.actionsModalData.topUp);
+    this.actionsModalData.amount = new BigNumber(this.actionsModalData.amount).plus(this.actionsModalData.topUp);
+    this.onRestakeDaysChanged();
+  }
+
   public onChangeAmount() {
     const divDecimals = Math.pow(10, this.tokensDecimals.AXN);
 
@@ -375,11 +381,12 @@ export class StakingPageComponent implements OnDestroy {
   public actionsModalData;
 
   public async openStakeActions(stake: Stake) {
-
+    console.log(this.account.balances)
     // Check if this is a late unstake
     const endMS = +stake.endSeconds * 1000;
     const penaltyWindow = endMS + (AVAILABLE_DAYS_AFTER_END * 86400 * 1000)
     const isLate = Date.now() > penaltyWindow
+    const topUp = new BigNumber(0);
 
     if (isLate) {
       const result = await this.contractService.getStakePayoutAndPenalty(stake, stake.interest);
@@ -392,7 +399,8 @@ export class StakingPageComponent implements OnDestroy {
         stakeDays: 0,
         amount: payout,
         penalty,
-        isLate
+        isLate,
+        topUp
       }
     } else {
       this.actionsModalData = {
@@ -400,7 +408,8 @@ export class StakingPageComponent implements OnDestroy {
         stake,
         stakeDays: 0,
         amount: stake.principal.plus(stake.interest),
-        isLate
+        isLate,
+        topUp
       }
     }
   }
@@ -414,10 +423,10 @@ export class StakingPageComponent implements OnDestroy {
     this.stakeWithdraw(stake, Date.now() < penaltyWindow);
   }
 
-  public restake(stake: Stake, stakingDays: number) {    
+  public restake(stake: Stake) {    
     this.actionsModalData.opened.close();
     stake.withdrawProgress = true;
-    this.contractService.restake(stake, stakingDays).then(() => {
+    this.contractService.restake(stake, this.actionsModalData.stakingDays, this.actionsModalData.topUp).then(() => {
       this.stakeList();
       this.contractService.updateAXNBalance(true);
     }).finally(() => {

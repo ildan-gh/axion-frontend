@@ -1328,10 +1328,10 @@ export class ContractService {
       });
   }
 
-  public restake(stake: Stake, stakeDays) {
+  public restake(stake: Stake, stakeDays, topUp: BigNumber) {
     const restakeMethod = stake.isV1 ? 'restakeV1' : 'restake';
 
-    return this.StakingContract.methods[restakeMethod](stake.sessionId, stakeDays).send({
+    return this.StakingContract.methods[restakeMethod](stake.sessionId, stakeDays, topUp).send({
       from: this.account.address,
     })
       .then((res) => {
