@@ -35,8 +35,9 @@ export interface MineInfo {
   providedIn: "root",
 })
 export class MiningContractService {
-  private account;
+  private readonly zeroAddress = "0x0000000000000000000000000000000000000000";
 
+  private account;
   private isActive: boolean;
   private allAccountSubscribers = [];
   private web3Service: MetamaskService;
@@ -133,7 +134,8 @@ export class MiningContractService {
   }
 
   private async getMineAddresses() {
-    this.mineAddresses = await this.mineManagerContract.methods.getMineAddresses().call();
+    const mineAddresses = await this.mineManagerContract.methods.getMineAddresses().call();
+    this.mineAddresses = mineAddresses.filter(address => address !== this.zeroAddress)
   }
 
   private getMineData() {
