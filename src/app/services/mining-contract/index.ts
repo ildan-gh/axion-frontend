@@ -47,6 +47,7 @@ export class MiningContractService {
   private mineData: { [id: string]: { contract: Contract, info: MineInfo } } = {};
 
   public mineAddresses: string[];
+  public nftAddresses: { liqRepNFTAddress: string, OG5555_25NFTAddress: string, OG5555_100NFTAddress: string };
 
   constructor(config: AppConfig, private contractService: ContractService) {
     this.web3Service = new MetamaskService(config);
@@ -92,7 +93,7 @@ export class MiningContractService {
     return !allowed.isNegative();
   }
 
-  private async isLPApproved(amount, mineAddress, lpTokenAddress): Promise<boolean> {
+  private async isLPApproved(amount: BigNumber, mineAddress: string, lpTokenAddress: string): Promise<boolean> {
     const token = this.web3Service.getContract(this.contractData.UniswapERC20Pair.ABI, lpTokenAddress);
     const allowance = await token.methods.allowance(this.account.address, mineAddress).call();
 
@@ -109,8 +110,22 @@ export class MiningContractService {
 
   private async initializeContracts() {
     this.mineManagerContract = this.web3Service.getContract(this.contractData.MineManager.ABI, this.contractData.MineManager.ADDRESS);
-    await this.getMineAddresses();
+    await Promise.all([this.getMineAddresses(), this.getNftAddresses()]);
     await this.getMineData();
+  }
+
+  private async getNftAddresses() {
+    const result = await Promise.all([
+      this.mineManagerContract.methods.liqRepNFTAddress().call(),
+      this.mineManagerContract.methods.OG5555_25NFTAddress().call(),
+      this.mineManagerContract.methods.OG5555_100NFTAddress().call()]
+    );
+
+    this.nftAddresses = {
+      liqRepNFTAddress: result[0],
+      OG5555_25NFTAddress: result[1],
+      OG5555_100NFTAddress: result[2]
+    };
   }
 
   private async getMineAddresses() {
@@ -178,9 +193,6 @@ export class MiningContractService {
   }
 
   public async getNFTBalances(): Promise<any> {
-    const og25NFT = this.contractData.OG5555_25NFT.ADDRESS;
-    const og100NFT = this.contractData.OG5555_100NFT.ADDRESS;
-    const liqNFT = this.contractData.liqRepNFT.ADDRESS;
     const result = {
       og25NFT: 0,
       og100NFT: 0,
@@ -190,11 +202,11 @@ export class MiningContractService {
 
     try {
       const balances = await Promise.all([
-        this.getNftTokenBalance(og25NFT),
-        this.getNftTokenBalance(og100NFT),
-        this.getNftTokenBalance(liqNFT)
+        this.getNftTokenBalance(this.nftAddresses.OG5555_25NFTAddress),
+        this.getNftTokenBalance(this.nftAddresses.OG5555_100NFTAddress),
+        this.getNftTokenBalance(this.nftAddresses.liqRepNFTAddress)
       ])
-     
+
       result.og25NFT = +balances[0];
       result.og100NFT = +balances[1];
       result.liqNFT = +balances[2];
@@ -205,8 +217,10 @@ export class MiningContractService {
         result.reward += 10;
       if (result.liqNFT > 0)
         result.reward += 10;
-    } 
-    catch (err) { return result; }
+
+      return result;
+    }
+    catch (err) { }
   }
 
   public async getTokenBalance(lpTokenAddress: string): Promise<any> {
@@ -220,7 +234,7 @@ export class MiningContractService {
   }
 
   public async getNftTokenBalance(address: string): Promise<string> {
-    const token = this.web3Service.getContract(this.contractData.ERC20.ABI, address);
+    const token = this.web3Service.getContract(this.contractData.ERC721.ABI, address);
     return await token.methods.balanceOf(this.account.address).call();
   }
 
@@ -233,7 +247,7 @@ export class MiningContractService {
       const blockReward = new BigNumber(mineInfo.blockReward);
 
       let apr = 0;
-      try { apr = await this.getMineApr(mineInfo.lpToken, blockReward) } 
+      try { apr = await this.getMineApr(mineInfo.lpToken, blockReward) }
       catch (err) { console.log("Not enough liquidity to provide APR.") }
 
       const mine: Mine = {
