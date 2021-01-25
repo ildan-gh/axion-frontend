@@ -187,10 +187,8 @@ export class MiningContractService {
     };
   }
 
-  public async getMines(): Promise<any[]> {
-    const mines: Mine[] = [];
-
-    for (const mineAddress of this.mineAddresses) {
+  public getMines(): Promise<Mine[]> {
+    return Promise.all(this.mineAddresses.map(async mineAddress => {
       const balance = await this.axionContract.methods.balanceOf(mineAddress).call();
 
       const mineInfo = this.mineData[mineAddress].info;
@@ -207,10 +205,8 @@ export class MiningContractService {
         apr: 0
       };
 
-      mines.push(mine);
-    }
-
-    return mines;
+      return mine;
+    }));
   }
 
   private async getMineApr(lpTokenAddress: string, blockReward: BigNumber) {
