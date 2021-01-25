@@ -81,7 +81,7 @@ export class MiningPageComponent implements OnDestroy {
     }
   };
 
-  private  usdcPerAxnPrice: BigNumber;
+  private usdcPerAxnPrice: BigNumber;
 
   constructor(
     public contractService: MiningContractService,
@@ -107,7 +107,7 @@ export class MiningPageComponent implements OnDestroy {
                 else if (mines.length > 0)
                   this.setCurrentMine(mines[0])
               });
-            }); 
+            });
 
             this.usdcPerAxnPrice = await this.contractService.getUsdcPerAxnPrice();
           }
@@ -122,7 +122,7 @@ export class MiningPageComponent implements OnDestroy {
 
   /** Cosmetic: Used when mine doesn't exist. Takes mine param out of the url.
       Doing it this way does not refresh the current page.*/
-  private fixURL(){
+  private fixURL() {
     window.history.replaceState({}, document.title, "/mining");
   }
 
@@ -170,11 +170,18 @@ export class MiningPageComponent implements OnDestroy {
   }
 
   public async updateMinerBalance() {
-    this.minerBalance.lpDeposit = await this.contractService.getMinerPoolBalance(this.currentMine.mineAddress);
-    this.minerBalance.pendingReward = await this.contractService.getPendingReward(this.currentMine.mineAddress);
-    this.minerBalance.lpAvailable = await this.contractService.getTokenBalance(this.currentMine.lpToken);
-    this.minerBalance.nft = await this.contractService.getNFTBalances();
-}
+    const result = await Promise.all([this.contractService.getMinerPoolBalance(
+      this.currentMine.mineAddress),
+    this.contractService.getPendingReward(this.currentMine.mineAddress),
+    this.contractService.getTokenBalance(this.currentMine.lpToken),
+    this.contractService.getNFTBalances()
+    ]);
+
+    this.minerBalance.lpDeposit = result[0];
+    this.minerBalance.pendingReward = result[1];
+    this.minerBalance.lpAvailable = result[2];
+    this.minerBalance.nft = result[3];
+  }
 
   public async onCreateMineAddressChanged() {
     const address = this.createMineData.tokenAddress;
@@ -254,27 +261,27 @@ export class MiningPageComponent implements OnDestroy {
     }
   }
 
-  public async withdrawRewards(){
-    if(!this.minerBalance.pendingReward.isZero()) {
+  public async withdrawRewards() {
+    if (!this.minerBalance.pendingReward.isZero()) {
       this.currentMine.withdrawRewardsLoading = true;
-      
+
       try {
         const tx = await this.contractService.withdrawReward(this.currentMine.mineAddress);
         this.updateMines();
         this.updateMinerBalance();
         this.openSuccessModal(tx.transactionHash);
-      } 
+      }
       catch (err) {
         if (err.message)
           this.openErrorModal(err.message)
       }
-      finally { 
-        this.currentMine.withdrawRewardsLoading = false 
+      finally {
+        this.currentMine.withdrawRewardsLoading = false
       }
     }
   }
 
-  public async withdrawAll() { 
+  public async withdrawAll() {
     if (!this.minerBalance.pendingReward.isZero() && !this.minerBalance.lpDeposit.isZero()) {
       this.currentMine.withdrawAllLoading = true;
 
@@ -294,7 +301,7 @@ export class MiningPageComponent implements OnDestroy {
     }
   }
 
-  public async withdrawLPTokens() { 
+  public async withdrawLPTokens() {
     if (!this.minerBalance.lpDeposit.isZero()) {
       this.currentMine.withdrawLPLoading = true;
 
@@ -324,16 +331,16 @@ export class MiningPageComponent implements OnDestroy {
     }
 
     this.createMineData.progressIndicator = true;
-    
+
     const rewards = this.createMineData.rewardAmount;
     const startBlock = this.createMineData.startBlock;
     const blockReward = this.contractService.calculateBlockReward(rewards, startBlock, this.createMineData.endBlock);
-    
+
     try {
       const tx = await this.contractService.createMine(
-        this.createMineData.tokenAddress, 
-        new BigNumber(rewards), 
-        blockReward, 
+        this.createMineData.tokenAddress,
+        new BigNumber(rewards),
+        blockReward,
         startBlock
       )
       this.createMineData.ref.close();
