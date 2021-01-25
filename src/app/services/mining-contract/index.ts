@@ -248,7 +248,7 @@ export class MiningContractService {
 
       let apy = 30;
       try { apy = await this.getMineApr(mineInfo.lpToken, blockReward) }
-      catch (err) { console.log("Unable to calculate pool APY.") }
+      catch (err) { console.log("Unable to calculate APY.") }
 
       const mine: Mine = {
         apy,
@@ -267,27 +267,39 @@ export class MiningContractService {
 
   private async getMineApr(lpTokenAddress: string, blockReward: BigNumber) {
     const pairContract = this.web3Service.getContract(this.contractData.UniswapPair.ABI, lpTokenAddress);
+    const pairERC20Contract = this.web3Service.getContract(this.contractData.ERC20.ABI, lpTokenAddress);
 
     const totalSupply = await pairContract.methods.totalSupply().call();
     const reserves = await pairContract.methods.getReserves().call();
 
     const token0Address = await pairContract.methods.token0().call();
-    const token0Contract = this.web3Service.getContract(this.contractData.ERC20.ABI, token0Address);
-    const token0Decimals = await token0Contract.methods.decimals().call();
-    const token0_1eDecimals = Math.pow(10, token0Decimals).toString();
-    const token0Price = await this.contractService.getTokenToUsdcAmountsOutAsync(token0Address, token0_1eDecimals);
-    const token0ReserveValue = new BigNumber(reserves.reserve0).div(token0_1eDecimals).times(token0Price);
-
     const token1Address = await pairContract.methods.token1().call();
-    const token1Contract = this.web3Service.getContract(this.contractData.ERC20.ABI, token1Address);
-    const token1Decimals = await token1Contract.methods.decimals().call();
-    const token1_1eDecimals = Math.pow(10, token1Decimals).toString();
-    const token1Price = await this.contractService.getTokenToUsdcAmountsOutAsync(token0Address, token1_1eDecimals);
-    const token1ReserveValue = new BigNumber(reserves.reserve0).div(token1_1eDecimals).times(token1Price);
 
-    const lpTokenPrice = token0ReserveValue.plus(token1ReserveValue).div(totalSupply);
+    const reserveValues = await Promise.all([
+      this.getReserveValueinAxn(token0Address, reserves.reserve0),
+      this.getReserveValueinAxn(token1Address, reserves.reserve1)
+    ]);
 
-    return blockReward.times(6500).times(365).times(100).div(lpTokenPrice).toNumber();
+    const lpTokenPrice = reserveValues[0].plus(reserveValues[1]).div(totalSupply);
+    const balance = await pairERC20Contract.balanceOf(this.mineManagerContract.options.address).call();
+    const decimals = await pairERC20Contract.decimals().call();
+    const _1eDecimals = Math.pow(10, decimals).toString();
+
+    const totalValueLocked = new BigNumber(balance).div(_1eDecimals).times(lpTokenPrice);
+
+    return blockReward.times(6500).times(365).times(100).div(totalValueLocked).toNumber();
+  }
+
+  private async getReserveValueinAxn(address: string, reserve: string) {
+    if (address === this.axionContract.options.address) {
+      //return new BigNumber(reserve).div(token_1eDecimals); 
+    }
+
+    const tokenContract = this.web3Service.getContract(this.contractData.ERC20.ABI, address);
+    const tokenDecimals = await tokenContract.methods.decimals().call();
+    const token_1eDecimals = Math.pow(10, tokenDecimals).toString();
+    const tokenPrice = await this.contractService.getTokenToUsdcAmountsOutAsync(address, token_1eDecimals);
+    return new BigNumber(reserve).div(token_1eDecimals).times(tokenPrice);
   }
 
   public getCurrentBlock(): Promise<number> {
