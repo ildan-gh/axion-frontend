@@ -16,6 +16,7 @@ export interface Mine {
   mineAddress: string;
   blockReward: BigNumber;
   rewardBalance: BigNumber;
+  lpTokenBalance: BigNumber;
 }
 
 export interface MineInfo {
@@ -34,6 +35,8 @@ export interface MineInfo {
   providedIn: "root",
 })
 export class MiningContractService {
+  private readonly _1e18 = Math.pow(10, 18).toString();
+
   private account;
 
   private isActive: boolean;
@@ -246,8 +249,14 @@ export class MiningContractService {
       const poolTokens = await this.getPoolTokens(mineInfo.lpToken);
       const blockReward = new BigNumber(mineInfo.blockReward);
 
+      const pairERC20Contract = this.web3Service.getContract(this.contractData.ERC20.ABI, mineInfo.lpToken);
+
+      const lpTokenBalance = new BigNumber(
+        await pairERC20Contract.methods.balanceOf(mineAddress).call())
+        .div(this._1e18);
+
       let apy = 30;
-      try { apy = await this.getMineApr(mineInfo.lpToken, blockReward) }
+      try { apy = await this.getMineApr(mineInfo.lpToken, blockReward, lpTokenBalance) }
       catch (err) { console.log("Unable to calculate APY.") }
 
       const mine: Mine = {
@@ -259,15 +268,15 @@ export class MiningContractService {
         lpToken: mineInfo.lpToken,
         startBlock: +mineInfo.startBlock,
         rewardBalance: new BigNumber(balance),
+        lpTokenBalance: lpTokenBalance
       };
 
       return mine;
     }));
   }
 
-  private async getMineApr(lpTokenAddress: string, blockReward: BigNumber) {
+  private async getMineApr(lpTokenAddress: string, blockReward: BigNumber, mineLpTokenBalance: BigNumber) {
     const pairContract = this.web3Service.getContract(this.contractData.UniswapPair.ABI, lpTokenAddress);
-    const pairERC20Contract = this.web3Service.getContract(this.contractData.ERC20.ABI, lpTokenAddress);
 
     const tokenData = await Promise.all([
       pairContract.methods.getReserves().call(),
@@ -285,11 +294,7 @@ export class MiningContractService {
     const axnTokenPrice = tokenValues.find(x => x.isAxn).tokenPrice;
     const lpTokenPriceInAxn = lpTokenPrice.div(axnTokenPrice);
 
-    const mineLPBalance = await pairERC20Contract.balanceOf(this.mineManagerContract.options.address).call();
-    const decimals = await pairERC20Contract.decimals().call();
-    const _1eDecimals = Math.pow(10, decimals).toString();
-
-    const lpSupplyValueInAxn = lpTokenPriceInAxn.times(mineLPBalance.div(_1eDecimals));
+    const lpSupplyValueInAxn = lpTokenPriceInAxn.times(mineLpTokenBalance);
 
     return blockReward.times(6500).times(365).times(100).div(lpSupplyValueInAxn).toNumber();
   }

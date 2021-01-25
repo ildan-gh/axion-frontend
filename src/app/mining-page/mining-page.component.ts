@@ -69,6 +69,7 @@ export class MiningPageComponent implements OnDestroy {
   public minerBalance = {
     lpDeposit: new BigNumber(0),
     pendingReward: new BigNumber(0),
+    rewardPerBlock: new BigNumber(0),
     lpAvailable: {
       wei: "0",
       bn: new BigNumber(0)
@@ -170,17 +171,18 @@ export class MiningPageComponent implements OnDestroy {
   }
 
   public async updateMinerBalance() {
-    const result = await Promise.all([this.contractService.getMinerPoolBalance(
-      this.selectedMine.mineAddress),
-    this.contractService.getPendingReward(this.selectedMine.mineAddress),
-    this.contractService.getTokenBalance(this.selectedMine.lpToken),
-    this.contractService.getNFTBalances()
+    const result = await Promise.all([
+      this.contractService.getMinerPoolBalance(this.selectedMine.mineAddress),
+      this.contractService.getPendingReward(this.selectedMine.mineAddress),
+      this.contractService.getTokenBalance(this.selectedMine.lpToken),
+      this.contractService.getNFTBalances()
     ]);
 
     this.minerBalance.lpDeposit = result[0];
     this.minerBalance.pendingReward = result[1];
     this.minerBalance.lpAvailable = result[2];
     this.minerBalance.nft = result[3];
+    this.minerBalance.rewardPerBlock = result[0].times(this.selectedMine.blockReward).div(this.selectedMine.lpTokenBalance).div("1000000000000000000");
   }
 
   public async onCreateMineAddressChanged() {

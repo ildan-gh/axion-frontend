@@ -194,7 +194,7 @@
 
          <div class="axn-form-block-one">
            <span class="axn-form-block-shares-text-min">
-            Total Bonus<br />
+            Bonus<br />
             <b>{{minerBalance.nft.reward}}%</b>
            </span>
         </div>
@@ -203,7 +203,7 @@
   
     <!-- CURRENT MINE INFO -->
     <div class="axn-form-block">
-      <div class="axn-form-base-3 axn-form-base-center p-b-25">
+      <div class="axn-form-base-4 axn-form-base-center p-b-25">
         <span class="axn-form-block-shares-text-min axn-text-center">
           APY<br/>
           <b>{{selectedMine.apy}}%</b>
@@ -215,6 +215,10 @@
         <span class="axn-form-block-shares-text-min axn-text-center">
           Block Reward<br />
           <b>{{selectedMine.blockReward | bigNumberFormat: tokensDecimals:true:false:2 }}</b>
+        </span>
+        <span class="axn-form-block-shares-text-min axn-text-center">
+          Your Reward per Block<br />
+          <b>{{minerBalance.rewardPerBlock | bigNumberFormat: tokensDecimals:true:false:2 }}</b>
         </span>
       </div>
 

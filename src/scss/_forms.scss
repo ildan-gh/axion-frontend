@@ -105,6 +105,15 @@
 
       &-4 {
         display: grid;
+        grid-template-columns: repeat(4, minmax(180px, 340px));
+
+        @include b(900) {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      &-5 {
+        display: grid;
         grid-template-columns: 1fr;
         grid-gap: 10px;
         float: right;
