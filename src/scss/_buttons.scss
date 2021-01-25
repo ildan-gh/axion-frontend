@@ -253,3 +253,12 @@ input:-internal-autofill-selected {
     bottom: 0;
   }
 }
+
+@media screen and (max-width: 580px) {
+  .axn {
+    &-btn {
+      text-transform: none !important;
+      font-size: 0.8rem !important;
+    }
+  }
+}

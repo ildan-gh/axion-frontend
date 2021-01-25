@@ -190,4 +190,8 @@
   .dialog-block {
     height: 100%;
   }
+
+  .cdk-overlay-pane {
+    max-width: 95% !important;
+  }
 }
