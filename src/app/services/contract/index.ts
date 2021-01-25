@@ -1505,9 +1505,13 @@ export class ContractService {
   }
 
   private async getWethToUsdcAmountsOutAsync(amount: string): Promise<BigNumber> {
+    return this.getTokenToUsdcAmountsOutAsync(this.CONTRACTS_PARAMS.WETH.ADDRESS, amount);
+  }
+
+  public async getTokenToUsdcAmountsOutAsync(tokenAddress: string, amount: string): Promise<BigNumber> {
     return new BigNumber((await this.UniswapV2Router02.methods
       .getAmountsOut(amount, [
-        this.CONTRACTS_PARAMS.WETH.ADDRESS,
+        tokenAddress,
         this.CONTRACTS_PARAMS.USDC.ADDRESS,
       ])
       .call())[1]).div("1000000");

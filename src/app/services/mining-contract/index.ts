@@ -44,7 +44,7 @@ export class MiningContractService {
   private contractData: any;
   private axionContract: Contract;
   private mineManagerContract: Contract;
-  private mineData: { [id: string]: {contract: Contract, info: MineInfo} } = {};
+  private mineData: { [id: string]: { contract: Contract, info: MineInfo } } = {};
 
   public mineAddresses: string[];
 
@@ -92,7 +92,7 @@ export class MiningContractService {
     return !allowed.isNegative();
   }
 
-  private async isLPApproved(amount, mineAddress, lpTokenAddress): Promise<boolean> {    
+  private async isLPApproved(amount, mineAddress, lpTokenAddress): Promise<boolean> {
     const token = this.web3Service.getContract(this.contractData.UniswapERC20Pair.ABI, lpTokenAddress);
     const allowance = await token.methods.allowance(this.account.address, mineAddress).call();
 
@@ -122,7 +122,7 @@ export class MiningContractService {
       const contract = this.web3Service.getContract(this.contractData.Mine.ABI, mineAddress);
       const info: MineInfo = await contract.methods.mineInfo().call();
 
-      this.mineData[mineAddress] = {contract, info};
+      this.mineData[mineAddress] = { contract, info };
     }
   }
 
@@ -213,6 +213,31 @@ export class MiningContractService {
     return mines;
   }
 
+  private async getMineApr(lpTokenAddress: string, blockReward: BigNumber) {
+    const pairContract = this.web3Service.getContract(this.contractData.UniswapPair.ABI, lpTokenAddress);
+
+    const totalSupply = await pairContract.methods.totalSupply().call();
+    const reserves = await pairContract.methods.getReserves().call();
+
+    const token0Address = await pairContract.methods.token0().call();
+    const token0Contract = this.web3Service.getContract(this.contractData.ERC20.ABI, token0Address);
+    const token0Decimals = await token0Contract.methods.decimals().call();
+    const token0_1eDecimals = Math.pow(10, token0Decimals).toString();
+    const token0Price = await this.contractService.getTokenToUsdcAmountsOutAsync(token0Address, token0_1eDecimals);
+    const token0ReserveValue = new BigNumber(reserves.reserve0).div(token0_1eDecimals).times(token0Price);
+
+    const token1Address = await pairContract.methods.token1().call();
+    const token1Contract = this.web3Service.getContract(this.contractData.ERC20.ABI, token1Address);
+    const token1Decimals = await token1Contract.methods.decimals().call();
+    const token1_1eDecimals = Math.pow(10, token1Decimals).toString();
+    const token1Price = await this.contractService.getTokenToUsdcAmountsOutAsync(token0Address, token1_1eDecimals);
+    const token1ReserveValue = new BigNumber(reserves.reserve0).div(token1_1eDecimals).times(token1Price);
+
+    const lpTokenPrice = token0ReserveValue.plus(token1ReserveValue).div(totalSupply);
+
+    return blockReward.times(6500).times(365).times(100).div(lpTokenPrice);
+  }
+
   public getCurrentBlock(): Promise<number> {
     return new Promise(async (resolve, reject) => {
       try {
@@ -273,7 +298,7 @@ export class MiningContractService {
       const res = await this.axionContract.methods.approve(this.mineManagerContract.options.address, rewardAmount).send({ from: this.account.address });
       await this.checkTransaction(res);
     }
-    
+
     const res = await this.mineManagerContract.methods.createMine(lpTokenAddress, rewardAmount, blockReward, startBlock).send({ from: this.account.address });
     await this.checkTransaction(res);
 
