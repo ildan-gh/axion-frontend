@@ -8,6 +8,7 @@ import { MetamaskService } from "../web3";
 import { Contract } from "web3-eth-contract";
 
 export interface Mine {
+  apr: number;
   base: string;
   market: string;
   lpToken: string;
@@ -15,7 +16,6 @@ export interface Mine {
   mineAddress: string;
   blockReward: BigNumber;
   rewardBalance: BigNumber;
-  apr: number;
 }
 
 export interface MineInfo {
@@ -177,6 +177,30 @@ export class MiningContractService {
     };
   }
 
+  public async getNFTBalances(): Promise<any> {
+    const og25NFT = this.contractData.OG5555_25NFT.ADDRESS;
+    const og100NFT = this.contractData.OG5555_100NFT.ADDRESS;
+    const liqNFT = this.contractData.liqRepNFT.ADDRESS;
+    const result = {
+      og25NFT: 0,
+      og100NFT: 0,
+      liqNFT: 0,
+    }
+
+    try {
+      const balances = await Promise.all([
+        this.getTokenBalance(og25NFT),
+        this.getTokenBalance(og100NFT),
+        this.getTokenBalance(liqNFT)
+      ])
+     
+      result.og25NFT = +balances[0];
+      result.og100NFT = +balances[1];
+      result.liqNFT = +balances[2];
+    } 
+    catch (err) { return result; }
+  }
+
   public async getTokenBalance(lpTokenAddress: string): Promise<any> {
     const token = this.web3Service.getContract(this.contractData.UniswapERC20Pair.ABI, lpTokenAddress);
     const balance = await token.methods.balanceOf(this.account.address).call();
@@ -193,16 +217,21 @@ export class MiningContractService {
 
       const mineInfo = this.mineData[mineAddress].info;
       const poolTokens = await this.getPoolTokens(mineInfo.lpToken);
+      const blockReward = new BigNumber(mineInfo.blockReward);
+
+      let apr = 0;
+      try { apr = await this.getMineApr(mineInfo.lpToken, blockReward) } 
+      catch (err) { console.log("Not enough liquidity to provide APR.") }
 
       const mine: Mine = {
+        apr,
+        blockReward,
         mineAddress,
         base: poolTokens.base,
         market: poolTokens.market,
         lpToken: mineInfo.lpToken,
         startBlock: +mineInfo.startBlock,
-        blockReward: new BigNumber(mineInfo.blockReward),
         rewardBalance: new BigNumber(balance),
-        apr: 0
       };
 
       return mine;
@@ -231,7 +260,7 @@ export class MiningContractService {
 
     const lpTokenPrice = token0ReserveValue.plus(token1ReserveValue).div(totalSupply);
 
-    return blockReward.times(6500).times(365).times(100).div(lpTokenPrice);
+    return blockReward.times(6500).times(365).times(100).div(lpTokenPrice).toNumber();
   }
 
   public getCurrentBlock(): Promise<number> {

@@ -11556,6 +11556,15 @@
           "type": "event"
         }
       ]
+    },
+    "liqRepNFT": {
+      "ADDRESS": "0xBd050D8555EE7c8c0cCc343b541E9Ed02EeeEE05"
+    },
+    "OG5555_25NFT": {
+      "ADDRESS": "0x3F4a14b2A23BD40944d9D316CDda2c74944C2646"
+    },
+    "OG5555_100NFT": {
+      "ADDRESS": "0x6d49c44F1bf0Bbe926b1dFe3e20109D1e4BdC626"
     }
   },
   "ropsten": {
@@ -23557,6 +23566,15 @@
           "type": "event"
         }
       ]
+    },
+    "liqRepNFT": {
+      "ADDRESS": "0xBd050D8555EE7c8c0cCc343b541E9Ed02EeeEE05"
+    },
+    "OG5555_25NFT": {
+      "ADDRESS": "0x3F4a14b2A23BD40944d9D316CDda2c74944C2646"
+    },
+    "OG5555_100NFT": {
+      "ADDRESS": "0x6d49c44F1bf0Bbe926b1dFe3e20109D1e4BdC626"
     }
   }
 }

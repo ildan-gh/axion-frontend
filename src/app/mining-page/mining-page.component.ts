@@ -72,6 +72,11 @@ export class MiningPageComponent implements OnDestroy {
     lpAvailable: {
       wei: "0",
       bn: new BigNumber(0)
+    },
+    nft: {
+      og25NFT: 0,
+      og100NFT: 0,
+      liqNFT: 0,
     }
   };
 
@@ -167,7 +172,8 @@ export class MiningPageComponent implements OnDestroy {
     this.minerBalance.lpDeposit = await this.contractService.getMinerPoolBalance(this.currentMine.mineAddress);
     this.minerBalance.pendingReward = await this.contractService.getPendingReward(this.currentMine.mineAddress);
     this.minerBalance.lpAvailable = await this.contractService.getTokenBalance(this.currentMine.lpToken);
-  }
+    this.minerBalance.nft = await this.contractService.getNFTBalances();
+}
 
   public async onCreateMineAddressChanged() {
     const address = this.createMineData.tokenAddress;
