@@ -103,10 +103,9 @@ export class MiningPageComponent implements OnDestroy {
             this.updateMines().then(mines => {
               // Determine which pool to load
               this.activatedRoute.params.subscribe(params => {
-                if (params['mine'])
-                  this.processParams(params['mine'])
-                else if (mines.length > 0)
-                  this.selectMine(mines[0])
+                if (params['mine']) {
+                  this.processParams(params['mine']);
+                }
               });
             });
 
@@ -128,9 +127,7 @@ export class MiningPageComponent implements OnDestroy {
   }
 
   public async updateMines() {
-    const mines = await this.contractService.getMines();
-    this.mines = mines;
-    return mines;
+    this.mines = await this.contractService.getMines();;
   }
 
   public getDollarValue(amount: BigNumber) {
@@ -231,9 +228,9 @@ export class MiningPageComponent implements OnDestroy {
   }
 
   // Process mine pair address found in URL parameter
-  public processParams(lpToken: string) {
+  public processParams(mineAddress: string) {
     if (this.mines.length > 0) {
-      const mineFound = this.mines.find(p => p.lpToken === lpToken)
+      const mineFound = this.mines.find(p => p.mineAddress === mineAddress)
 
       if (mineFound) {
         this.selectMine(mineFound)

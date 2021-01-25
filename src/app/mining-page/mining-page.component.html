@@ -11,7 +11,7 @@
 
           1) You first need to own/buy AXN.
 
-          2) You then fund a Uniswap liquidity pool with AXN and {{selectedMine ? selectedMine?.market : ''}}.
+          2) You then fund a Uniswap liquidity pool with AXN and {{selectedMine ? selectedMine?.market : 'another token'}}.
 
           3) Once you add the liquidity, Uniswap automatically generates and sends you a LP token as a proof of deposit.
 
@@ -259,11 +259,7 @@
 </section>
 
 <!-- AVAILABLE MINES -->
-<section class="axn-section" *ngIf="account && selectedMine && mines.length > 1">
-  <div class="axn-title-block">
-    <span class="axn-title">Mines</span>
-  </div>
-
+<section class="axn-section" *ngIf="account && !selectedMine">
   <div class="axn-mines">
     <div class="axn-form-block axn-form-block-one axn-form-base-center axn-mine" *ngFor="let mine of mines">
       <p class="axn-text-subtitle">{{mine.base}}-{{mine.market}}</p>
@@ -275,10 +271,10 @@
       </p>
 
       <button 
-        (click)="selectMine(mine)" 
+        routerLink="/mining/{{mine.mineAddress}}"
         class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-big" 
         [ngClass]="{ progress: switchingLoading === mine.mineAddress }"
-        [disabled]="switchingLoading === mine.mineAddress || selectedMine.mineAddress === mine.mineAddress" 
+        [disabled]="switchingLoading === mine.mineAddress || selectedMine?.mineAddress === mine.mineAddress" 
       >
         <!-- Ellipsis Loading Indicator -->
         <span class="lds-ellipsis" *ngIf="switchingLoading === mine.mineAddress">
@@ -288,7 +284,7 @@
         </span>
       
         <!-- Button Text -->
-        <span class="axn-btn-text">{{selectedMine.mineAddress === mine.mineAddress ? "Selected" : "View"}} Mine</span>
+        <span class="axn-btn-text">{{selectedMine?.mineAddress === mine.mineAddress ? "Selected" : "View"}} Mine</span>
       </button>
 
     </div>
@@ -297,7 +293,7 @@
 </section>
 
 <!-- MANAGERS ONLY: CREATE A POOL -->
-<section class="axn-section" *ngIf="account && account.isManager">
+<section class="axn-section" *ngIf="account && account.isManager && !selectedMine">
   <div class="axn-form-block-one axn-form-base-center">
     <button (click)="openCreateMineModal()" class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-big">
       <span class="axn-btn-text">
