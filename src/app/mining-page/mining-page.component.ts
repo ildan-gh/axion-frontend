@@ -168,7 +168,7 @@ export class MiningPageComponent implements OnDestroy {
     try {
       const startBlock = await this.contractService.getCurrentBlock();
       this.createMineData.startBlock = startBlock + 25;
-      this.createMineData.endBlock = startBlock + 3400000;
+      this.createMineData.endBlock = startBlock + 1223333;
     } catch (err) { console.log(err) }
   }
 
