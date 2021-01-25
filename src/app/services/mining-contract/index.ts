@@ -166,10 +166,10 @@ export class MiningContractService {
 
     const uniPairContract = this.web3Service.getContract(this.contractData.UniswapPair.ABI, lpTokenAddress);
 
-    // Get base token symbol
-    const token1 = await uniPairContract.methods.token1().call();
-    const baseTokenContract = this.web3Service.getContract(this.contractData.UniswapERC20Pair.ABI, token1)
-    const market = await baseTokenContract.methods.symbol().call();
+    // Get market token symbol
+    const address = await uniPairContract.methods.token1().call();
+    const contract = this.web3Service.getContract(this.contractData.UniswapERC20Pair.ABI, address)
+    const market = await contract.methods.symbol().call();
 
     return {
       base: "AXN",
@@ -190,9 +190,9 @@ export class MiningContractService {
 
     try {
       const balances = await Promise.all([
-        this.getTokenBalance(og25NFT),
-        this.getTokenBalance(og100NFT),
-        this.getTokenBalance(liqNFT)
+        this.getNftTokenBalance(og25NFT),
+        this.getNftTokenBalance(og100NFT),
+        this.getNftTokenBalance(liqNFT)
       ])
      
       result.og25NFT = +balances[0];
@@ -217,6 +217,11 @@ export class MiningContractService {
       wei: balance,
       bn: new BigNumber(balance)
     };
+  }
+
+  public async getNftTokenBalance(address: string): Promise<string> {
+    const token = this.web3Service.getContract(this.contractData.ERC20.ABI, address);
+    return await token.methods.balanceOf(this.account.address).call();
   }
 
   public getMines(): Promise<Mine[]> {
@@ -285,8 +290,8 @@ export class MiningContractService {
 
     if (!isApproved) {
       const token = this.web3Service.getContract(this.contractData.UniswapERC20Pair.ABI, lpTokenAddress);
-      const resut = await token.methods.approve(mineAddress, amount).send({ from: this.account.address });
-      await this.checkTransaction(resut);
+      const result = await token.methods.approve(mineAddress, amount).send({ from: this.account.address });
+      await this.checkTransaction(result);
     }
 
     const res = await this.mineData[mineAddress].contract.methods.depositLPTokens(amount).send({ from: this.account.address });
