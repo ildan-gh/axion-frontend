@@ -117,13 +117,13 @@ export class MiningContractService {
     this.mineAddresses = await this.mineManagerContract.methods.getMineAddresses().call();
   }
 
-  private async getMineData() {
-    for (const mineAddress of this.mineAddresses) {
+  private getMineData() {
+    return Promise.all(this.mineAddresses.map(async mineAddress => {
       const contract = this.web3Service.getContract(this.contractData.Mine.ABI, mineAddress);
       const info: MineInfo = await contract.methods.mineInfo().call();
 
       this.mineData[mineAddress] = { contract, info };
-    }
+    }));
   }
 
   private checkTx(tx, resolve, reject) {
