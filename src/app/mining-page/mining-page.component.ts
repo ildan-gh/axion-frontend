@@ -164,6 +164,8 @@ export class MiningPageComponent implements OnDestroy {
   }
 
   public async openCreateMineModal() {
+    this.createMineData.rewardAmount = "";
+    this.createMineData.blockReward = new BigNumber(0);
     this.createMineData.ref = this.dialog.open(this.createMineModal, {});
     try {
       const startBlock = await this.contractService.getCurrentBlock();
