@@ -368,6 +368,17 @@
       }
     }
   }
+
+  &-farms {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  &-farm {
+    flex: 1 1 30%; /*grow | shrink | basis */
+    margin: 1%;
+  }
 }
 
 .table-container {

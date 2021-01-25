@@ -5,13 +5,13 @@
     <div #tooltip2="matTooltip" (click)="tooltip2.toggle()" class="question" mat-raised-button matTooltip="
           Stake Liquidity Provider (LP) tokens and get rewarded in AXN.
 
-          Rewards will be calculated on minute-by-minute basis, so you can stake and unstake whenever you want.
+          Rewards will be calculated on minute-by-minute basis, so you can deposit and withdraw whenever you want.
 
-          To stake an LP token:
+          To deposit into any mine:
 
           1) You first need to own/buy the base token ({{currentMine ? currentMine?.base : ''}}), which increases buying pressure.
 
-          2) You then fund a uniswap liquidity pool with an equal dollar amount of {{currentMine ? currentMine?.base : ''}} and {{currentMine ? currentMine?.market : ''}}.
+          2) You then fund a uniswap liquidity pool with an equal dollar amounts of {{currentMine ? currentMine?.base : ''}} and {{currentMine ? currentMine?.market : ''}}.
 
           3) Once you add the liquidity, Uniswap automatically generates and sends you a LP token as a 'credit'.
 
@@ -43,7 +43,7 @@
           [(ngModel)]="formData.depositLPAmount"
           autocomplete="off"
         />
-        <span class="axn-cheap icon icon_uni cl-purple-bg">{{currentMine.base}}-{{currentMine.market}}</span>
+        <span class="axn-cheap icon icon_uni_dark cl-purple-bg">{{currentMine.base}}-{{currentMine.market}}</span>
 
         <div class="axn-form-bottom axn-form-base-2">
           <div class="axn-form-block-sendmax">
@@ -96,7 +96,7 @@
             {{ minerBalance.lpDeposit | bigNumberFormat: tokensDecimals:true:false:2 || 0 }}
           </span>
 
-          <span class="axn-cheap icon icon_uni cl-purple-bg">{{currentMine.base}}-{{currentMine.market}}</span>
+          <span class="axn-cheap icon icon_uni_dark cl-purple-bg">{{currentMine.base}}-{{currentMine.market}}</span>
         </div>
         <div class="axn-form-block-one">
           <span class="axn-form-block-one-title">AXN Earned</span>
@@ -185,7 +185,7 @@
 </section>
 
 <!-- AVAILABLE MINES -->
-<section class="axn-section" *ngIf="account && currentMine && mines.length > 1">
+<section class="axn-section" *ngIf="account && currentMine && mines.length > 0">
   <div class="axn-title-block">
     <span class="axn-title">Mines</span>
 
@@ -199,8 +199,8 @@
     </div>
   </div>
 
-  <div class="axn-form axn-form-base-3">
-    <div class="axn-form-block axn-form-block-one axn-form-base-center" *ngFor="let mine of mines">
+  <div class="axn-farms">
+    <div class="axn-form-block axn-form-block-one axn-form-base-center axn-farm" *ngFor="let mine of mines">
       <p class="axn-text-subtitle">{{mine.base}}-{{mine.market}}</p>
       <p class="axn-text-body">
         Mine Start Block: <b>{{mine.startBlock}}</b><br/>
