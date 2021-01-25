@@ -185,6 +185,7 @@ export class MiningContractService {
       og25NFT: 0,
       og100NFT: 0,
       liqNFT: 0,
+      reward: 0
     }
 
     try {
@@ -197,6 +198,13 @@ export class MiningContractService {
       result.og25NFT = +balances[0];
       result.og100NFT = +balances[1];
       result.liqNFT = +balances[2];
+
+      if (result.og25NFT > 0)
+        result.reward += 10;
+      if (result.og100NFT > 0)
+        result.reward += 10;
+      if (result.liqNFT > 0)
+        result.reward += 10;
     } 
     catch (err) { return result; }
   }

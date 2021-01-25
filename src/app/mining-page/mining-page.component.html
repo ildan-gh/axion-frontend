@@ -174,18 +174,67 @@
     </div>
   </div>
 
-  <!-- OPEN POOL INFO -->
-  <div class="axn-form-block-one axn-form-base-center" *ngIf="currentMine">
-    <button (click)="openUniswapPoolInfo()" class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-big">
-      <span class="axn-btn-text">
-        <span class="icon icon_uni"></span>&nbsp;&nbsp;Open Pool Stats
-      </span>
-    </button>
+  <!-- NFT Info & Current Stats -->
+  <div class="axn-form axn-form-base-2 vertical-center">
+    <!-- MINER INFO -->
+    <div class="axn-form-block">
+      <div class="axn-form-base-2 axn-form-base-center">
+        
+        <div class="axn-form-block-one">
+          <span class="icon icon-flex axn-form-block-shares-text-min" [ngClass]="{'icon_ok-1': minerBalance.nft.og25NFT !== 0, icon_no: minerBalance.nft.og25NFT === 0}">OG-5555 2.5m NFT</span>
+        </div>
+
+        <div class="axn-form-block-one">
+          <span class="icon icon-flex axn-form-block-shares-text-min" [ngClass]="{'icon_ok-1': minerBalance.nft.og100NFT !== 0, icon_no: minerBalance.nft.og100NFT === 0}">OG-5555 100m NFT</span>
+        </div>
+
+        <div class="axn-form-block-one">
+          <span class="icon icon-flex axn-form-block-shares-text-min" [ngClass]="{'icon_ok-1': minerBalance.nft.liqNFT !== 0, icon_no: minerBalance.nft.liqNFT === 0}">Liquidity Rep. NFT</span>
+        </div>
+
+         <div class="axn-form-block-one">
+           <span class="axn-form-block-shares-text-min">
+            Total Bonus<br />
+            {{minerBalance.nft.reward}}%
+           </span>
+        </div>
+      </div>
+    </div>
+  
+    <!-- CURRENT MINE INFO -->
+    <div class="axn-form-block">
+      <div class="axn-form-base-3 axn-form-base-center p-b-25">
+        <span class="axn-form-block-shares-text-min axn-text-center">
+          Pool APY<br/>
+          <b>{{currentMine.apr}}%</b>
+        </span>
+        <span class="axn-form-block-shares-text-min axn-text-center">
+          Rewards Left<br />
+          <b>{{currentMine.rewardBalance | bigNumberFormat: tokensDecimals:true:false:2 }}</b>
+        </span>
+        <span class="axn-form-block-shares-text-min axn-text-center">
+          Block Reward<br />
+          <b>{{currentMine.blockReward | bigNumberFormat: tokensDecimals:true:false:2 }}</b>
+        </span>
+      </div>
+
+      <!-- OPEN POOL INFO -->
+      <div class="axn-form-block-one axn-form-block-one-np axn-form-base-center">
+        <button (click)="openUniswapPoolInfo()" class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-big">
+          <span class="axn-btn-text">
+            <span class="icon icon_uni"></span>&nbsp;&nbsp;Open Uniswap Info
+          </span>
+        </button>
+      </div>
+
+    </div>
   </div>
+
+ 
 </section>
 
 <!-- AVAILABLE MINES -->
-<section class="axn-section" *ngIf="account && currentMine && mines.length > 0">
+<section class="axn-section" *ngIf="account && currentMine && mines.length > 1">
   <div class="axn-title-block">
     <span class="axn-title">Mines</span>
 
