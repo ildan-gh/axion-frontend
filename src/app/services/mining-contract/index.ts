@@ -275,31 +275,34 @@ export class MiningContractService {
     const token0Address = await pairContract.methods.token0().call();
     const token1Address = await pairContract.methods.token1().call();
 
-    const reserveValues = await Promise.all([
-      this.getReserveValueinAxn(token0Address, reserves.reserve0),
-      this.getReserveValueinAxn(token1Address, reserves.reserve1)
+    const tokenValues = await Promise.all([
+      this.getValueInUsdc(token0Address, reserves.reserve0),
+      this.getValueInUsdc(token1Address, reserves.reserve1)
     ]);
 
-    const lpTokenPrice = reserveValues[0].plus(reserveValues[1]).div(totalSupply);
+    const lpTokenPrice = tokenValues[0].reserve.plus(tokenValues[1].reserve).div(totalSupply);
+    const axnTokenPrice = tokenValues.find(x => x.isAxn).tokenPrice;
+    const lpTokenPriceInAXN = lpTokenPrice.div(axnTokenPrice);
+
     const balance = await pairERC20Contract.balanceOf(this.mineManagerContract.options.address).call();
     const decimals = await pairERC20Contract.decimals().call();
     const _1eDecimals = Math.pow(10, decimals).toString();
 
-    const totalValueLocked = new BigNumber(balance).div(_1eDecimals).times(lpTokenPrice);
+    const lpSupplyValueInAxn = lpTokenPriceInAXN.times(balance.div(_1eDecimals));
 
-    return blockReward.times(6500).times(365).times(100).div(totalValueLocked).toNumber();
+    return blockReward.times(6500).times(365).times(100).div(lpSupplyValueInAxn).toNumber();
   }
 
-  private async getReserveValueinAxn(address: string, reserve: string) {
-    if (address === this.axionContract.options.address) {
-      //return new BigNumber(reserve).div(token_1eDecimals); 
-    }
-
+  private async getValueInUsdc(address: string, reserve: string): Promise<{ tokenPrice: BigNumber, reserve: BigNumber, isAxn: boolean }> {
     const tokenContract = this.web3Service.getContract(this.contractData.ERC20.ABI, address);
     const tokenDecimals = await tokenContract.methods.decimals().call();
     const token_1eDecimals = Math.pow(10, tokenDecimals).toString();
     const tokenPrice = await this.contractService.getTokenToUsdcAmountsOutAsync(address, token_1eDecimals);
-    return new BigNumber(reserve).div(token_1eDecimals).times(tokenPrice);
+    return {
+      tokenPrice,
+      reserve: new BigNumber(reserve).div(token_1eDecimals).times(tokenPrice),
+      isAxn: address === this.axionContract.options.address
+    };
   }
 
   public getCurrentBlock(): Promise<number> {
