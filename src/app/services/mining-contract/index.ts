@@ -35,8 +35,6 @@ export interface MineInfo {
   providedIn: "root",
 })
 export class MiningContractService {
-  private readonly _1e18 = Math.pow(10, 18).toString();
-
   private account;
 
   private isActive: boolean;
@@ -49,11 +47,14 @@ export class MiningContractService {
   private mineManagerContract: Contract;
   private mineData: { [id: string]: { contract: Contract, info: MineInfo } } = {};
 
+  public _1e18: string;
   public mineAddresses: string[];
   public nftAddresses: { liqRepNFTAddress: string, OG5555_25NFTAddress: string, OG5555_100NFTAddress: string };
 
   constructor(config: AppConfig, private contractService: ContractService) {
+    this._1e18 = contractService._1e18;
     this.web3Service = new MetamaskService(config);
+    
     contractService.accountSubscribe().subscribe(async (account: any) => {
       if (account) {
         this.isActive = true;
@@ -253,7 +254,7 @@ export class MiningContractService {
 
       const lpTokenBalance = new BigNumber(
         await pairERC20Contract.methods.balanceOf(mineAddress).call())
-        .div(this._1e18);
+        .div(this.contractService._1e18);
 
       let apy = 30;
       try { apy = await this.getMineApr(mineInfo.lpToken, blockReward, lpTokenBalance) }

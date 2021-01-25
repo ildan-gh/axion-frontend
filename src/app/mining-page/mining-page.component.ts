@@ -85,7 +85,7 @@ export class MiningPageComponent implements OnDestroy {
   private usdcPerAxnPrice: BigNumber;
 
   constructor(
-    public contractService: MiningContractService,
+    private contractService: MiningContractService,
     private ngZone: NgZone,
     private appComponent: AppComponent,
     private dialog: MatDialog,
@@ -182,7 +182,7 @@ export class MiningPageComponent implements OnDestroy {
     this.minerBalance.pendingReward = result[1];
     this.minerBalance.lpAvailable = result[2];
     this.minerBalance.nft = result[3];
-    this.minerBalance.rewardPerBlock = result[0].times(this.selectedMine.blockReward).div(this.selectedMine.lpTokenBalance).div("1000000000000000000");
+    this.minerBalance.rewardPerBlock = result[0].times(this.selectedMine.blockReward).div(this.selectedMine.lpTokenBalance).div(this.contractService._1e18);
   }
 
   public async onCreateMineAddressChanged() {
