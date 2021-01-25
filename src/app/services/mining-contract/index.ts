@@ -269,18 +269,19 @@ export class MiningContractService {
     const pairContract = this.web3Service.getContract(this.contractData.UniswapPair.ABI, lpTokenAddress);
     const pairERC20Contract = this.web3Service.getContract(this.contractData.ERC20.ABI, lpTokenAddress);
 
-    const totalSupply = await pairContract.methods.totalSupply().call();
-    const reserves = await pairContract.methods.getReserves().call();
-
-    const token0Address = await pairContract.methods.token0().call();
-    const token1Address = await pairContract.methods.token1().call();
-
-    const tokenValues = await Promise.all([
-      this.getValueInUsdc(token0Address, reserves.reserve0),
-      this.getValueInUsdc(token1Address, reserves.reserve1)
+    const tokenData = await Promise.all([
+      pairContract.methods.getReserves().call(),
+      pairContract.methods.token0().call(),
+      pairContract.methods.token1().call(),
+      pairContract.methods.totalSupply().call()
     ]);
 
-    const lpTokenPrice = tokenValues[0].reserve.plus(tokenValues[1].reserve).div(totalSupply);
+    const tokenValues = await Promise.all([
+      this.getValueInUsdc(tokenData[1], tokenData[0].reserve0),
+      this.getValueInUsdc(tokenData[2], tokenData[0].reserve1)
+    ]);
+
+    const lpTokenPrice = tokenValues[0].reserve.plus(tokenValues[1].reserve).div(tokenData[3]);
     const axnTokenPrice = tokenValues.find(x => x.isAxn).tokenPrice;
     const lpTokenPriceInAxn = lpTokenPrice.div(axnTokenPrice);
 
@@ -305,13 +306,8 @@ export class MiningContractService {
     };
   }
 
-  public getCurrentBlock(): Promise<number> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const latestBlock = await this.web3Service.getBlock();
-        resolve(latestBlock.number)
-      } catch (err) { reject(err) }
-    })
+  public async getCurrentBlock(): Promise<number> {
+    return (await this.web3Service.getBlock()).number;
   }
 
   public async depositLPTokens(mineAddress: string, lpTokenAddress: string, amount: BigNumber): Promise<any> {
