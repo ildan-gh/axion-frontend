@@ -3,17 +3,17 @@
   <div class="axn-title-block">
     <span class="axn-title" (hover)="tooltip2.toggle()">Liquidity Mining</span>
     <div #tooltip2="matTooltip" (click)="tooltip2.toggle()" class="question" mat-raised-button matTooltip="
-          Stake Liquidity Provider (LP) tokens and get rewarded in AXN.
+          Deposit Liquidity Provider (LP) tokens and get rewarded in AXN!
 
-          Rewards will be calculated on minute-by-minute basis, so you can deposit and withdraw whenever you want.
+          Rewards will be calculated on block-by-block basis, so you can deposit and withdraw whenever you want.
 
-          To deposit into any mine:
+          To deposit into a mine:
 
-          1) You first need to own/buy the base token ({{currentMine ? currentMine?.base : ''}}), which increases buying pressure.
+          1) You first need to own/buy AXN.
 
-          2) You then fund a uniswap liquidity pool with an equal dollar amounts of {{currentMine ? currentMine?.base : ''}} and {{currentMine ? currentMine?.market : ''}}.
+          2) You then fund a Uniswap liquidity pool with AXN and {{selectedMine ? selectedMine?.market : ''}}.
 
-          3) Once you add the liquidity, Uniswap automatically generates and sends you a LP token as a 'credit'.
+          3) Once you add the liquidity, Uniswap automatically generates and sends you a LP token as a proof of deposit.
 
           4) You can deposit those LP tokens here to earn a sizeable reward in AXN!
         " matTooltipClass="question__tooltip question__extrawidth">
@@ -22,12 +22,12 @@
 </section>
 
 <!-- CURRENT POOL -->
-<section class="axn-section" *ngIf="account && currentMine">
+<section class="axn-section" *ngIf="account && selectedMine">
   <div class="axn-form axn-form-base-2 vertical-center">
     <!-- DEPOSIT -->
     <div class="axn-form-block axn-form-auction">
       <div class="axn-form-block-one axn-form-arrow p-b-none">
-        <span class="axn-form-block-one-title">Deposit {{currentMine.base}}-{{currentMine.market}} LP Tokens</span>
+        <span class="axn-form-block-one-title">Deposit {{selectedMine.base}}-{{selectedMine.market}} LP Tokens</span>
         <input
           type="text"
           *ngIf="account"
@@ -43,7 +43,7 @@
           [(ngModel)]="formData.depositLPAmount"
           autocomplete="off"
         />
-        <span class="axn-cheap icon icon_uni_dark cl-purple-bg">{{currentMine.base}}-{{currentMine.market}}</span>
+        <span class="axn-cheap icon icon_uni_dark cl-purple-bg">{{selectedMine.base}}-{{selectedMine.market}}</span>
 
         <div class="axn-form-bottom axn-form-base-2">
           <div class="axn-form-block-sendmax">
@@ -62,12 +62,12 @@
           <div class="axn-form-block-button" layout-align="center center">
             <button
               class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid"
-              [ngClass]="{ progress: currentMine.depositLPLoading }"
-              [disabled]="!formData.depositLPAmount || +formData.depositLPAmount === 0 || currentMine.depositLPLoading"
+              [ngClass]="{ progress: selectedMine.depositLPLoading }"
+              [disabled]="!formData.depositLPAmount || +formData.depositLPAmount === 0 || selectedMine.depositLPLoading"
               (click)="deposit()"
             >
               <!-- Ellipsis Loading Indicator -->
-              <span class="lds-ellipsis" *ngIf="currentMine.depositLPLoading">
+              <span class="lds-ellipsis" *ngIf="selectedMine.depositLPLoading">
                 <span class="lds-ellipsis-container">
                   <span></span><span></span><span></span><span></span>
                 </span>
@@ -86,7 +86,7 @@
     <div class="axn-form-block axn-form-auction p-b-5">
       <div class="axn-form-base-2">
         <div class="axn-form-block-one axn-form-border-dashed-right">
-          <span class="axn-form-block-one-title">Your {{currentMine.base}}-{{currentMine.market}} LP Tokens</span>
+          <span class="axn-form-block-one-title">Your {{selectedMine.base}}-{{selectedMine.market}} LP Tokens</span>
           <span
             class="axn-form-block-one-value-small p-tb-5"
             matTooltipClass="table__tooltip"
@@ -96,7 +96,7 @@
             {{ minerBalance.lpDeposit | bigNumberFormat: tokensDecimals:true:false:2 || 0 }}
           </span>
 
-          <span class="axn-cheap icon icon_uni_dark cl-purple-bg">{{currentMine.base}}-{{currentMine.market}}</span>
+          <span class="axn-cheap icon icon_uni_dark cl-purple-bg">{{selectedMine.base}}-{{selectedMine.market}}</span>
         </div>
         <div class="axn-form-block-one">
           <span class="axn-form-block-one-title">AXN Earned</span>
@@ -117,12 +117,12 @@
         <div class="axn-form-block-one axn-form-base-center">
           <button 
             (click)="openWithdrawLPModal()"
-            [disabled]="minerBalance.lpDeposit.isZero() || currentMine.withdrawLPLoading" 
-            [ngClass]="{ progress: currentMine.withdrawLPLoading }"
+            [disabled]="minerBalance.lpDeposit.isZero() || selectedMine.withdrawLPLoading" 
+            [ngClass]="{ progress: selectedMine.withdrawLPLoading }"
             class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid" 
           >
             <!-- Ellipsis Loading Indicator -->
-            <span class="lds-ellipsis" *ngIf="currentMine.withdrawLPLoading">
+            <span class="lds-ellipsis" *ngIf="selectedMine.withdrawLPLoading">
               <span class="lds-ellipsis-container">
                 <span></span><span></span><span></span><span></span>
               </span>
@@ -136,12 +136,12 @@
         <div class="axn-form-block-one axn-form-base-center">
           <button 
             (click)="withdrawAll()"
-            [ngClass]="{ progress: currentMine.withdrawAllLoading }"
+            [ngClass]="{ progress: selectedMine.withdrawAllLoading }"
             class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid" 
-            [disabled]="minerBalance.pendingReward.isZero() || minerBalance.lpDeposit.isZero() || currentMine.withdrawAllLoading || currentMine.withdrawLPLoading ||  currentMine.withdrawRewardsLoading" 
+            [disabled]="minerBalance.pendingReward.isZero() || minerBalance.lpDeposit.isZero() || selectedMine.withdrawAllLoading || selectedMine.withdrawLPLoading ||  selectedMine.withdrawRewardsLoading" 
           >
             <!-- Ellipsis Loading Indicator -->
-            <span class="lds-ellipsis" *ngIf="currentMine.withdrawAllLoading">
+            <span class="lds-ellipsis" *ngIf="selectedMine.withdrawAllLoading">
               <span class="lds-ellipsis-container">
                 <span></span><span></span><span></span><span></span>
               </span>
@@ -156,11 +156,11 @@
           <button 
             (click)="withdrawRewards()"
             class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid" 
-            [disabled]="minerBalance.pendingReward.isZero() || currentMine.withdrawRewardsLoading" 
-            [ngClass]="{ progress: currentMine.withdrawRewardsLoading }"
+            [disabled]="minerBalance.pendingReward.isZero() || selectedMine.withdrawRewardsLoading" 
+            [ngClass]="{ progress: selectedMine.withdrawRewardsLoading }"
           >
             <!-- Ellipsis Loading Indicator -->
-            <span class="lds-ellipsis" *ngIf="currentMine.withdrawRewardsLoading">
+            <span class="lds-ellipsis" *ngIf="selectedMine.withdrawRewardsLoading">
               <span class="lds-ellipsis-container">
                 <span></span><span></span><span></span><span></span>
               </span>
@@ -206,15 +206,15 @@
       <div class="axn-form-base-3 axn-form-base-center p-b-25">
         <span class="axn-form-block-shares-text-min axn-text-center">
           APY<br/>
-          <b>{{currentMine.apy}}%</b>
+          <b>{{selectedMine.apy}}%</b>
         </span>
         <span class="axn-form-block-shares-text-min axn-text-center">
           Rewards Left<br />
-          <b>{{currentMine.rewardBalance | bigNumberFormat: tokensDecimals:true:false:2 }}</b>
+          <b>{{selectedMine.rewardBalance | bigNumberFormat: tokensDecimals:true:false:2 }}</b>
         </span>
         <span class="axn-form-block-shares-text-min axn-text-center">
           Block Reward<br />
-          <b>{{currentMine.blockReward | bigNumberFormat: tokensDecimals:true:false:2 }}</b>
+          <b>{{selectedMine.blockReward | bigNumberFormat: tokensDecimals:true:false:2 }}</b>
         </span>
       </div>
 
@@ -234,18 +234,9 @@
 </section>
 
 <!-- AVAILABLE MINES -->
-<section class="axn-section" *ngIf="account && currentMine && mines.length > 1">
+<section class="axn-section" *ngIf="account && selectedMine && mines.length > 1">
   <div class="axn-title-block">
     <span class="axn-title">Mines</span>
-
-    <div 
-      #tooltip2="matTooltip" 
-      (click)="tooltip2.toggle()" 
-      class="question" 
-      mat-raised-button
-      matTooltip="Below are the available mines."
-      matTooltipClass="question__tooltip">
-    </div>
   </div>
 
   <div class="axn-farms">
@@ -261,7 +252,7 @@
         (click)="setCurrentMine(mine)" 
         class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-big" 
         [ngClass]="{ progress: switchingLoading === mine.mineAddress }"
-        [disabled]="switchingLoading === mine.mineAddress || currentMine.mineAddress === mine.mineAddress" 
+        [disabled]="switchingLoading === mine.mineAddress || selectedMine.mineAddress === mine.mineAddress" 
       >
         <!-- Ellipsis Loading Indicator -->
         <span class="lds-ellipsis" *ngIf="switchingLoading === mine.mineAddress">
@@ -271,7 +262,7 @@
         </span>
       
         <!-- Button Text -->
-        <span class="axn-btn-text">{{currentMine.mineAddress === mine.mineAddress ? "Current" : "View"}} Mine</span>
+        <span class="axn-btn-text">{{selectedMine.mineAddress === mine.mineAddress ? "Current" : "View"}} Mine</span>
       </button>
 
     </div>
@@ -389,7 +380,7 @@
           [(ngModel)]="formData.withdrawLPAmount"
           autocomplete="off"
         />
-        <span class="axn-cheap icon icon_uni cl-purple-bg">{{currentMine?.base}}-{{currentMine?.market}}</span>
+        <span class="axn-cheap icon icon_uni cl-purple-bg">{{selectedMine?.base}}-{{selectedMine?.market}}</span>
 
         <div class="axn-form-block-sendmax">
           <span class="axn-btn axn-btn-max" (click)="formData.withdrawLPAmount = minerBalance.lpDeposit.toString()">
@@ -414,10 +405,10 @@
       <button 
         (click)="withdrawLPTokens()" 
         class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid"
-        [ngClass]="{ progress: currentMine?.withdrawLPLoading }" 
-        [disabled]="currentMine?.withdrawLPLoading || +formData.withdrawLPAmount === 0"
+        [ngClass]="{ progress: selectedMine?.withdrawLPLoading }" 
+        [disabled]="selectedMine?.withdrawLPLoading || +formData.withdrawLPAmount === 0"
       >
-        <span class="lds-ellipsis" *ngIf="currentMine?.withdrawLPLoading">
+        <span class="lds-ellipsis" *ngIf="selectedMine?.withdrawLPLoading">
           <span class="lds-ellipsis-container">
             <span></span><span></span><span></span><span></span>
           </span>
