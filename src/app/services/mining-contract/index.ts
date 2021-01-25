@@ -135,7 +135,7 @@ export class MiningContractService {
 
   private async getMineAddresses() {
     const mineAddresses = await this.mineManagerContract.methods.getMineAddresses().call();
-    this.mineAddresses = mineAddresses.filter(address => address !== this.zeroAddress)
+    this.mineAddresses = mineAddresses.filter(address => address !== this.zeroAddress);
   }
 
   private getMineData() {
@@ -147,8 +147,9 @@ export class MiningContractService {
     }));
   }
 
-  private checkTx(tx, resolve, reject) {
-    this.web3Service.Web3.eth.getTransaction(tx.transactionHash).then((txInfo) => {
+  private async checkTx(tx, resolve, reject) {
+    try {
+      const txInfo = await this.web3Service.Web3.eth.getTransaction(tx.transactionHash);
       if (txInfo.blockNumber) {
         this.callAllTransactionsSubscribers(txInfo);
         resolve(tx);
@@ -157,7 +158,7 @@ export class MiningContractService {
           this.checkTx(tx, resolve, reject);
         }, 2000);
       }
-    }, reject);
+    } catch (err) { reject(err) }
   }
 
   public accountSubscribe() {
@@ -327,9 +328,7 @@ export class MiningContractService {
       await this.checkTransaction(result);
     }
 
-    const res = await this.mineData[mineAddress].contract.methods.depositLPTokens(amount).send({ from: this.account.address });
-    await this.checkTransaction(res);
-    return res;
+    return this.mineData[mineAddress].contract.methods.depositLPTokens(amount).send({ from: this.account.address });
   }
 
   public withdrawLPTokens(mineAddress: string, amount: string): Promise<any> {
@@ -371,7 +370,6 @@ export class MiningContractService {
     }
 
     const res = await this.mineManagerContract.methods.createMine(lpTokenAddress, rewardAmount, blockReward, startBlock).send({ from: this.account.address });
-    await this.checkTransaction(res);
 
     await this.getMineAddresses();
     await this.getMineData();
