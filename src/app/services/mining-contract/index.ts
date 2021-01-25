@@ -282,13 +282,13 @@ export class MiningContractService {
 
     const lpTokenPrice = tokenValues[0].reserve.plus(tokenValues[1].reserve).div(totalSupply);
     const axnTokenPrice = tokenValues.find(x => x.isAxn).tokenPrice;
-    const lpTokenPriceInAXN = lpTokenPrice.div(axnTokenPrice);
+    const lpTokenPriceInAxn = lpTokenPrice.div(axnTokenPrice);
 
-    const balance = await pairERC20Contract.balanceOf(this.mineManagerContract.options.address).call();
+    const mineLPBalance = await pairERC20Contract.balanceOf(this.mineManagerContract.options.address).call();
     const decimals = await pairERC20Contract.decimals().call();
     const _1eDecimals = Math.pow(10, decimals).toString();
 
-    const lpSupplyValueInAxn = lpTokenPriceInAXN.times(balance.div(_1eDecimals));
+    const lpSupplyValueInAxn = lpTokenPriceInAxn.times(mineLPBalance.div(_1eDecimals));
 
     return blockReward.times(6500).times(365).times(100).div(lpSupplyValueInAxn).toNumber();
   }
