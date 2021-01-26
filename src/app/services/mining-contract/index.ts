@@ -294,6 +294,9 @@ export class MiningContractService {
   }
 
   private async getMineApr(lpTokenAddress: string, blockReward: BigNumber, mineLpTokenBalance: BigNumber) {
+    if (mineLpTokenBalance.isZero())
+      return 0;
+
     const pairContract = this.web3Service.getContract(this.contractData.UniswapPair.ABI, lpTokenAddress);
 
     const tokenData = await Promise.all([
