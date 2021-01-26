@@ -203,7 +203,7 @@
         <div class="axn-form-base-4 axn-form-base-center p-b-25">
           <span class="axn-form-block-shares-text-min axn-text-center">
             APY<br/>
-            <b>{{selectedMine.apy === 0 ? "TBC" : selectedMine.apy+"%"}}</b>
+            <b>{{selectedMine.apy === 0 || mine.apy > 10000 ? "TBC" : selectedMine.apy+"%"}}</b>
           </span>
           <span class="axn-form-block-shares-text-min axn-text-center">
             Your/Total Block Reward<br />
@@ -256,7 +256,7 @@
     <div class="axn-form-block axn-form-block-one axn-form-base-center axn-mine" *ngFor="let mine of mines">
       <p class="axn-text-subtitle">{{mine.base}}-{{mine.market}}</p>
       <p class="axn-text-body">
-        APY: <b>{{mine.apy === 0 ? "TBC" : mine.apy+"%"}}</b><br/><br />
+        APY: <b>{{mine.apy === 0 || mine.apy > 10000 ? "TBC" : mine.apy+"%"}}</b><br/><br />
         Mine Start Block: <b>{{mine.startBlock}}</b><br/><br />
         Available Rewards: <b>{{mine.rewardBalance | bigNumberFormat: tokensDecimals:true:false:2 || 0}} AXN</b><br /><br />
         Block Reward: <b>{{mine.blockReward | bigNumberFormat: tokensDecimals:true:false:4 || 0}} AXN</b><br /><br />

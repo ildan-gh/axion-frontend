@@ -206,8 +206,8 @@ export class MiningPageComponent implements OnDestroy {
   private getMinerRewardPerBlock(lpDeposit: BigNumber) {
     return lpDeposit
       .times(this.selectedMine.blockReward)
-      .div(this.selectedMine.lpTokenBalance.isZero() ? 1 : this.selectedMine.lpTokenBalance)
-      .div(this.contractService._1e18);
+      .div(this.contractService._1e18)
+      .div(this.selectedMine.lpTokenBalance.isZero() ? 1 : this.selectedMine.lpTokenBalance);
   }
 
   public async onCreateMineAddressChanged() {
