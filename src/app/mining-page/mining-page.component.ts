@@ -84,7 +84,7 @@ export class MiningPageComponent implements OnDestroy {
   };
 
   private usdcPerAxnPrice: BigNumber;
-  private currentBlock: Number;
+  public currentBlock: number;
 
   constructor(
     private contractService: MiningContractService,
