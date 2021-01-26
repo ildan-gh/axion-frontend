@@ -956,17 +956,21 @@
               <span class="axn-cheap cl-blue-bg" style="text-transform: none;">{{today + (actionsModalData.stakingDays * 24 * 60 * 60 * 1000) | date: "MMM d, y"}}</span>
               <div class="axn-form-block-sendmax axn-form-bottom-mid">
                 <span class="axn-btn axn-btn-max" (click)="actionsModalData.stakingDays = stakeMaxDays;">Max Days</span>
+                <br />
+                <span class="axn-form-block-text">
+                 Max: <b>{{ stakeMaxDays }} days</b>
+                </span>
               </div>
             </div>
 
               <!-- CENTER COL -->
-            <div class="axn-form axn-form-block-one axn-form-border-dashed-right">
+            <div class="axn-form-block-one axn-form-border-dashed-right">
               <span class="axn-form-block-one-title">TopUp (Optional)</span>
               <input
                 *ngIf="account"
                 class="axn-input"
                 required="required"
-                name="stake-amount"
+                name="restake-topup"
                 placeholder="0"
                 onfocus="this.placeholder = ''"
                 onblur="this.placeholder = '0'"
@@ -976,7 +980,8 @@
               />
               <span class="axn-cheap icon icon_axn cl-blue-bg">AXN</span>
               <div class="axn-form-block-sendmax axn-form-bottom-mid">
-                <span class="axn-btn axn-btn-max" (click)="actionsModalData.topUp = account.balances.AXN.wei;">Max TopUp</span>
+                <span class="axn-btn axn-btn-max" (click)="actionsModalData.topUp = account.balances.AXN.wei;">Max</span>
+                <br/>
                 <span class="axn-form-block-text">
                   Balance: <b>{{ account?.balances?.AXN.display }}</b>
                 </span>

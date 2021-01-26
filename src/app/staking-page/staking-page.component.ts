@@ -287,9 +287,9 @@ export class StakingPageComponent implements OnDestroy {
   }
 
   public onRestakeTopUpChanged() {
-    this.actionsModalData.topUp = new BigNumber(this.actionsModalData.topUp);
-    this.actionsModalData.amount = new BigNumber(this.actionsModalData.amount).plus(this.actionsModalData.topUp);
-    this.onRestakeDaysChanged();
+    // this.actionsModalData.topUp = new BigNumber(this.actionsModalData.topUp);
+    // this.actionsModalData.amount = new BigNumber(this.actionsModalData.amount).plus(this.actionsModalData.topUp);
+    // this.onRestakeDaysChanged();
   }
 
   public onChangeAmount() {
@@ -381,12 +381,10 @@ export class StakingPageComponent implements OnDestroy {
   public actionsModalData;
 
   public async openStakeActions(stake: Stake) {
-    console.log(this.account.balances)
     // Check if this is a late unstake
     const endMS = +stake.endSeconds * 1000;
     const penaltyWindow = endMS + (AVAILABLE_DAYS_AFTER_END * 86400 * 1000)
     const isLate = Date.now() > penaltyWindow
-    const topUp = new BigNumber(0);
 
     if (isLate) {
       const result = await this.contractService.getStakePayoutAndPenalty(stake, stake.interest);
@@ -400,7 +398,7 @@ export class StakingPageComponent implements OnDestroy {
         amount: payout,
         penalty,
         isLate,
-        topUp
+        topUp: "0"
       }
     } else {
       this.actionsModalData = {
@@ -409,7 +407,7 @@ export class StakingPageComponent implements OnDestroy {
         stakeDays: 0,
         amount: stake.principal.plus(stake.interest),
         isLate,
-        topUp
+        topUp: "0"
       }
     }
   }
