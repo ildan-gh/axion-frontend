@@ -98,6 +98,12 @@ export class MiningContractService {
     return !allowed.isNegative();
   }
 
+  public updatePendingRewardOnNewBlock(selectedMineAddress: string, minerBalance) {
+    this.web3Service.subscribeToNewBlocks(async () => {
+      minerBalance.pendingReward = await this.getPendingReward(selectedMineAddress);
+    })
+  }
+
   private async isLPApproved(amount: BigNumber, mineAddress: string, lpTokenAddress: string): Promise<boolean> {
     const token = this.web3Service.getContract(this.contractData.ERC20.ABI, lpTokenAddress);
     const allowance = await token.methods.allowance(this.account.address, mineAddress).call();

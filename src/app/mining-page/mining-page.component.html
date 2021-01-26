@@ -60,7 +60,7 @@
               <button
                 class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid"
                 [ngClass]="{ progress: selectedMine.depositLPLoading }"
-                [disabled]="!formData.depositLPAmount || +formData?.depositLPAmount === 0 || selectedMine.depositLPLoading"
+                [disabled]="!formData.depositLPAmount || +formData?.depositLPAmount === 0 || selectedMine.depositLPLoading || selectedMine.rewardBalance.isZero()"
                 (click)="deposit()"
               >
                 <!-- Ellipsis Loading Indicator -->

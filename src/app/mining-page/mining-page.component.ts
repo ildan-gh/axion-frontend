@@ -190,6 +190,8 @@ export class MiningPageComponent implements OnDestroy {
       .times(this.selectedMine.blockReward)
       .div(this.selectedMine.lpTokenBalance.isZero() ? 1 : this.selectedMine.lpTokenBalance)
       .div(this.contractService._1e18);
+
+    this.contractService.updatePendingRewardOnNewBlock(this.selectedMine.mineAddress, this.minerBalance);
   }
 
   public async onCreateMineAddressChanged() {

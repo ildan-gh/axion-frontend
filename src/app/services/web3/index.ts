@@ -18,7 +18,7 @@ export class MetamaskService {
     testnet: "ropsten",
   };
 
-  constructor(private config: AppConfig) {
+  constructor(config: AppConfig) {
     const settingsApp = config.getConfig();
 
     this.networks.testnet = settingsApp.settings.network;
@@ -40,6 +40,11 @@ export class MetamaskService {
 
   public getContract(abi, address) {
     return new this.Web3.eth.Contract(abi, address);
+  }
+
+  public subscribeToNewBlocks(callback) {
+    return this.Web3.eth.subscribe("newBlockHeaders")
+      .on("data", () => callback());
   }
 
   public encodeFunctionCall(name, type, inputs, params) {
@@ -135,7 +140,7 @@ export class MetamaskService {
               });
               reject();
             }
-            resolve();
+            resolve(null);
           });
       });
     };
