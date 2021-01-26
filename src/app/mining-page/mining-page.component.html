@@ -251,7 +251,7 @@
       </div>
     </div>
   
-    <div *ngIf="selectedMine && this.mines.length > 1" class="axn-form-block-one axn-form-block-one-np axn-form-base-center p-tb-15">
+    <div *ngIf="selectedMine && this.mines?.length > 1" class="axn-form-block-one axn-form-block-one-np axn-form-base-center p-tb-15">
       <button routerLink="/mining"
         class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid axn-btn-arrow-left">
         <span class="axn-btn-text">Back to Mines</span>
@@ -259,7 +259,7 @@
     </div>
   </div>
 
-  <div *ngIf="!selectedMine && this.mines.length > 1" class="axn-mines">
+  <div *ngIf="!selectedMine && this.mines?.length > 1" class="axn-mines">
     <div class="axn-form-block axn-form-block-one axn-form-base-center axn-mine" *ngFor="let mine of mines">
       <p class="axn-text-subtitle">{{mine.base}}-{{mine.market}}</p>
       <p class="axn-text-body">
@@ -290,7 +290,7 @@
   </div>
 </section>
 
-<section class="axn-section" *ngIf="account && this.mines.length == 0">
+<section class="axn-section" *ngIf="account && this.mines?.length == 0">
   <div class="axn-title-block">
     <span class="axn-title">No mines have been created yet.</span>
   </div>
@@ -298,7 +298,7 @@
 
 <!-- MANAGERS ONLY: CREATE A POOL -->
 <section class="axn-section">
-  <div *ngIf="account.isManager && !selectedMine || this.mines.length <= 1" class="axn-form-block-one axn-form-base-center">
+  <div *ngIf="account?.isManager && !selectedMine || this.mines?.length <= 1" class="axn-form-block-one axn-form-base-center">
     <button (click)="openCreateMineModal()" class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-big">
       <span class="axn-btn-text">
         Create a Mine
