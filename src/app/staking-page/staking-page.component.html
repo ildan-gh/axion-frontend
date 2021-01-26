@@ -958,7 +958,7 @@
                 <span class="axn-btn axn-btn-max" (click)="actionsModalData.stakingDays = stakeMaxDays;">Max Days</span>
                 <br />
                 <span class="axn-form-block-text">
-                 Max: <b>{{ stakeMaxDays }} days</b>
+                 Max: <b>{{ stakeMaxDays.toLocaleString() }} days</b>
                 </span>
               </div>
             </div>
@@ -967,6 +967,7 @@
             <div class="axn-form-block-one axn-form-border-dashed-right">
               <span class="axn-form-block-one-title">TopUp (Optional)</span>
               <input
+                type="text"
                 *ngIf="account"
                 class="axn-input"
                 required="required"
@@ -974,7 +975,7 @@
                 placeholder="0"
                 onfocus="this.placeholder = ''"
                 onblur="this.placeholder = '0'"
-                (ngModelChange)="onRestakeTopUpChanged()"
+                (ngModelChange)="updateShares()"
                 [(ngModel)]="actionsModalData.topUp"
                 [appBigNumber]="{ decimals: tokensDecimals['AXN'], min: 0, max: account.balances.AXN.wei }"
               />
@@ -994,6 +995,9 @@
               <p *ngIf="actionsModalData.isLate">Late Penalty<br/><b>{{actionsModalData.penalty | bigNumberFormat: tokensDecimals.AXN:true:false:2}} AXN</b></p>
               <p *ngIf="actionsModalData.shares">Shares<br /><b>{{actionsModalData.shares | bigNumberFormat: tokensDecimals.AXN:true:false:2}}</b></p>
               <p *ngIf="actionsModalData.lpb">Longer Pays Better<br /><b>{{actionsModalData.lpb | bigNumberFormat: tokensDecimals.AXN:true:false:2}}</b></p>
+              <p *ngIf="!makeBigNumber(actionsModalData.topUp).isZero() && !makeBigNumber(actionsModalData.topUp).isNaN()">
+                Top Up<br /><b>{{ makeBigNumber(actionsModalData.topUp) | bigNumberFormat: tokensDecimals.AXN:true:false:2}} AXN</b>
+              </p>
               <p *ngIf="actionsModalData.totalShares">Total Shares<br /><b>{{actionsModalData.totalShares | bigNumberFormat: tokensDecimals.AXN:true:false:2}}</b></p>
             </div>
           </div> 

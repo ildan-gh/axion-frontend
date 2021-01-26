@@ -272,6 +272,13 @@ export class StakingPageComponent implements OnDestroy {
     return amount.div(shareRate).times(divDecimals);
   }
 
+  get userSharesRestakeTopUp() {
+    const divDecimals = Math.pow(10, this.tokensDecimals.AXN);
+    const shareRate = new BigNumber(this.stakingContractInfo.ShareRate || 0).div(divDecimals);
+    const amount = new BigNumber(this.makeBigNumber(this.actionsModalData.topUp || 0)).div(divDecimals);
+    return amount.div(shareRate).times(divDecimals);
+  }
+
   get stakeDaysInvalid() {
     return (this.formsData.stakeDays || 0) > this.stakeMaxDays;
   }
@@ -286,10 +293,14 @@ export class StakingPageComponent implements OnDestroy {
     this.actionsModalData.totalShares = shares.plus(LPB)
   }
 
-  public onRestakeTopUpChanged() {
-    // this.actionsModalData.topUp = new BigNumber(this.actionsModalData.topUp);
-    // this.actionsModalData.amount = new BigNumber(this.actionsModalData.amount).plus(this.actionsModalData.topUp);
-    // this.onRestakeDaysChanged();
+  public makeBigNumber(str) {
+    return new BigNumber(str).multipliedBy(new BigNumber(10).pow(18))
+  }
+
+  public updateShares() {
+    const basicShares = this.userSharesRestake;
+    const topUpShares = this.userSharesRestakeTopUp;
+    this.actionsModalData.totalShares = basicShares.plus(topUpShares)
   }
 
   public onChangeAmount() {
