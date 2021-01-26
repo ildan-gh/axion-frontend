@@ -1014,7 +1014,7 @@
         <span>Cancel</span>
       </button>
 
-      <button class="axn-btn axn-btn-gray" (click)="restake(restakeData.stake)" [ngClass]="{ progress: restakeData.stake.withdrawProgress }" [disabled]="restakeData.stake.withdrawProgress">
+      <button class="axn-btn axn-btn-gray" (click)="restake(restakeData.stake)" [ngClass]="{ progress: restakeData.stake.withdrawProgress }" [disabled]="restakeData.stake.withdrawProgress || !restakeData.stakeDays">
         <span class="lds-ellipsis" *ngIf="restakeData.stake.withdrawProgress">
           <span class="lds-ellipsis-container">
             <span></span><span></span><span></span><span></span>
