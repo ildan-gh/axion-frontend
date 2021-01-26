@@ -1331,12 +1331,16 @@ export class ContractService {
   public restake(stake: Stake, stakeDays, topUp) {
     const restakeMethod = stake.isV1 ? 'restakeV1' : 'restake';
 
+    if(!topUp) {
+      topUp = new BigNumber(0)
+    }
+
     return this.StakingContract.methods[restakeMethod](stake.sessionId, stakeDays, topUp).send({
       from: this.account.address,
     })
-      .then((res) => {
-        return this.checkTransaction(res);
-      });
+    .then((res) => {
+      return this.checkTransaction(res);
+    });
   }
 
   public async bpdWithdraw(sessionId) {

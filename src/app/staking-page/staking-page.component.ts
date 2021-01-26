@@ -307,7 +307,7 @@ export class StakingPageComponent implements OnDestroy {
     this.restakeData.totalShares = shares.plus(LPB)
   }
 
-  public updateShares() {
+  public onTopUpAmountChanged() {
     const basicShares = this.userSharesRestake;
     const topUpShares = this.userSharesRestakeTopUp;
     this.restakeData.totalShares = basicShares.plus(topUpShares)
@@ -411,22 +411,22 @@ export class StakingPageComponent implements OnDestroy {
       const penalty = new BigNumber(result[1]);
 
       this.restakeData = {
-        opened: this.dialog.open(this.actionsModal, {}),
         stake,
+        isLate,
+        penalty,
+        topUp: "",
         stakeDays: 0,
         amount: payout,
-        penalty,
-        isLate,
-        topUp: ""
+        opened: this.dialog.open(this.actionsModal, {})
       }
     } else {
       this.restakeData = {
-        opened: this.dialog.open(this.actionsModal, {}),
         stake,
+        isLate,
+        topUp: "",
         stakeDays: 0,
         amount: stake.principal.plus(stake.interest),
-        isLate,
-        topUp: ""
+        opened: this.dialog.open(this.actionsModal, {})
       }
     }
   }
@@ -441,12 +441,13 @@ export class StakingPageComponent implements OnDestroy {
   }
 
   public restake(stake: Stake) {    
-    this.restakeData.opened.close();
     stake.withdrawProgress = true;
     this.contractService.restake(stake, this.restakeData.stakeDays, this.restakeData.topUp).then(() => {
       this.stakeList();
       this.contractService.updateAXNBalance(true);
-    }).finally(() => {
+      this.restakeData.opened.close();
+    })
+    .finally(() => {
       stake.withdrawProgress = false;
     })
   }
