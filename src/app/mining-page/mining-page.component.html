@@ -206,26 +206,19 @@
             <b>{{selectedMine.apy}}%</b>
           </span>
           <span class="axn-form-block-shares-text-min axn-text-center">
-            Your Reward per Block<br />
+            Your/Total Block Reward<br />
             <span
               class="axn-form-block-one-value-small p-tb-5"
               matTooltipClass="table__tooltip"
               mat-raised-button
               matTooltip="${{getDollarValue(minerBalance.rewardPerBlock) | bigNumberFormat: tokensDecimals:true:false:2 || 0 }}"
             >
-            <b>{{minerBalance.rewardPerBlock | bigNumberFormat: tokensDecimals:true:false:2 }} AXN</b>
+            <b>{{minerBalance.rewardPerBlock | bigNumberFormat: tokensDecimals:true:false:2 }}/{{selectedMine.blockReward | bigNumberFormat: tokensDecimals:true:false:2 }} AXN</b>
             </span>
           </span>
           <span class="axn-form-block-shares-text-min axn-text-center">
-            Block Reward<br />
-            <span
-              class="axn-form-block-one-value-small p-tb-5"
-              matTooltipClass="table__tooltip"
-              mat-raised-button
-              matTooltip="${{getDollarValue(selectedMine.blockReward) | bigNumberFormat: tokensDecimals:true:false:2 || 0 }}"
-            >
-            <b>{{selectedMine.blockReward | bigNumberFormat: tokensDecimals:true:false:2 }} AXN</b>
-            </span>
+            Days Left<br />
+            <b>{{selectedMine.approxDaysLeft}}</b>
           </span>
           <span class="axn-form-block-shares-text-min axn-text-center">
             Rewards Left<br />
@@ -236,7 +229,6 @@
               matTooltip="${{getDollarValue(selectedMine.rewardBalance) | bigNumberFormat: tokensDecimals:true:false:2 || 0 }}"
             >
             <b>{{selectedMine.rewardBalance | bigNumberFormat: tokensDecimals:true:false:2 }} AXN</b><br />
-            <b>{{selectedMine.approxDaysLeft}} Days</b>
             </span>
           </span>
         </div>
