@@ -293,7 +293,12 @@
 
     </div>
   </div>
+</section>
 
+<section class="axn-section" *ngIf="account && this.mines.length == 0">
+  <div class="axn-title-block">
+    <span class="axn-title">No mines have been created yet.</span>
+  </div>
 </section>
 
 <!-- MANAGERS ONLY: CREATE A POOL -->
