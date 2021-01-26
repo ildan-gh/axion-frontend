@@ -60,7 +60,7 @@
               <button
                 class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid"
                 [ngClass]="{ progress: selectedMine.depositLPLoading }"
-                [disabled]="!formData.depositLPAmount || +formData.depositLPAmount === 0 || selectedMine.depositLPLoading"
+                [disabled]="!formData.depositLPAmount || +formData?.depositLPAmount === 0 || selectedMine.depositLPLoading"
                 (click)="deposit()"
               >
                 <!-- Ellipsis Loading Indicator -->
@@ -432,7 +432,7 @@
         (click)="withdrawLPTokens()" 
         class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid"
         [ngClass]="{ progress: selectedMine?.withdrawLPLoading }" 
-        [disabled]="selectedMine?.withdrawLPLoading || +formData.withdrawLPAmount === 0"
+        [disabled]="selectedMine?.withdrawLPLoading || +formData?.withdrawLPAmount === 0"
       >
         <span class="lds-ellipsis" *ngIf="selectedMine?.withdrawLPLoading">
           <span class="lds-ellipsis-container">
