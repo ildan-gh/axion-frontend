@@ -1488,7 +1488,6 @@ export class ContractService {
     const axnForOneEth = (await this.getWethToAxionAmountsOutAsync(this._1e18))[1];
     const usdcForOneEth = await this.getWethToUsdcAmountsOutAsync(this._1e18);
 
-    // USDC uses 6 decimal places
     return new BigNumber(this._1e18).div(axnForOneEth).times(usdcForOneEth);
   }
 
@@ -1515,7 +1514,7 @@ export class ContractService {
         tokenAddress,
         this.CONTRACTS_PARAMS.USDC.ADDRESS,
       ])
-      .call())[1]).div("1000000");
+      .call())[1]).div("1000000"); // USDC uses 6 decimal places
   }
 
   public getAuctionsData(todaysAuctionId: number, start: number) {

@@ -136,12 +136,8 @@ export class MiningPageComponent implements OnDestroy {
   }
 
   private async updateSelectedMine() {
-    const res = await Promise.all([
-      this.contractService.getMine(this.selectedMine.mineAddress),
-      this.updateMinerBalance()
-    ]);
-
-    this.selectedMine = res[0];
+    this.selectedMine = await this.contractService.getMine(this.selectedMine.mineAddress);
+    await this.updateMinerBalance();
   }
 
   public getDollarValue(amount: BigNumber) {

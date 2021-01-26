@@ -57,7 +57,7 @@ export class MiningContractService {
   constructor(config: AppConfig, private contractService: ContractService) {
     this._1e18 = contractService._1e18;
     this.web3Service = new MetamaskService(config);
-    
+
     contractService.accountSubscribe().subscribe(async (account: any) => {
       if (account) {
         this.isActive = true;
@@ -317,18 +317,31 @@ export class MiningContractService {
 
     const lpSupplyValueInAxn = lpTokenPriceInAxn.times(mineLpTokenBalance);
 
-    return blockReward.times(6500).times(365).times(100).div(lpSupplyValueInAxn).toNumber();
+    return blockReward.times(6500).times(365).times(100).div(lpSupplyValueInAxn).div(this._1e18).dp(2).toNumber();
   }
 
   private async getValueInUsdc(address: string, reserve: string): Promise<{ tokenPrice: BigNumber, reserve: BigNumber, isAxn: boolean }> {
+    const isAxn = address === this.axionContract.options.address;
+
+    if (isAxn) {
+      const tokenPrice = await this.contractService.getUsdcPerAxnPrice();
+
+      return {
+        tokenPrice,
+        reserve: new BigNumber(reserve).times(tokenPrice),
+        isAxn
+      };
+    }
+
     const tokenContract = this.web3Service.getContract(this.contractData.ERC20.ABI, address);
     const tokenDecimals = await tokenContract.methods.decimals().call();
     const token_1eDecimals = Math.pow(10, tokenDecimals).toString();
-    const tokenPrice = await this.contractService.getTokenToUsdcAmountsOutAsync(address, token_1eDecimals);
+    const tokenPrice = await this.contractService.getTokenToUsdcAmountsOutAsync(address, token_1eDecimals)
+
     return {
       tokenPrice,
-      reserve: new BigNumber(reserve).div(token_1eDecimals).times(tokenPrice),
-      isAxn: address === this.axionContract.options.address
+      reserve: new BigNumber(reserve).times(tokenPrice),
+      isAxn
     };
   }
 
