@@ -984,7 +984,7 @@
                 <span class="axn-btn axn-btn-max" (click)="restakeData.topUp = account.balances.AXN.wei;">Max</span>
                 <br/>
                 <span class="axn-form-block-text">
-                  Balance: <b>{{ account?.balances?.AXN.display }}</b>
+                  Balance: <b>{{ account?.balances?.AXN.wei | bigNumberFormat: tokensDecimals.AXN:true:false:2 }}</b>
                 </span>
               </div>  
             </div>
@@ -995,9 +995,7 @@
               <p *ngIf="restakeData.isLate">Late Penalty<br/><b>{{restakeData.penalty | bigNumberFormat: tokensDecimals.AXN:true:false:2}} AXN</b></p>
               <p *ngIf="restakeData.shares">Shares<br /><b>{{restakeData.shares | bigNumberFormat: tokensDecimals.AXN:true:false:2}}</b></p>
               <p *ngIf="restakeData.lpb">Longer Pays Better<br /><b>{{restakeData.lpb | bigNumberFormat: tokensDecimals.AXN:true:false:2}}</b></p>
-              <p *ngIf="!makeBigNumber(restakeData.topUp).isZero() && !makeBigNumber(restakeData.topUp).isNaN()">
-                Top Up<br /><b>{{ makeBigNumber(restakeData.topUp) | bigNumberFormat: tokensDecimals.AXN:true:false:2}} AXN</b>
-              </p>
+              <p *ngIf="restakeData.topUp">Top Up<br /><b>{{ restakeData.topUp| bigNumberFormat: tokensDecimals.AXN:true:false:2}} AXN</b></p>
               <p *ngIf="restakeData.totalShares">Total Shares<br /><b>{{restakeData.totalShares | bigNumberFormat: tokensDecimals.AXN:true:false:2}}</b></p>
             </div>
           </div> 

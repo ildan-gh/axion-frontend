@@ -289,7 +289,7 @@ export class StakingPageComponent implements OnDestroy {
   get userSharesRestakeTopUp() {
     const divDecimals = Math.pow(10, this.tokensDecimals.AXN);
     const shareRate = new BigNumber(this.stakingContractInfo.ShareRate || 0).div(divDecimals);
-    const amount = new BigNumber(this.makeBigNumber(this.restakeData.topUp || 0)).div(divDecimals);
+    const amount = new BigNumber(this.restakeData.topUp || 0).div(divDecimals);
     return amount.div(shareRate).times(divDecimals);
   }
 
@@ -305,10 +305,6 @@ export class StakingPageComponent implements OnDestroy {
     this.restakeData.lpb = LPB;
 
     this.restakeData.totalShares = shares.plus(LPB)
-  }
-
-  public makeBigNumber(str) {
-    return new BigNumber(str).multipliedBy(new BigNumber(10).pow(18))
   }
 
   public updateShares() {
