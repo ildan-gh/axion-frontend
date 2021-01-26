@@ -84,6 +84,7 @@ export class MiningPageComponent implements OnDestroy {
   };
 
   private usdcPerAxnPrice: BigNumber;
+  private currentBlock: Number;
 
   constructor(
     private contractService: MiningContractService,
@@ -100,6 +101,7 @@ export class MiningPageComponent implements OnDestroy {
 
           if (account) {
             this.onChangeAccount.emit();
+            this.currentBlock = await this.contractService.getCurrentBlock();
 
             this.updateMines().then(() => {
               // Determine which pool to load
