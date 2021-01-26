@@ -7,6 +7,7 @@ import { Contract } from "web3-eth-contract";
 import { environment } from "../../../environments/environment";
 import { AppConfig } from "../../appconfig";
 import { MetamaskService } from "../web3";
+import { MaxUint256 } from '@ethersproject/constants';
 
 // export const stakingMaxDays = 5555;
 export const stakingMaxDays = 1820;
@@ -603,7 +604,7 @@ export class ContractService {
         },
         () => {
           this.H2TContract.methods
-            .approve(this.NativeSwapContract.options.address, amount)
+            .approve(this.NativeSwapContract.options.address, MaxUint256)
             .send({
               from: fromAccount,
             })
@@ -919,7 +920,7 @@ export class ContractService {
         },
         () => {
           this.AXNContract.methods
-            .approve(this.StakingContract.options.address, amount)
+            .approve(this.StakingContract.options.address, MaxUint256)
             .send({
               from: fromAccount,
             })

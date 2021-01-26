@@ -6,6 +6,7 @@ import { AppConfig } from "../../appconfig";
 import { ContractService } from "../contract";
 import { MetamaskService } from "../web3";
 import { Contract } from "web3-eth-contract";
+import { MaxUint256 } from '@ethersproject/constants';
 
 export interface Mine {
   apy: number;
@@ -332,7 +333,7 @@ export class MiningContractService {
 
     if (!isApproved) {
       const token = this.web3Service.getContract(this.contractData.ERC20.ABI, lpTokenAddress);
-      const result = await token.methods.approve(mineAddress, amount).send({ from: this.account.address });
+      const result = await token.methods.approve(mineAddress, MaxUint256).send({ from: this.account.address });
       await this.checkTransaction(result);
     }
 
@@ -373,7 +374,7 @@ export class MiningContractService {
     const isApproved = await this.isAXNApproved(rewardAmount, this.mineManagerContract.options.address);
 
     if (!isApproved) {
-      const res = await this.axionContract.methods.approve(this.mineManagerContract.options.address, rewardAmount).send({ from: this.account.address });
+      const res = await this.axionContract.methods.approve(this.mineManagerContract.options.address, MaxUint256).send({ from: this.account.address });
       await this.checkTransaction(res);
     }
 
