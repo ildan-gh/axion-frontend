@@ -106,6 +106,8 @@ export class MiningPageComponent implements OnDestroy {
               this.activatedRoute.params.subscribe(params => {
                 if (params['mine']) {
                   this.processParams(params['mine']);
+                } else if (this.mines.length == 1) {
+                  this.selectMine(this.mines[0])
                 }
               });
             });
