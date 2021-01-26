@@ -43,6 +43,20 @@ export class StakingPageComponent implements OnDestroy {
     stakeAmount?: string;
     stakeDays?: number;
   } = {};
+
+  public restakeData: {
+    opened?: any;
+    stake?: Stake;
+    lpb?: BigNumber;
+    isLate?: boolean;
+    topUp?: string;
+    shares?: BigNumber;
+    stakeDays?: Number;
+    amount?: BigNumber;
+    penalty?: BigNumber;
+    totalShares?: BigNumber;
+  } = {};
+
   public stakeTokensProgress: boolean;
   public stakes: {
     active?: Stake[];
@@ -250,9 +264,9 @@ export class StakingPageComponent implements OnDestroy {
   }
 
   get bonusLongerPaysBetterRestake() {
-    const currentValue = new BigNumber(this.actionsModalData.amount || 0);
+    const currentValue = new BigNumber(this.restakeData.amount || 0);
     return currentValue
-      .times((this.actionsModalData.stakingDays || 1) - 1)
+      .times((+this.restakeData.stakeDays || 1) - 1)
       .div(stakingMaxDays);
   }
 
@@ -268,14 +282,14 @@ export class StakingPageComponent implements OnDestroy {
   get userSharesRestake() {
     const divDecimals = Math.pow(10, this.tokensDecimals.AXN);
     const shareRate = new BigNumber(this.stakingContractInfo.ShareRate || 0).div(divDecimals);
-    const amount = new BigNumber(this.actionsModalData.amount || 0).div(divDecimals);
+    const amount = new BigNumber(this.restakeData.amount || 0).div(divDecimals);
     return amount.div(shareRate).times(divDecimals);
   }
 
   get userSharesRestakeTopUp() {
     const divDecimals = Math.pow(10, this.tokensDecimals.AXN);
     const shareRate = new BigNumber(this.stakingContractInfo.ShareRate || 0).div(divDecimals);
-    const amount = new BigNumber(this.makeBigNumber(this.actionsModalData.topUp || 0)).div(divDecimals);
+    const amount = new BigNumber(this.makeBigNumber(this.restakeData.topUp || 0)).div(divDecimals);
     return amount.div(shareRate).times(divDecimals);
   }
 
@@ -285,12 +299,12 @@ export class StakingPageComponent implements OnDestroy {
 
   public onRestakeDaysChanged() {
     const shares = this.userSharesRestake;
-    this.actionsModalData.shares = shares;
+    this.restakeData.shares = shares;
 
     const LPB = this.bonusLongerPaysBetterRestake;
-    this.actionsModalData.lpb = LPB;
+    this.restakeData.lpb = LPB;
 
-    this.actionsModalData.totalShares = shares.plus(LPB)
+    this.restakeData.totalShares = shares.plus(LPB)
   }
 
   public makeBigNumber(str) {
@@ -300,7 +314,7 @@ export class StakingPageComponent implements OnDestroy {
   public updateShares() {
     const basicShares = this.userSharesRestake;
     const topUpShares = this.userSharesRestakeTopUp;
-    this.actionsModalData.totalShares = basicShares.plus(topUpShares)
+    this.restakeData.totalShares = basicShares.plus(topUpShares)
   }
 
   public onChangeAmount() {
@@ -389,8 +403,6 @@ export class StakingPageComponent implements OnDestroy {
     }
   }
 
-  public actionsModalData;
-
   public async openStakeActions(stake: Stake) {
     // Check if this is a late unstake
     const endMS = +stake.endSeconds * 1000;
@@ -402,29 +414,29 @@ export class StakingPageComponent implements OnDestroy {
       const payout = new BigNumber(result[0]);
       const penalty = new BigNumber(result[1]);
 
-      this.actionsModalData = {
+      this.restakeData = {
         opened: this.dialog.open(this.actionsModal, {}),
         stake,
         stakeDays: 0,
         amount: payout,
         penalty,
         isLate,
-        topUp: "0"
+        topUp: ""
       }
     } else {
-      this.actionsModalData = {
+      this.restakeData = {
         opened: this.dialog.open(this.actionsModal, {}),
         stake,
         stakeDays: 0,
         amount: stake.principal.plus(stake.interest),
         isLate,
-        topUp: "0"
+        topUp: ""
       }
     }
   }
 
   public successWithPenaltyActions(stake: Stake) {
-    this.actionsModalData.opened.close();
+    this.restakeData.opened.close();
 
     // Skip late penalty dialog if not past 14 days
     const endMS = +stake.endSeconds * 1000;
@@ -433,9 +445,9 @@ export class StakingPageComponent implements OnDestroy {
   }
 
   public restake(stake: Stake) {    
-    this.actionsModalData.opened.close();
+    this.restakeData.opened.close();
     stake.withdrawProgress = true;
-    this.contractService.restake(stake, this.actionsModalData.stakingDays, this.actionsModalData.topUp).then(() => {
+    this.contractService.restake(stake, this.restakeData.stakeDays, this.restakeData.topUp).then(() => {
       this.stakeList();
       this.contractService.updateAXNBalance(true);
     }).finally(() => {
