@@ -222,7 +222,7 @@
               class="axn-form-block-one-value-small p-tb-5"
               matTooltipClass="table__tooltip"
               mat-raised-button
-              matTooltip="${{getDollarValue(minerBalance.rewardPerBlock) | bigNumberFormat: tokensDecimals:true:false:2 || 0 }}"
+              matTooltip="${{getDollarValue(minerBalance.rewardPerBlock.times(6500)) | bigNumberFormat: tokensDecimals:true:false:2 || 0 }} per day"
             >
             <b>{{minerBalance.rewardPerBlock | bigNumberFormat: tokensDecimals:true:false:2 }}/{{selectedMine.blockReward | bigNumberFormat: tokensDecimals:true:false:2 }} AXN</b>
             </span>
