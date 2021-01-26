@@ -134,7 +134,12 @@ export class MiningPageComponent implements OnDestroy {
   }
 
   private async updateSelectedMine() {
-    this.selectedMine = await this.contractService.getMine(this.selectedMine.mineAddress);
+    const res = await Promise.all([
+      this.contractService.getMine(this.selectedMine.mineAddress),
+      this.updateMinerBalance()
+    ]);
+
+    this.selectedMine = res[0];
   }
 
   public getDollarValue(amount: BigNumber) {
@@ -180,10 +185,10 @@ export class MiningPageComponent implements OnDestroy {
 
   public async updateMinerBalance() {
     const result = await Promise.all([
-      this.contractService.getMinerPoolBalance(this.selectedMine.mineAddress),
-      this.contractService.getPendingReward(this.selectedMine.mineAddress),
-      this.contractService.getTokenBalance(this.selectedMine.lpToken),
-      this.contractService.getNFTBalances()
+      this.contractService.getMinerLpDeposit(this.selectedMine.mineAddress),
+      this.contractService.getMinerPendingReward(this.selectedMine.mineAddress),
+      this.contractService.getMinerLpTokenBalance(this.selectedMine.lpToken),
+      this.contractService.getMinerNftBalances()
     ]);
 
     this.minerBalance.lpDeposit = result[0];
@@ -195,7 +200,8 @@ export class MiningPageComponent implements OnDestroy {
       .div(this.selectedMine.lpTokenBalance.isZero() ? 1 : this.selectedMine.lpTokenBalance)
       .div(this.contractService._1e18);
 
-    this.contractService.updatePendingRewardOnNewBlock(this.selectedMine.mineAddress, this.minerBalance);
+    if (!this.minerBalance.lpDeposit.isZero())
+      this.contractService.updatePendingRewardOnNewBlock(this.selectedMine.mineAddress, this.minerBalance);
   }
 
   public async onCreateMineAddressChanged() {
@@ -248,7 +254,7 @@ export class MiningPageComponent implements OnDestroy {
         const fallbackPool = this.mines[0]
         this.fixURL();
         this.selectMine(fallbackPool)
-        if(!this.mineNotFoundModal) {
+        if (!this.mineNotFoundModal) {
           this.mineNotFoundModal = this.openErrorModal(`Mine not found. Falling back to ${fallbackPool.base}-${fallbackPool.market}.`)
         }
       }

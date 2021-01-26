@@ -100,7 +100,7 @@ export class MiningContractService {
 
   public updatePendingRewardOnNewBlock(selectedMineAddress: string, minerBalance) {
     this.web3Service.subscribeToNewBlocks(async () => {
-      minerBalance.pendingReward = await this.getPendingReward(selectedMineAddress);
+      minerBalance.pendingReward = await this.getMinerPendingReward(selectedMineAddress);
     })
   }
 
@@ -205,7 +205,7 @@ export class MiningContractService {
     };
   }
 
-  public async getNFTBalances(): Promise<any> {
+  public async getMinerNftBalances(): Promise<any> {
     const result = {
       og25NFT: 0,
       og100NFT: 0,
@@ -236,7 +236,7 @@ export class MiningContractService {
     catch (err) { }
   }
 
-  public async getTokenBalance(lpTokenAddress: string): Promise<any> {
+  public async getMinerLpTokenBalance(lpTokenAddress: string): Promise<any> {
     const token = this.web3Service.getContract(this.contractData.ERC20.ABI, lpTokenAddress);
     const balance = await token.methods.balanceOf(this.account.address).call();
 
@@ -351,13 +351,13 @@ export class MiningContractService {
     return this.mineData[mineAddress].contract.methods.withdrawAll().send({ from: this.account.address });
   }
 
-  public async getPendingReward(mineAddress: string): Promise<BigNumber> {
+  public async getMinerPendingReward(mineAddress: string): Promise<BigNumber> {
     const reward = await this.mineData[mineAddress].contract.methods.getPendingReward().call({ from: this.account.address });
 
     return new BigNumber(reward);
   }
 
-  public async getMinerPoolBalance(mineAddress: string): Promise<BigNumber> {
+  public async getMinerLpDeposit(mineAddress: string): Promise<BigNumber> {
     const minerInfo = await this.mineData[mineAddress].contract.methods.minerInfo(this.account.address).call();
 
     return new BigNumber(minerInfo.lpDeposit);
