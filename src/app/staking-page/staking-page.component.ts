@@ -51,7 +51,7 @@ export class StakingPageComponent implements OnDestroy {
     isLate?: boolean;
     topUp?: string;
     shares?: BigNumber;
-    stakeDays?: Number;
+    stakeDays?: number;
     amount?: BigNumber;
     penalty?: BigNumber;
     totalShares?: BigNumber;
