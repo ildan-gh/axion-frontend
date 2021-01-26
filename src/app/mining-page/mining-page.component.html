@@ -235,7 +235,8 @@
               mat-raised-button
               matTooltip="${{getDollarValue(selectedMine.rewardBalance) | bigNumberFormat: tokensDecimals:true:false:2 || 0 }}"
             >
-            <b>{{selectedMine.rewardBalance | bigNumberFormat: tokensDecimals:true:false:2 }} AXN</b>
+            <b>{{selectedMine.rewardBalance | bigNumberFormat: tokensDecimals:true:false:2 }} AXN</b><br />
+            <b>{{selectedMine.approxDaysLeft}} Days</b>
             </span>
           </span>
         </div>
@@ -266,7 +267,8 @@
         APY: <b>{{mine.apy}}%</b><br/>
         Mine Start Block: <b>{{mine.startBlock}}</b><br/>
         Available Rewards: <b>{{mine.rewardBalance | bigNumberFormat: tokensDecimals:true:false:2 || 0}} AXN</b><br />
-        Block Reward: <b>{{mine.blockReward | bigNumberFormat: tokensDecimals:true:false:4 || 0}} AXN</b>
+        Block Reward: <b>{{mine.blockReward | bigNumberFormat: tokensDecimals:true:false:4 || 0}} AXN</b><br />
+        Approximate Days Left: <b>{{mine.approxDaysLeft}}</b>
       </p>
 
       <button 

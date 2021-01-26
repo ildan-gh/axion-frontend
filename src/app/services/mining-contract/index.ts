@@ -18,6 +18,7 @@ export interface Mine {
   blockReward: BigNumber;
   rewardBalance: BigNumber;
   lpTokenBalance: BigNumber;
+  approxDaysLeft: number;
 }
 
 export interface MineInfo {
@@ -273,6 +274,9 @@ export class MiningContractService {
     try { apy = await this.getMineApr(mineInfo.lpToken, blockReward, lpTokenBalance); }
     catch (err) { console.log("Unable to calculate APY."); }
 
+    const rewardBalance = new BigNumber(balance);
+    const approxDaysLeft = rewardBalance.div(blockReward.times(6500)).dp(0).toNumber();
+
     const mine: Mine = {
       apy,
       blockReward,
@@ -281,8 +285,9 @@ export class MiningContractService {
       market: poolTokens.market,
       lpToken: mineInfo.lpToken,
       startBlock: +mineInfo.startBlock,
-      rewardBalance: new BigNumber(balance),
-      lpTokenBalance: lpTokenBalance
+      rewardBalance: rewardBalance,
+      lpTokenBalance: lpTokenBalance,
+      approxDaysLeft
     };
 
     return mine;
