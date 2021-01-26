@@ -101,7 +101,7 @@ export class MiningPageComponent implements OnDestroy {
           if (account) {
             this.onChangeAccount.emit();
 
-            this.updateMines().then(mines => {
+            this.updateMines().then(() => {
               // Determine which pool to load
               this.activatedRoute.params.subscribe(params => {
                 if (params['mine']) {
@@ -130,7 +130,11 @@ export class MiningPageComponent implements OnDestroy {
   }
 
   public async updateMines() {
-    this.mines = await this.contractService.getMines();;
+    this.mines = await this.contractService.getMines();
+  }
+
+  private async updateSelectedMine() {
+    this.selectedMine = await this.contractService.getMine(this.selectedMine.mineAddress);
   }
 
   public getDollarValue(amount: BigNumber) {
@@ -259,8 +263,7 @@ export class MiningPageComponent implements OnDestroy {
       try {
         this.selectedMine.depositLPLoading = true;
         const tx = await this.contractService.depositLPTokens(this.selectedMine.mineAddress, this.selectedMine.lpToken, new BigNumber(this.formData.depositLPAmount));
-        this.updateMinerBalance();
-        this.updateMines();
+        await this.updateSelectedMine();
         this.formData.depositLPAmount = "0";
         this.openSuccessModal(tx.transactionHash);
       }
@@ -280,8 +283,7 @@ export class MiningPageComponent implements OnDestroy {
 
       try {
         const tx = await this.contractService.withdrawReward(this.selectedMine.mineAddress);
-        this.updateMines();
-        this.updateMinerBalance();
+        await this.updateSelectedMine();
         this.openSuccessModal(tx.transactionHash);
       }
       catch (err) {
@@ -300,8 +302,7 @@ export class MiningPageComponent implements OnDestroy {
 
       try {
         const tx = await this.contractService.withdrawAll(this.selectedMine.mineAddress);
-        this.updateMines();
-        this.updateMinerBalance();
+        await this.updateSelectedMine();
         this.openSuccessModal(tx.transactionHash);
       }
       catch (err) {
@@ -320,8 +321,7 @@ export class MiningPageComponent implements OnDestroy {
 
       try {
         const tx = await this.contractService.withdrawLPTokens(this.selectedMine.mineAddress, this.formData.withdrawLPAmount);
-        this.updateMines();
-        this.updateMinerBalance();
+        await this.updateSelectedMine();
         this.formData.ref.close();
         this.formData.withdrawLPAmount = "0";
         this.openSuccessModal(tx.transactionHash);
@@ -357,7 +357,7 @@ export class MiningPageComponent implements OnDestroy {
         startBlock
       )
       this.createMineData.ref.close();
-      this.updateMines();
+      await this.updateMines();
       this.openSuccessModal(tx.transactionHash);
       this.createMineData = {
         base: "",

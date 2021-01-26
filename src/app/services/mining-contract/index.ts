@@ -252,37 +252,39 @@ export class MiningContractService {
   }
 
   public getMines(): Promise<Mine[]> {
-    return Promise.all(this.mineAddresses.map(async mineAddress => {
-      const balance = await this.axionContract.methods.balanceOf(mineAddress).call();
+    return Promise.all(this.mineAddresses.map(mineAddress => this.getMine(mineAddress)));
+  }
 
-      const mineInfo = this.mineData[mineAddress].info;
-      const poolTokens = await this.getPoolTokens(mineInfo.lpToken);
-      const blockReward = new BigNumber(mineInfo.blockReward);
+  public async getMine(mineAddress: string) {
+    const balance = await this.axionContract.methods.balanceOf(mineAddress).call();
 
-      const pairERC20Contract = this.web3Service.getContract(this.contractData.ERC20.ABI, mineInfo.lpToken);
+    const mineInfo = this.mineData[mineAddress].info;
+    const poolTokens = await this.getPoolTokens(mineInfo.lpToken);
+    const blockReward = new BigNumber(mineInfo.blockReward);
 
-      const lpTokenBalance = new BigNumber(
-        await pairERC20Contract.methods.balanceOf(mineAddress).call())
-        .div(this.contractService._1e18);
+    const pairERC20Contract = this.web3Service.getContract(this.contractData.ERC20.ABI, mineInfo.lpToken);
 
-      let apy = 30;
-      try { apy = await this.getMineApr(mineInfo.lpToken, blockReward, lpTokenBalance) }
-      catch (err) { console.log("Unable to calculate APY.") }
+    const lpTokenBalance = new BigNumber(
+      await pairERC20Contract.methods.balanceOf(mineAddress).call())
+      .div(this.contractService._1e18);
 
-      const mine: Mine = {
-        apy,
-        blockReward,
-        mineAddress,
-        base: poolTokens.base,
-        market: poolTokens.market,
-        lpToken: mineInfo.lpToken,
-        startBlock: +mineInfo.startBlock,
-        rewardBalance: new BigNumber(balance),
-        lpTokenBalance: lpTokenBalance
-      };
+    let apy = 30;
+    try { apy = await this.getMineApr(mineInfo.lpToken, blockReward, lpTokenBalance); }
+    catch (err) { console.log("Unable to calculate APY."); }
 
-      return mine;
-    }));
+    const mine: Mine = {
+      apy,
+      blockReward,
+      mineAddress,
+      base: poolTokens.base,
+      market: poolTokens.market,
+      lpToken: mineInfo.lpToken,
+      startBlock: +mineInfo.startBlock,
+      rewardBalance: new BigNumber(balance),
+      lpTokenBalance: lpTokenBalance
+    };
+
+    return mine;
   }
 
   private async getMineApr(lpTokenAddress: string, blockReward: BigNumber, mineLpTokenBalance: BigNumber) {
