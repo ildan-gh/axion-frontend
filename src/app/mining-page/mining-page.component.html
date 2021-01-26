@@ -98,6 +98,7 @@
           <div class="axn-form-block-one">
             <span class="axn-form-block-one-title">AXN Earned</span>
             <span
+              *ngIf="currentBlock >= selectedMine.startBlock && !selectedMine.rewardBalance.isZero()"
               class="axn-form-block-one-value-small p-tb-5"
               matTooltipClass="table__tooltip"
               mat-raised-button
@@ -105,7 +106,17 @@
             >
               {{ minerBalance.pendingReward | bigNumberFormat: tokensDecimals:true:false:2 }}
             </span>
-            <span class="axn-cheap icon icon_axn cl-blue-bg">AXN</span>
+
+            <span *ngIf="currentBlock >= selectedMine.startBlock && selectedMine.rewardBalance.isZero()" class="axn-text-body">
+              Reward Pool is Empty.
+            </span>
+
+            <span *ngIf="currentBlock < selectedMine.startBlock" class="axn-text-body">
+              Starting Soon<br/>
+              Start Block: {{selectedMine.startBlock}}
+            </span>
+
+            <span *ngIf="currentBlock >= selectedMine.startBlock && !selectedMine.rewardBalance.isZero()" class="axn-cheap icon icon_axn cl-blue-bg">AXN</span>
           </div>
         </div>
   
@@ -153,7 +164,7 @@
             <button 
               (click)="withdrawRewards()"
               class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid" 
-              [disabled]="minerBalance.pendingReward.isZero() || selectedMine.withdrawRewardsLoading || selectedMine.withdrawAllLoading" 
+              [disabled]="minerBalance.pendingReward.isZero() || selectedMine.withdrawRewardsLoading || selectedMine.withdrawAllLoading || selectedMine.rewardBalance.isZero()" 
               [ngClass]="{ progress: selectedMine.withdrawRewardsLoading }"
             >
               <!-- Ellipsis Loading Indicator -->
