@@ -263,7 +263,7 @@
 </section>
 
 <!-- AVAILABLE MINES -->
-<section class="axn-section" *ngIf="account && !selectedMine">
+<section class="axn-section" *ngIf="account && !selectedMine && this.mines.length > 1">
   <div class="axn-mines">
     <div class="axn-form-block axn-form-block-one axn-form-base-center axn-mine" *ngFor="let mine of mines">
       <p class="axn-text-subtitle">{{mine.base}}-{{mine.market}}</p>
