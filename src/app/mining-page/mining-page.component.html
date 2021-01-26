@@ -1,7 +1,9 @@
 <!-- PAGE TITLE -->
 <section class="axn-section" *ngIf="account">
   <div class="axn-title-block">
-    <span class="axn-title" (hover)="tooltip2.toggle()">Liquidity Mining</span>
+    <span class="axn-title" (hover)="tooltip2.toggle()">
+      Liquidity Mining
+    </span>
     <div #tooltip2="matTooltip" (click)="tooltip2.toggle()" class="question" mat-raised-button matTooltip="
           Deposit Liquidity Provider (LP) tokens and get rewarded in AXN!
 
@@ -18,6 +20,7 @@
           4) You can deposit those LP tokens here to earn a sizeable reward in AXN!
         " matTooltipClass="question__tooltip question__extrawidth">
     </div>
+    <br/>
   </div>
 </section>
 
@@ -251,11 +254,15 @@
           </span>
         </button>
       </div>
-
     </div>
   </div>
 
- 
+  <div class="axn-form-block-one axn-form-block-one-np axn-form-base-center p-tb-15">
+    <button routerLink="/mining" *ngIf="selectedMine"
+      class="axn-btn axn-btn-gray axn-btn-form axn-btn-form-mid axn-btn-arrow-left">
+      <span class="axn-btn-text">Back to Mines</span>
+    </button>
+  </div>
 </section>
 
 <!-- AVAILABLE MINES -->
