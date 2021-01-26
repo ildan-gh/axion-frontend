@@ -275,7 +275,7 @@ export class MiningContractService {
     catch (err) { console.log("Unable to calculate APY."); }
 
     const rewardBalance = new BigNumber(balance);
-    const approxDaysLeft = rewardBalance.div(blockReward.times(6500)).dp(0).toNumber();
+    const approxDaysLeft = rewardBalance.div(blockReward.times(6500)).dp(1).toNumber();
 
     const mine: Mine = {
       apy,
