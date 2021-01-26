@@ -106,7 +106,7 @@ export class MiningContractService {
     })
   }
 
-  private async isLPApproved(amount: BigNumber, mineAddress: string, lpTokenAddress: string): Promise<boolean> {
+  private async isLpTokenApproved(amount: BigNumber, mineAddress: string, lpTokenAddress: string): Promise<boolean> {
     const token = this.web3Service.getContract(this.contractData.ERC20.ABI, lpTokenAddress);
     const allowance = await token.methods.allowance(this.account.address, mineAddress).call();
 
@@ -270,7 +270,7 @@ export class MiningContractService {
       await pairERC20Contract.methods.balanceOf(mineAddress).call())
       .div(this.contractService._1e18);
 
-    let apy = 30;
+    let apy = 0;
     try { apy = await this.getMineApr(mineInfo.lpToken, blockReward, lpTokenBalance); }
     catch (err) { console.log("Unable to calculate APY."); }
 
@@ -285,8 +285,8 @@ export class MiningContractService {
       market: poolTokens.market,
       lpToken: mineInfo.lpToken,
       startBlock: +mineInfo.startBlock,
-      rewardBalance: rewardBalance,
-      lpTokenBalance: lpTokenBalance,
+      rewardBalance,
+      lpTokenBalance,
       approxDaysLeft
     };
 
@@ -334,7 +334,7 @@ export class MiningContractService {
   }
 
   public async depositLPTokens(mineAddress: string, lpTokenAddress: string, amount: BigNumber): Promise<any> {
-    const isApproved = await this.isLPApproved(amount, mineAddress, lpTokenAddress);
+    const isApproved = await this.isLpTokenApproved(amount, mineAddress, lpTokenAddress);
 
     if (!isApproved) {
       const token = this.web3Service.getContract(this.contractData.ERC20.ABI, lpTokenAddress);
