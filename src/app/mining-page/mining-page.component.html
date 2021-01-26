@@ -108,11 +108,11 @@
             </span>
 
             <span *ngIf="currentBlock >= selectedMine.startBlock && selectedMine.rewardBalance.isZero()" class="axn-text-body">
-              Reward Pool is Empty.
+              Mine is Empty.
             </span>
 
             <span *ngIf="currentBlock < selectedMine.startBlock" class="axn-text-body">
-              Starting Soon<br/>
+              Mining is Starting Soon<br/>
               Start Block: {{selectedMine.startBlock}}
             </span>
 
