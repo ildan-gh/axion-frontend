@@ -9,7 +9,8 @@ import { Contract } from "web3-eth-contract";
 import { MaxUint256 } from '@ethersproject/constants';
 
 export interface Mine {
-  apy: number;
+  apy: BigNumber;
+  adjustedApy: BigNumber;
   base: string;
   market: string;
   lpToken: string;
@@ -213,7 +214,7 @@ export class MiningContractService {
       og100NFT: 0,
       liqNFT: 0,
       reward: 0
-    }
+    };
 
     try {
       const balances = await Promise.all([
@@ -227,15 +228,20 @@ export class MiningContractService {
       result.liqNFT = +balances[2];
 
       if (result.og25NFT > 0)
-        result.reward += 10;
+        result.reward += 0.1;
       if (result.og100NFT > 0)
-        result.reward += 10;
+        result.reward += 0.1;
       if (result.liqNFT > 0)
-        result.reward += 10;
+        result.reward += 0.1;
 
       return result;
     }
     catch (err) { }
+  }
+
+  public adjustApy(mine: Mine, nftBalance) {
+    nftBalance.bonusApy = mine.apy.times(nftBalance.reward).dp(2);
+    mine.adjustedApy = mine.apy.times(0.7).dp(2);
   }
 
   public async getMinerLpTokenBalance(lpTokenAddress: string): Promise<any> {
@@ -268,17 +274,16 @@ export class MiningContractService {
 
     const lpTokenBalance = new BigNumber(
       await pairERC20Contract.methods.balanceOf(mineAddress).call())
-      .div(this.contractService._1e18);
+        .div(this.contractService._1e18);
 
-    let apy = 0;
-    try { apy = await this.getMineApr(mineInfo.lpToken, blockReward, lpTokenBalance); }
-    catch (err) { console.log("Unable to calculate APY."); }
+    let apy = await this.getMineApr(mineInfo.lpToken, blockReward, lpTokenBalance);
 
     const rewardBalance = new BigNumber(balance);
     const approxDaysLeft = rewardBalance.div(blockReward.times(6500)).dp(0).toNumber();
 
     const mine: Mine = {
       apy,
+      adjustedApy: new BigNumber(0),
       blockReward,
       mineAddress,
       base: poolTokens.base,
@@ -293,9 +298,9 @@ export class MiningContractService {
     return mine;
   }
 
-  private async getMineApr(lpTokenAddress: string, blockReward: BigNumber, mineLpTokenBalance: BigNumber) {
+  private async getMineApr(lpTokenAddress: string, blockReward: BigNumber, mineLpTokenBalance: BigNumber): Promise<BigNumber> {
     if (mineLpTokenBalance.isZero())
-      return 0;
+      return new BigNumber(0);
 
     const pairContract = this.web3Service.getContract(this.contractData.UniswapPair.ABI, lpTokenAddress);
 
@@ -317,7 +322,7 @@ export class MiningContractService {
 
     const lpSupplyValueInAxn = lpTokenPriceInAxn.times(mineLpTokenBalance);
 
-    return blockReward.times(6500).times(365).times(100).div(lpSupplyValueInAxn).div(this._1e18).dp(2).toNumber();
+    return blockReward.times(6500).times(365).times(100).div(lpSupplyValueInAxn).div(this._1e18);
   }
 
   private async getValueInUsdc(address: string, reserve: string): Promise<{ tokenPrice: BigNumber, reserve: BigNumber, isAxn: boolean }> {

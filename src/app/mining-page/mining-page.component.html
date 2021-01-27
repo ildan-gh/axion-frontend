@@ -202,8 +202,8 @@
   
            <div class="axn-form-block-one">
              <span class="axn-form-block-shares-text-min">
-              Bonus<br />
-              <b>{{minerBalance.nft.reward}}%</b>
+              Bonus APY<br />
+              <b>{{minerBalance.nft.bonusApy}}%</b>
              </span>
           </div>
         </div>
@@ -214,7 +214,7 @@
         <div class="axn-form-base-4 axn-form-base-center p-b-25">
           <span class="axn-form-block-shares-text-min axn-text-center">
             APY<br/>
-            <b>{{selectedMine.apy === 0 || selectedMine.apy > 10000 ? "TBC" : selectedMine.apy+"%"}}</b>
+            <b>{{selectedMine.adjustedApy === 0 || selectedMine.adjustedApy > 10000 ? "TBC" : selectedMine.adjustedApy+"%"}}</b>
           </span>
           <span class="axn-form-block-shares-text-min axn-text-center">
             Your/Total Block Reward<br />

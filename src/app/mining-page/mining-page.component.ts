@@ -189,6 +189,8 @@ export class MiningPageComponent implements OnDestroy {
       this.contractService.getMinerNftBalances()
     ]);
 
+    this.contractService.adjustApy(this.selectedMine, result[3]);
+
     this.minerBalance.lpDeposit = result[0];
     this.minerBalance.pendingReward = result[1];
     this.minerBalance.lpAvailable = result[2];
