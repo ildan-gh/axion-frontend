@@ -79,7 +79,8 @@ export class MiningPageComponent implements OnDestroy {
       og25NFT: 0,
       og100NFT: 0,
       liqNFT: 0,
-      reward: 0
+      reward: 0,
+      bonusApy: 0
     }
   };
 

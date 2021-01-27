@@ -214,7 +214,7 @@
         <div class="axn-form-base-4 axn-form-base-center p-b-25">
           <span class="axn-form-block-shares-text-min axn-text-center">
             APY<br/>
-            <b>{{selectedMine.adjustedApy === 0 || selectedMine.adjustedApy > 10000 ? "TBC" : selectedMine.adjustedApy+"%"}}</b>
+            <b>{{selectedMine.adjustedApy.isZero() || selectedMine.adjustedApy.isGreaterThan(10000) ? "TBC" : selectedMine.adjustedApy+"%"}}</b>
           </span>
           <span class="axn-form-block-shares-text-min axn-text-center">
             Your/Total Block Reward<br />
