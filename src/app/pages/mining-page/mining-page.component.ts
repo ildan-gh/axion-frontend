@@ -7,13 +7,13 @@ import {
   TemplateRef,
 } from "@angular/core";
 import BigNumber from "bignumber.js";
-import { AppComponent } from "../app.component";
+import { AppComponent } from "../../app.component";
 import { MatDialog } from "@angular/material/dialog";
-import { MiningContractService } from "../services/mining-contract";
-import { MetamaskErrorComponent } from "../components/metamaskError/metamask-error.component";
+import { MiningContractService } from "../../services/mining-contract";
+import { MetamaskErrorComponent } from "../../components/metamaskError/metamask-error.component";
 import { ActivatedRoute } from "@angular/router";
-import { TransactionSuccessModalComponent } from "../components/transactionSuccessModal/transaction-success-modal.component";
-import { Mine as BasicMine } from '../services/mining-contract';
+import { TransactionSuccessModalComponent } from "../../components/transactionSuccessModal/transaction-success-modal.component";
+import { Mine as BasicMine } from '../../services/mining-contract';
 
 interface Mine extends BasicMine {
   depositLPLoading?: boolean,

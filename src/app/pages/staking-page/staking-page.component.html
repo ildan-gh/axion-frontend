@@ -628,7 +628,7 @@
               }} BPD</span
             >
           </td>
-          <td>{{ stake.apy }}%</td>
+          <td>{{stake.apy === 0 ? "TBC" : stake.apy+"%"}}</td>
           <td class="action-button">
             <button
               class="axn-btn axn-btn-gray"
