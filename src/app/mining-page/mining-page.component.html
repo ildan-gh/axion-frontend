@@ -113,7 +113,7 @@
 
             <span *ngIf="currentBlock < selectedMine.startBlock" class="axn-text-body">
               Mining is Starting Soon<br/>
-              Start Block: {{selectedMine.startBlock}}
+              Start Block: <a style="text-decoration: none;" href="https://etherscan.io/block/countdown/{{selectedMine.startBlock}}">{{selectedMine.startBlock}}</a>
             </span>
 
             <span *ngIf="currentBlock >= selectedMine.startBlock && !selectedMine.rewardBalance.isZero()" class="axn-cheap icon icon_axn cl-blue-bg">AXN</span>
